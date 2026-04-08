@@ -1,0 +1,13 @@
+@import "./satoshi.css";
+@import "./typography.css";
+@import "./variables.css";
+
+/* -------- GLOBAL -------- */
+.tag {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--padding-min) 1.375rem;
+  border-radius: 1px;
+  border: 2px solid var(--color-dark);
+}
