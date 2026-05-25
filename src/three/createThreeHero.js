@@ -70,42 +70,54 @@ export const createThreeHero = async () => {
   const logo = gltf.scene
   scene.add(logo)
 
-  const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshNormalMaterial())
-  scene.add(cube)
-  cube.position.x = -3
-
   /**
    * Scroll logic
    */
   let scrollProgress = 0
+
+  const radius = 6
+  const floorHeight = 3
+  const floorCount = 3
+  const totalHeight = floorHeight * (floorCount - 1)
+  const totalCameraAngle = Math.PI * 0.5
 
   const setScrollProgress = (value) => {
     scrollProgress = value
   }
 
   const updateSceneFromScroll = () => {
-    logo.position.y = scrollProgress * 1.2
+    const currentY = scrollProgress * totalHeight
+    const angle = scrollProgress * totalCameraAngle
+
+    logo.position.y = currentY
+
+    camera.position.x = Math.sin(angle) * radius
+    camera.position.y = currentY
+    camera.position.z = Math.cos(angle) * radius
+
+    camera.lookAt(0, currentY, 0)
   }
 
   /**
    * Animate
    */
-  const timer = new THREE.Timer()
+  let previousTime = performance.now()
 
-  const tick = () => {
-    timer.update()
-    const delta = timer.getDelta()
+  const tick = (currentTime) => {
+    const delta = (currentTime - previousTime) / 1000
+    previousTime = currentTime
+
+    updateSceneFromScroll()
 
     // Update logo
-    logo.rotation.y += delta * 0.8
-    cube.rotation.y += delta * 0.8
+    logo.rotation.y += delta * 0.25
 
     renderer.render(scene, camera)
 
     window.requestAnimationFrame(tick)
   }
 
-  tick()
+  window.requestAnimationFrame(tick)
 
   return {
     scene,
