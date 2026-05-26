@@ -56,6 +56,26 @@ export const createThreeHero = async () => {
   renderer.outputColorSpace = THREE.SRGBColorSpace
 
   /**
+   * Environment map
+   */
+  const textureLoader = new THREE.TextureLoader()
+
+  const environmentTexture = await textureLoader.loadAsync("/textures/scene-gradient.webp")
+
+  environmentTexture.mapping = THREE.EquirectangularReflectionMapping
+  environmentTexture.colorSpace = THREE.SRGBColorSpace
+
+  const pmremGenerator = new THREE.PMREMGenerator(renderer)
+  pmremGenerator.compileEquirectangularShader
+
+  const environmentMap = pmremGenerator.fromEquirectangular(environmentTexture).texture
+
+  scene.background = environmentTexture
+  scene.environment = environmentMap
+
+  pmremGenerator.dispose()
+
+  /**
    * Light
    */
   const ambientLight = new THREE.AmbientLight(0xffffff, 1.2)
@@ -87,7 +107,7 @@ export const createThreeHero = async () => {
 
   const updateSceneFromScroll = () => {
     const currentY = scrollProgress * totalHeight
-    const angle = scrollProgress * totalCameraAngle
+    const angle = -scrollProgress * totalCameraAngle
 
     logo.position.y = currentY
 

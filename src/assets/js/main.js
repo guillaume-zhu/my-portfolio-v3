@@ -15,6 +15,6 @@ ScrollTrigger.create({
   markers: true,
 
   onUpdate: (self) => {
-    threeHero.setScrollProgress(0)
+    threeHero.setScrollProgress(self.progress)
   },
 })
