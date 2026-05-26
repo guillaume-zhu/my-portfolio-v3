@@ -54,6 +54,8 @@ export const createThreeHero = async () => {
   renderer.setPixelRatio(sizes.pixelRatio)
   renderer.setClearColor("#6b6baf")
   renderer.outputColorSpace = THREE.SRGBColorSpace
+  renderer.toneMapping = THREE.ACESFilmicToneMapping
+  renderer.toneMappingExposure = 1
 
   /**
    * Environment map
@@ -81,14 +83,35 @@ export const createThreeHero = async () => {
   const ambientLight = new THREE.AmbientLight(0xffffff, 1.2)
   scene.add(ambientLight)
 
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.05)
+  directionalLight.position.set(3, 4, 5)
+  scene.add(directionalLight)
+
   /**
-   * Model
+   * Logo Model
    */
   const gltfLoader = new GLTFLoader()
   const gltf = await gltfLoader.loadAsync("/models/logo.glb")
 
   const logo = gltf.scene
   scene.add(logo)
+
+  // Rotation
+  const logoRotationAxis = new THREE.Vector3(0.2, 1, 0.1).normalize()
+
+  // Material
+  const silverMaterial = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    metalness: 1,
+    roughness: 0.4,
+    envMapIntensity: 1.2,
+  })
+
+  logo.traverse((child) => {
+    if (!child.isMesh) return
+
+    child.material = silverMaterial
+  })
 
   /**
    * Scroll logic
@@ -117,7 +140,6 @@ export const createThreeHero = async () => {
 
     camera.lookAt(0, currentY, 0)
   }
-
   /**
    * Animate
    */
@@ -130,7 +152,7 @@ export const createThreeHero = async () => {
     updateSceneFromScroll()
 
     // Update logo
-    logo.rotation.y += delta * 0.25
+    logo.rotateOnAxis(logoRotationAxis, delta * 0.25)
 
     renderer.render(scene, camera)
 
