@@ -68,7 +68,7 @@ export const createThreeHero = async () => {
   environmentTexture.colorSpace = THREE.SRGBColorSpace
 
   const pmremGenerator = new THREE.PMREMGenerator(renderer)
-  pmremGenerator.compileEquirectangularShader
+  pmremGenerator.compileEquirectangularShader()
 
   const environmentMap = pmremGenerator.fromEquirectangular(environmentTexture).texture
 
@@ -96,9 +96,6 @@ export const createThreeHero = async () => {
   const logo = gltf.scene
   scene.add(logo)
 
-  // Rotation
-  const logoRotationAxis = new THREE.Vector3(0.2, 1, 0.1).normalize()
-
   // Material
   const silverMaterial = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
@@ -113,10 +110,18 @@ export const createThreeHero = async () => {
     child.material = silverMaterial
   })
 
+  // Rotation
+  const logoRotationAxis = new THREE.Vector3(0.2, 1, 0.1).normalize()
+  const logoBaseRotationSpeed = 0.2
+
   /**
    * Scroll logic
    */
   let scrollProgress = 0
+  let scrollRotationBoost = 0
+
+  const maxScrollRotationBoost = 2.5
+  const scrollVelocityNormalizer = 2000
 
   const radius = 6
   const floorHeight = 3
@@ -124,8 +129,17 @@ export const createThreeHero = async () => {
   const totalHeight = floorHeight * (floorCount - 1)
   const totalCameraAngle = Math.PI * 0.5
 
-  const setScrollProgress = (value) => {
+  const setScrollProgress = (value, velocity = 0) => {
     scrollProgress = value
+
+    const normalizedVelocity = THREE.MathUtils.clamp(
+      Math.abs(velocity) / scrollVelocityNormalizer,
+      0,
+      1,
+    )
+
+    const boost = normalizedVelocity * maxScrollRotationBoost
+    scrollRotationBoost = Math.max(scrollRotationBoost, boost)
   }
 
   const updateSceneFromScroll = () => {
@@ -152,7 +166,10 @@ export const createThreeHero = async () => {
     updateSceneFromScroll()
 
     // Update logo
-    logo.rotateOnAxis(logoRotationAxis, delta * 0.25)
+    scrollRotationBoost = THREE.MathUtils.damp(scrollRotationBoost, 0, 1.5, delta)
+
+    const logoRotationSpeed = logoBaseRotationSpeed + scrollRotationBoost
+    logo.rotateOnAxis(logoRotationAxis, delta * logoRotationSpeed)
 
     renderer.render(scene, camera)
 
