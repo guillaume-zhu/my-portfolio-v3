@@ -7,6 +7,7 @@ export const createThreeHero = async () => {
    */
   // Debug
   // const gui = new GUI()
+  const textureLoader = new THREE.TextureLoader()
 
   // Canvas
   const canvas = document.querySelector(".webgl")
@@ -60,7 +61,6 @@ export const createThreeHero = async () => {
   /**
    * Environment map
    */
-  const textureLoader = new THREE.TextureLoader()
 
   const environmentTexture = await textureLoader.loadAsync("/textures/scene-gradient.webp")
 
@@ -113,6 +113,61 @@ export const createThreeHero = async () => {
   // Rotation
   const logoRotationAxis = new THREE.Vector3(0.2, 1, 0.1).normalize()
   const logoBaseRotationSpeed = 0.2
+
+  /**
+   * Text planes
+   */
+  const createTextPlane = async ({ path, width, height, position, rotation }) => {
+    const texture = await textureLoader.loadAsync(path)
+
+    texture.colorSpace = THREE.SRGBColorSpace
+
+    const geometry = new THREE.PlaneGeometry(width, height)
+
+    const material = new THREE.MeshBasicMaterial({
+      map: texture,
+      transparent: true,
+      depthWrite: false,
+    })
+
+    const mesh = new THREE.Mesh(geometry, material)
+
+    mesh.position.set(position.x, position.y, position.z)
+    mesh.rotation.set(rotation.x, rotation.y, rotation.z)
+
+    scene.add(mesh)
+
+    return mesh
+  }
+
+  // Positions and scale
+  const multiplyer1 = 2
+  const multiplyer2 = 0.85
+  const multiplyer3 = 0.6
+
+  const textName = await createTextPlane({
+    path: "/textures/texts/text-name.png",
+    width: 5.5 * multiplyer1,
+    height: 1.4 * multiplyer1,
+    position: { x: 0, y: 0, z: -2.5 },
+    rotation: { x: 0, y: 0, z: 0 },
+  })
+
+  const textArt = await createTextPlane({
+    path: "/textures/texts/text-art-director-justified.png",
+    width: 5.5 * multiplyer2,
+    height: 1.4 * multiplyer2,
+    position: { x: 1, y: 5.25, z: -1.75 },
+    rotation: { x: 0, y: -Math.PI * 0.5, z: 0 },
+  })
+
+  const textCreative = await createTextPlane({
+    path: "/textures/texts/text-creative-developer-justified.png",
+    width: 5.5 * multiplyer3,
+    height: 1.4 * multiplyer3,
+    position: { x: -1, y: 6.5, z: 1.25 },
+    rotation: { x: 0, y: -Math.PI * 0.5, z: 0 },
+  })
 
   /**
    * Scroll logic
