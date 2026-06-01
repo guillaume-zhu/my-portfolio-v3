@@ -12,11 +12,11 @@ void main() {
     vec3 viewDirection = normalize(cameraPosition - vPosition);
 
     float fresnel = pow(1.0 - max(dot(normal, viewDirection), 0.0),2.0);
-    float organicNoise = noise(vPosition * 2.4 + vec3(0.0, uTime * 0.2, 0.0));
+    float organicNoise = noise(vPosition * 2.0 + vec3(0.0, uTime * 0.2, 0.0));
 
     float reveal = smoothstep(
         1.0 - uHoverProgress,
-        1.0 - uHoverProgress + 0.10,
+        1.0 - uHoverProgress + 0.1,
         organicNoise
     );
 

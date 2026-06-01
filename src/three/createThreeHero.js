@@ -9,6 +9,7 @@ export const createThreeHero = async () => {
    */
   // Debug
   // const gui = new GUI()
+
   const textureLoader = new THREE.TextureLoader()
 
   // Canvas
@@ -17,13 +18,21 @@ export const createThreeHero = async () => {
   // Scene
   const scene = new THREE.Scene()
 
-  // Sizes
+  // Rayscaster
+  const raycaster = new THREE.Raycaster()
+  const mouse = new THREE.Vector2()
+
+  let hoverTarget = 0
+  let hoverProgress = 0
+
+  // Sizes & Events
   const sizes = {
     width: window.innerWidth,
     height: window.innerHeight,
     pixelRatio: Math.min(window.devicePixelRatio, 2),
   }
 
+  // -- Resize
   window.addEventListener("resize", () => {
     // Update sizes
     sizes.width = window.innerWidth
@@ -37,6 +46,12 @@ export const createThreeHero = async () => {
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(sizes.pixelRatio)
+  })
+
+  // -- Mouse
+  window.addEventListener("mousemove", (event) => {
+    mouse.x = (event.clientX / sizes.width) * 2 - 1
+    mouse.y = -(event.clientY / sizes.height) * 2 + 1
   })
 
   /**
@@ -92,6 +107,8 @@ export const createThreeHero = async () => {
   /**
    * Logo Model
    */
+
+  // Model group
   const gltfLoader = new GLTFLoader()
   const gltf = await gltfLoader.loadAsync("/models/logo.glb")
 
@@ -103,6 +120,21 @@ export const createThreeHero = async () => {
 
   const glassLogo = logo.clone(true)
   logoGroup.add(glassLogo)
+
+  // Hitbox
+  const logoBox = new THREE.Box3().setFromObject(logo)
+  const logoSize = logoBox.getSize(new THREE.Vector3())
+  const logoCenter = logoBox.getCenter(new THREE.Vector3())
+
+  const logoHitBox = new THREE.Mesh(
+    new THREE.BoxGeometry(logoSize.x, logoSize.y, logoSize.z),
+    new THREE.MeshBasicMaterial({
+      wireframe: true,
+    }),
+  )
+
+  logoHitBox.position.copy(logoCenter)
+  logoGroup.add(logoHitBox)
 
   // Silver Material
   const silverMaterial = new THREE.MeshPhysicalMaterial({
@@ -129,7 +161,7 @@ export const createThreeHero = async () => {
     side: THREE.DoubleSide,
 
     uniforms: {
-      uHoverProgress: { value: 0.45 },
+      uHoverProgress: { value: 0 },
       uOpacity: { value: 0.85 },
       uSurfaceOffset: { value: 0.0005 },
       uTime: { value: 0 },
@@ -252,9 +284,21 @@ export const createThreeHero = async () => {
     const delta = (currentTime - previousTime) / 1000
     previousTime = currentTime
 
+    // Update glass logo shader
     glassMaterial.uniforms.uTime.value = currentTime * 0.001
 
+    // Update screen
     updateSceneFromScroll()
+
+    // Raycaster
+    raycaster.setFromCamera(mouse, camera)
+    const intersects = raycaster.intersectObject(logoHitBox)
+    hoverTarget = intersects.length > 0 ? 1 : 0
+    document.body.style.cursor = hoverTarget ? "pointer" : "default"
+
+    hoverProgress = THREE.MathUtils.damp(hoverProgress, hoverTarget, 5, delta)
+
+    glassMaterial.uniforms.uHoverProgress.value = hoverProgress
 
     // Update logo
     scrollRotationBoost = THREE.MathUtils.damp(scrollRotationBoost, 0, 1.5, delta)
