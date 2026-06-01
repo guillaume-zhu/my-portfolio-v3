@@ -2,6 +2,7 @@ uniform float uSurfaceOffset;
 
 varying vec3 vNormal;
 varying vec3 vPosition;
+varying vec4 vScreenPosition;
 
 void main() {
     vec3 displacedPosition = position + normal * uSurfaceOffset;
@@ -14,4 +15,5 @@ void main() {
 
     vNormal = normalize(normal);
     vPosition = modelPosition.xyz;
+    vScreenPosition = projectedPosition;
 } 

@@ -46,6 +46,8 @@ export const createThreeHero = async () => {
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(sizes.pixelRatio)
+
+    sceneRenderTarget.setSize(sizes.width * sizes.pixelRatio, sizes.height * sizes.pixelRatio)
   })
 
   // -- Mouse
@@ -64,6 +66,7 @@ export const createThreeHero = async () => {
   /**
    * Renderer
    */
+  // Setup
   const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     antialias: true,
@@ -74,6 +77,15 @@ export const createThreeHero = async () => {
   renderer.outputColorSpace = THREE.SRGBColorSpace
   renderer.toneMapping = THREE.ACESFilmicToneMapping
   renderer.toneMappingExposure = 1
+
+  // Render Target
+  const sceneRenderTarget = new THREE.WebGLRenderTarget(
+    sizes.width * sizes.pixelRatio,
+    sizes.height * sizes.pixelRatio,
+    {
+      samples: 4,
+    },
+  )
 
   /**
    * Environment map
@@ -170,6 +182,8 @@ export const createThreeHero = async () => {
       uNoiseSpeed: { value: 0.1 },
       uRevealEdge: { value: 0.1 },
       uFresnelPower: { value: 2.0 },
+
+      uSceneTexture: { value: sceneRenderTarget.texture },
     },
   })
 
@@ -311,6 +325,17 @@ export const createThreeHero = async () => {
     const logoRotationSpeed = logoBaseRotationSpeed + scrollRotationBoost
     logoGroup.rotateOnAxis(logoRotationAxis, delta * logoRotationSpeed)
 
+    // Render
+    logo.visible = false
+    glassLogo.visible = false
+
+    renderer.setRenderTarget(sceneRenderTarget)
+    renderer.render(scene, camera)
+
+    logo.visible = true
+    glassLogo.visible = true
+
+    renderer.setRenderTarget(null)
     renderer.render(scene, camera)
 
     window.requestAnimationFrame(tick)
