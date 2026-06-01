@@ -64,10 +64,10 @@ void main() {
     float blue = texture2D(uSceneTexture, distortedScreenUv - chromaticOffset).b;
 
     vec3 sceneColor = vec3(red, green, blue);
-
+    
 
     // Tint
-    vec3 glassTint = vec3(0.9, 0.96, 1.0);
+    vec3 glassTint = vec3(0.90, 0.95, 1);
 
     float tintStrength = mix(0.12, 0.28, fresnel);
     
@@ -78,4 +78,5 @@ void main() {
 
 
     gl_FragColor = vec4(finalColor, alpha);
+    // gl_FragColor = vec4(vec3(fresnel), 1.0);
 }   

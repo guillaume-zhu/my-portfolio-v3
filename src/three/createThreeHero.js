@@ -176,7 +176,7 @@ export const createThreeHero = async () => {
 
     uniforms: {
       uHoverProgress: { value: 0 },
-      uOpacity: { value: 0.9 },
+      uOpacity: { value: 1.0 },
       uSurfaceOffset: { value: 0.0005 },
       uTime: { value: 0 },
 
@@ -199,12 +199,12 @@ export const createThreeHero = async () => {
     child.renderOrder = 2
   })
 
-  gui
-    .add(glassMaterial.uniforms.uChromaticAberration, "value")
-    .min(0)
-    .max(0.05)
-    .step(0.0001)
-    .name("chromatic aberration")
+  // gui
+  //   .add(glassMaterial.uniforms.uChromaticAberration, "value")
+  //   .min(0)
+  //   .max(0.05)
+  //   .step(0.0001)
+  //   .name("chromatic aberration")
 
   // Rotation
   const logoRotationAxis = new THREE.Vector3(0.2, 1, 0.1).normalize()
@@ -265,6 +265,9 @@ export const createThreeHero = async () => {
     rotation: { x: 0, y: -Math.PI * 0.5, z: 0 },
   })
 
+  textArt.material.opacity = 0
+  textCreative.material.opacity = 0
+
   /**
    * Scroll logic
    */
@@ -304,6 +307,11 @@ export const createThreeHero = async () => {
     camera.position.z = Math.cos(angle) * radius
 
     camera.lookAt(0, currentY, 0)
+
+    const roleTextOpacity = THREE.MathUtils.smoothstep(scrollProgress, 0.72, 0.9)
+
+    textArt.material.opacity = roleTextOpacity
+    textCreative.material.opacity = roleTextOpacity
   }
 
   /**
