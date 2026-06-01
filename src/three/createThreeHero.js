@@ -165,6 +165,11 @@ export const createThreeHero = async () => {
       uOpacity: { value: 0.85 },
       uSurfaceOffset: { value: 0.0005 },
       uTime: { value: 0 },
+
+      uNoiseScale: { value: 2.0 },
+      uNoiseSpeed: { value: 0.1 },
+      uRevealEdge: { value: 0.1 },
+      uFresnelPower: { value: 2.0 },
     },
   })
 

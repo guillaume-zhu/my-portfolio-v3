@@ -2,6 +2,11 @@ uniform float uHoverProgress;
 uniform float uOpacity;
 uniform float uTime;
 
+uniform float uNoiseScale;
+uniform float uNoiseSpeed;
+uniform float uRevealEdge;
+uniform float uFresnelPower;
+
 varying vec3 vNormal;
 varying vec3 vPosition;
 
@@ -11,12 +16,13 @@ void main() {
     vec3 normal = normalize(vNormal);
     vec3 viewDirection = normalize(cameraPosition - vPosition);
 
-    float fresnel = pow(1.0 - max(dot(normal, viewDirection), 0.0),2.0);
-    float organicNoise = noise(vPosition * 2.0 + vec3(0.0, uTime * 0.2, 0.0));
+    float fresnel = pow(1.0 - max(dot(normal, viewDirection), 0.0), uFresnelPower);
+
+    float organicNoise = noise(vPosition * uNoiseScale + vec3(0.0, uTime * uNoiseSpeed, 0.0));
 
     float reveal = smoothstep(
         1.0 - uHoverProgress,
-        1.0 - uHoverProgress + 0.1,
+        1.0 - uHoverProgress + uRevealEdge,
         organicNoise
     );
 
