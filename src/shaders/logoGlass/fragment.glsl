@@ -37,7 +37,14 @@ void main() {
     vec2 screenUv = vScreenPosition.xy / vScreenPosition.w;
     screenUv = screenUv * 0.5 + 0.5;
 
-    vec2 distortion = vec2(organicNoise - 0.5, fresnel - 0.5) * uDistortionStrength * reveal * uHoverProgress;
+    // Distortion
+    float distortionNoiseX = noise( vPosition * uNoiseScale + vec3(uTime * uNoiseSpeed, 0.0, 0.0));
+    float distortionNoiseY = noise( vPosition * uNoiseScale + vec3(12.4,uTime * uNoiseSpeed, 7.8));
+
+    vec2 distortion = vec2(
+        distortionNoiseX - 0.5,
+        distortionNoiseY - 0.5
+    ) * uDistortionStrength * reveal * uHoverProgress;
 
     vec2 distortedScreenUv = screenUv + distortion;
 

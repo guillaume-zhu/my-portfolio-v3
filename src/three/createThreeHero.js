@@ -182,7 +182,7 @@ export const createThreeHero = async () => {
       uNoiseSpeed: { value: 0.1 },
       uRevealEdge: { value: 0.1 },
       uFresnelPower: { value: 2.0 },
-      uDistortionStrength: { value: 0.008 },
+      uDistortionStrength: { value: 0.025 },
 
       uSceneTexture: { value: sceneRenderTarget.texture },
     },
