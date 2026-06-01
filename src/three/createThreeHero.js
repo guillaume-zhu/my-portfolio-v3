@@ -141,7 +141,7 @@ export const createThreeHero = async () => {
   const logoHitBox = new THREE.Mesh(
     new THREE.BoxGeometry(logoSize.x, logoSize.y, logoSize.z),
     new THREE.MeshBasicMaterial({
-      wireframe: true,
+      visible: false,
     }),
   )
 
@@ -182,6 +182,7 @@ export const createThreeHero = async () => {
       uNoiseSpeed: { value: 0.1 },
       uRevealEdge: { value: 0.1 },
       uFresnelPower: { value: 2.0 },
+      uDistortionStrength: { value: 0.008 },
 
       uSceneTexture: { value: sceneRenderTarget.texture },
     },

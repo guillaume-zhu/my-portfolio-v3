@@ -6,6 +6,7 @@ uniform float uNoiseScale;
 uniform float uNoiseSpeed;
 uniform float uRevealEdge;
 uniform float uFresnelPower;
+uniform float uDistortionStrength;
 
 uniform sampler2D uSceneTexture;
 
@@ -35,17 +36,16 @@ void main() {
     // ScreenUv
     vec2 screenUv = vScreenPosition.xy / vScreenPosition.w;
     screenUv = screenUv * 0.5 + 0.5;
-    vec3 sceneColor = texture2D(uSceneTexture, screenUv).rgb;
+
+    vec2 distortion = vec2(organicNoise - 0.5, fresnel - 0.5) * uDistortionStrength * reveal * uHoverProgress;
+
+    vec2 distortedScreenUv = screenUv + distortion;
+
+    vec3 sceneColor = texture2D(uSceneTexture, distortedScreenUv).rgb;
 
     // // Texture
-    // vec3 glassColorA = vec3(0.75, 0.95, 1.0);
-    // vec3 glassColorB = vec3(1.0, 0.55, 0.95);
-
-    // vec3 glassColor = mix(glassColorA, glassColorB, fresnel);
-
     float alpha = reveal * uHoverProgress * uOpacity;
     alpha *= mix(0.35, 1.0, fresnel);
 
-    // gl_FragColor = vec4(glassColor, alpha);
     gl_FragColor = vec4(sceneColor, alpha);
 }   
