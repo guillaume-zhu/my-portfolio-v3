@@ -1,5 +1,7 @@
 import * as THREE from "three"
 import { GLTFLoader } from "three/examples/jsm/Addons.js"
+import logoGlassVertexShader from "../shaders/logoGlass/vertex.glsl"
+import logoGlassFragmentShader from "../shaders/logoGlass/fragment.glsl"
 
 export const createThreeHero = async () => {
   /**
@@ -93,10 +95,16 @@ export const createThreeHero = async () => {
   const gltfLoader = new GLTFLoader()
   const gltf = await gltfLoader.loadAsync("/models/logo.glb")
 
-  const logo = gltf.scene
-  scene.add(logo)
+  const logoGroup = new THREE.Group()
+  scene.add(logoGroup)
 
-  // Material
+  const logo = gltf.scene
+  logoGroup.add(logo)
+
+  const glassLogo = logo.clone(true)
+  logoGroup.add(glassLogo)
+
+  // Silver Material
   const silverMaterial = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
     metalness: 1,
@@ -108,6 +116,31 @@ export const createThreeHero = async () => {
     if (!child.isMesh) return
 
     child.material = silverMaterial
+    child.renderOrder = 1
+  })
+
+  // Glass Shader Material
+  const glassMaterial = new THREE.ShaderMaterial({
+    vertexShader: logoGlassVertexShader,
+    fragmentShader: logoGlassFragmentShader,
+
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+
+    uniforms: {
+      uHoverProgress: { value: 0.45 },
+      uOpacity: { value: 0.85 },
+      uSurfaceOffset: { value: 0.0005 },
+      uTime: { value: 0 },
+    },
+  })
+
+  glassLogo.traverse((child) => {
+    if (!child.isMesh) return
+
+    child.material = glassMaterial
+    child.renderOrder = 2
   })
 
   // Rotation
@@ -201,7 +234,7 @@ export const createThreeHero = async () => {
     const currentY = scrollProgress * totalHeight
     const angle = -scrollProgress * totalCameraAngle
 
-    logo.position.y = currentY
+    logoGroup.position.y = currentY
 
     camera.position.x = Math.sin(angle) * radius
     camera.position.y = currentY
@@ -209,6 +242,7 @@ export const createThreeHero = async () => {
 
     camera.lookAt(0, currentY, 0)
   }
+
   /**
    * Animate
    */
@@ -218,13 +252,15 @@ export const createThreeHero = async () => {
     const delta = (currentTime - previousTime) / 1000
     previousTime = currentTime
 
+    glassMaterial.uniforms.uTime.value = currentTime * 0.001
+
     updateSceneFromScroll()
 
     // Update logo
     scrollRotationBoost = THREE.MathUtils.damp(scrollRotationBoost, 0, 1.5, delta)
 
     const logoRotationSpeed = logoBaseRotationSpeed + scrollRotationBoost
-    logo.rotateOnAxis(logoRotationAxis, delta * logoRotationSpeed)
+    logoGroup.rotateOnAxis(logoRotationAxis, delta * logoRotationSpeed)
 
     renderer.render(scene, camera)
 
@@ -237,7 +273,7 @@ export const createThreeHero = async () => {
     scene,
     camera,
     renderer,
-    logo,
+    logoGroup,
     setScrollProgress,
   }
 }
