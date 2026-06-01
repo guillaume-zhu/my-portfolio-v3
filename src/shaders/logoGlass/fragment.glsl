@@ -6,7 +6,9 @@ uniform float uNoiseScale;
 uniform float uNoiseSpeed;
 uniform float uRevealEdge;
 uniform float uFresnelPower;
+
 uniform float uDistortionStrength;
+uniform float uChromaticAberration;
 
 uniform sampler2D uSceneTexture;
 
@@ -48,9 +50,18 @@ void main() {
 
     vec2 distortedScreenUv = screenUv + distortion;
 
-    vec3 sceneColor = texture2D(uSceneTexture, distortedScreenUv).rgb;
+    // Chromatic Aberration
+    vec2 chromaticDirection = normalize(distortion + vec2(0.0001));
+    vec2 chromaticOffset = chromaticDirection * uChromaticAberration * reveal * uHoverProgress;
+
+    float red = texture2D(uSceneTexture, distortedScreenUv + chromaticOffset).r;
+    float green = texture2D(uSceneTexture, distortedScreenUv).g;
+    float blue = texture2D(uSceneTexture, distortedScreenUv - chromaticOffset).b;
+    
 
     // // Texture
+    vec3 sceneColor = vec3(red, green, blue);
+
     float alpha = reveal * uHoverProgress * uOpacity;
     alpha *= mix(0.35, 1.0, fresnel);
 

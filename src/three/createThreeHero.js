@@ -1,5 +1,7 @@
 import * as THREE from "three"
 import { GLTFLoader } from "three/examples/jsm/Addons.js"
+import GUI from "lil-gui"
+
 import logoGlassVertexShader from "../shaders/logoGlass/vertex.glsl"
 import logoGlassFragmentShader from "../shaders/logoGlass/fragment.glsl"
 
@@ -8,7 +10,7 @@ export const createThreeHero = async () => {
    * Base
    */
   // Debug
-  // const gui = new GUI()
+  const gui = new GUI()
 
   const textureLoader = new THREE.TextureLoader()
 
@@ -182,7 +184,9 @@ export const createThreeHero = async () => {
       uNoiseSpeed: { value: 0.1 },
       uRevealEdge: { value: 0.1 },
       uFresnelPower: { value: 2.0 },
+
       uDistortionStrength: { value: 0.025 },
+      uChromaticAberration: { value: 0.0045 },
 
       uSceneTexture: { value: sceneRenderTarget.texture },
     },
@@ -194,6 +198,13 @@ export const createThreeHero = async () => {
     child.material = glassMaterial
     child.renderOrder = 2
   })
+
+  gui
+    .add(glassMaterial.uniforms.uChromaticAberration, "value")
+    .min(0)
+    .max(0.05)
+    .step(0.0001)
+    .name("chromatic aberration")
 
   // Rotation
   const logoRotationAxis = new THREE.Vector3(0.2, 1, 0.1).normalize()
