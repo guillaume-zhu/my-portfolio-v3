@@ -176,14 +176,14 @@ export const createThreeHero = async () => {
 
     uniforms: {
       uHoverProgress: { value: 0 },
-      uOpacity: { value: 0.85 },
+      uOpacity: { value: 0.9 },
       uSurfaceOffset: { value: 0.0005 },
       uTime: { value: 0 },
 
       uNoiseScale: { value: 2.0 },
       uNoiseSpeed: { value: 0.1 },
       uRevealEdge: { value: 0.1 },
-      uFresnelPower: { value: 2.0 },
+      uFresnelPower: { value: 1.2 },
 
       uDistortionStrength: { value: 0.025 },
       uChromaticAberration: { value: 0.0045 },
@@ -327,7 +327,7 @@ export const createThreeHero = async () => {
     hoverTarget = intersects.length > 0 ? 1 : 0
     document.body.style.cursor = hoverTarget ? "pointer" : "default"
 
-    hoverProgress = THREE.MathUtils.damp(hoverProgress, hoverTarget, 5, delta)
+    hoverProgress = THREE.MathUtils.damp(hoverProgress, hoverTarget, 4.5, delta)
 
     glassMaterial.uniforms.uHoverProgress.value = hoverProgress
 

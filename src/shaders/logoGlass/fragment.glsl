@@ -23,7 +23,12 @@ void main() {
     vec3 viewDirection = normalize(cameraPosition - vPosition);
 
     // Fresnel
-    float fresnel = pow(1.0 - max(dot(normal, viewDirection), 0.0), uFresnelPower);
+    float facing = abs(dot(normal, viewDirection));
+
+    float fresnel = pow(
+    1.0 - clamp(facing, 0.0, 1.0),
+    uFresnelPower
+);
 
     // Noise
     float organicNoise = noise(vPosition * uNoiseScale + vec3(0.0, uTime * uNoiseSpeed, 0.0));
@@ -57,13 +62,20 @@ void main() {
     float red = texture2D(uSceneTexture, distortedScreenUv + chromaticOffset).r;
     float green = texture2D(uSceneTexture, distortedScreenUv).g;
     float blue = texture2D(uSceneTexture, distortedScreenUv - chromaticOffset).b;
-    
 
-    // // Texture
     vec3 sceneColor = vec3(red, green, blue);
 
-    float alpha = reveal * uHoverProgress * uOpacity;
-    alpha *= mix(0.35, 1.0, fresnel);
 
-    gl_FragColor = vec4(sceneColor, alpha);
+    // Tint
+    vec3 glassTint = vec3(0.9, 0.96, 1.0);
+
+    float tintStrength = mix(0.12, 0.28, fresnel);
+    
+    vec3 finalColor = mix(sceneColor, glassTint, tintStrength);
+
+    // Alpha
+    float alpha = reveal * uHoverProgress * uOpacity;
+
+
+    gl_FragColor = vec4(finalColor, alpha);
 }   
