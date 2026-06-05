@@ -62,7 +62,7 @@ body {
 /* -------- MANIFESTO -------- */
 .manifesto {
   overflow: hidden;
-  margin-top: -525px;
+  margin-top: -500px;
 }
 
 .manifesto .container {
@@ -80,6 +80,7 @@ body {
   white-space: nowrap;
   color: var(--color-dark);
   font-size: 12vw;
+  cursor: default;
 }
 
 .manifesto .letter {
