@@ -3,6 +3,19 @@
 @import "./variables.css";
 
 /* -------- GLOBAL -------- */
+html,
+body {
+  scrollbar-width: none; /* Firefox */
+}
+
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+body {
+  background-color: var(--color-cream);
+}
+
 .tag {
   display: flex;
   justify-content: center;
@@ -16,22 +29,37 @@
 .hero-three {
   position: relative;
   height: 100vh;
-  width: 100vw;
+  width: 100%;
   overflow: hidden;
-  background-color: rgb(91, 91, 91);
+  background-color: var(--color-cream);
 }
 
-.webgl {
+.hero-three__frame {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  display: block;
+  overflow: hidden;
+  border-radius: 0;
+  transform-origin: center center;
   z-index: 1;
+  will-change: transform, border-radius;
+}
+
+.webgl {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .hero-content {
   position: relative;
   z-index: 2;
   height: 100%;
+}
+
+/* -------- MANIFESTO -------- */
+.manifesto {
+  width: 100%;
+  height: 100vh;
 }

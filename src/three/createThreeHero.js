@@ -10,7 +10,7 @@ export const createThreeHero = async () => {
    * Base
    */
   // Debug
-  const gui = new GUI()
+  // const gui = new GUI()
 
   const textureLoader = new THREE.TextureLoader()
 
@@ -265,6 +265,7 @@ export const createThreeHero = async () => {
     rotation: { x: 0, y: -Math.PI * 0.5, z: 0 },
   })
 
+  textName.material.opcaity = 1
   textArt.material.opacity = 0
   textCreative.material.opacity = 0
 
@@ -308,8 +309,10 @@ export const createThreeHero = async () => {
 
     camera.lookAt(0, currentY, 0)
 
+    const nameTextOpacity = 1 - THREE.MathUtils.smoothstep(scrollProgress, 0.2, 0.4)
     const roleTextOpacity = THREE.MathUtils.smoothstep(scrollProgress, 0.72, 0.9)
 
+    textName.material.opacity = nameTextOpacity
     textArt.material.opacity = roleTextOpacity
     textCreative.material.opacity = roleTextOpacity
   }
