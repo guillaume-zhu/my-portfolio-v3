@@ -42,7 +42,7 @@ ScrollTrigger.create({
 gsap.to(".hero-three__frame", {
   scaleX: 0.98,
   scaleY: 0.98,
-  borderRadius: "32px",
+  borderRadius: "Opx 0px 32px 32px",
   ease: "none",
 
   scrollTrigger: {
