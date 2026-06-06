@@ -2,6 +2,9 @@ uniform float uHoverProgress;
 uniform float uOpacity;
 uniform float uTime;
 
+uniform float uClickProgress;
+uniform float uClickDistortionBoost;
+
 uniform float uNoiseScale;
 uniform float uNoiseSpeed;
 uniform float uRevealEdge;
@@ -46,12 +49,15 @@ void main() {
 
     // Distortion
     float distortionNoiseX = noise( vPosition * uNoiseScale + vec3(uTime * uNoiseSpeed, 0.0, 0.0));
+
     float distortionNoiseY = noise( vPosition * uNoiseScale + vec3(12.4,uTime * uNoiseSpeed, 7.8));
+
+    float clickDistortionBoost = 1.0 + uClickProgress * uClickDistortionBoost;
 
     vec2 distortion = vec2(
         distortionNoiseX - 0.5,
         distortionNoiseY - 0.5
-    ) * uDistortionStrength * reveal * uHoverProgress;
+    ) * uDistortionStrength * clickDistortionBoost * reveal * uHoverProgress;
 
     vec2 distortedScreenUv = screenUv + distortion;
 
