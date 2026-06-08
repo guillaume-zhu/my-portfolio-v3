@@ -20,13 +20,12 @@ export const createThreeHero = async () => {
   // Scene
   const scene = new THREE.Scene()
 
-  // Rayscaster and animations targets
+  // Rayscaster
   const raycaster = new THREE.Raycaster()
   const mouse = new THREE.Vector2()
 
   let hoverTarget = 0
   let hoverProgress = 0
-  let clickProgress = 0
 
   // Sizes & Events
   const sizes = {
@@ -57,13 +56,6 @@ export const createThreeHero = async () => {
   window.addEventListener("mousemove", (event) => {
     mouse.x = (event.clientX / sizes.width) * 2 - 1
     mouse.y = -(event.clientY / sizes.height) * 2 + 1
-  })
-
-  window.addEventListener("click", () => {
-    if (!hoverTarget) return
-    if (hoverProgress < 0.75) return
-
-    clickProgress = 1
   })
 
   /**
@@ -166,50 +158,6 @@ export const createThreeHero = async () => {
     envMapIntensity: 1.2,
   })
 
-  const silverUniforms = {
-    uTime: { value: 0 },
-    uClickProgress: { value: 0 },
-    uClickStrength: { value: 0.1 },
-    uClickWaveFrequency: { value: 8.0 },
-    uClickWaveSpeed: { value: 8.0 },
-  }
-
-  silverMaterial.onBeforeCompile = (shader) => {
-    shader.uniforms.uTime = silverUniforms.uTime
-    shader.uniforms.uClickProgress = silverUniforms.uClickProgress
-    shader.uniforms.uClickStrength = silverUniforms.uClickStrength
-    shader.uniforms.uClickWaveFrequency = silverUniforms.uClickWaveFrequency
-    shader.uniforms.uClickWaveSpeed = silverUniforms.uClickWaveSpeed
-
-    shader.vertexShader = shader.vertexShader.replace(
-      "#include <common>",
-      `
-        #include <common>
-
-        uniform float uTime;
-        uniform float uClickProgress;
-        uniform float uClickStrength;
-        uniform float uClickWaveFrequency;
-        uniform float uClickWaveSpeed;
-      `,
-    )
-
-    shader.vertexShader = shader.vertexShader.replace(
-      "#include <begin_vertex>",
-      `
-        vec3 transformed = vec3(position);
-
-        float waveA = sin(position.y * uClickWaveFrequency + uTime * uClickWaveSpeed);
-        float waveB = sin(position.x * uClickWaveFrequency * 0.7 - uTime * uClickWaveSpeed * 0.6);
-
-        float fluidWave = (waveA + waveB) * 0.5;
-        float fluidOffset = fluidWave * uClickStrength * uClickProgress;
-
-        transformed += normal * fluidOffset;
-      `,
-    )
-  }
-
   logo.traverse((child) => {
     if (!child.isMesh) return
 
@@ -227,19 +175,11 @@ export const createThreeHero = async () => {
     side: THREE.DoubleSide,
 
     uniforms: {
-      // Vertex hover animation
       uHoverProgress: { value: 0 },
       uOpacity: { value: 1.0 },
       uSurfaceOffset: { value: 0.0005 },
       uTime: { value: 0 },
 
-      // Vertex click animation
-      uClickProgress: { value: 0 },
-      uClickStrength: { value: 0.1 },
-      uClickWaveFrequency: { value: 8.0 },
-      uClickWaveSpeed: { value: 8.0 },
-
-      // Fragment hover animation
       uNoiseScale: { value: 2.0 },
       uNoiseSpeed: { value: 0.1 },
       uRevealEdge: { value: 0.1 },
@@ -258,6 +198,13 @@ export const createThreeHero = async () => {
     child.material = glassMaterial
     child.renderOrder = 2
   })
+
+  // gui
+  //   .add(glassMaterial.uniforms.uChromaticAberration, "value")
+  //   .min(0)
+  //   .max(0.05)
+  //   .step(0.0001)
+  //   .name("chromatic aberration")
 
   // Rotation
   const logoRotationAxis = new THREE.Vector3(0.2, 1, 0.1).normalize()
@@ -318,7 +265,7 @@ export const createThreeHero = async () => {
     rotation: { x: 0, y: -Math.PI * 0.5, z: 0 },
   })
 
-  textName.material.opacity = 1
+  textName.material.opcaity = 1
   textArt.material.opacity = 0
   textCreative.material.opacity = 0
 
@@ -381,7 +328,6 @@ export const createThreeHero = async () => {
 
     // Update glass logo shader
     glassMaterial.uniforms.uTime.value = currentTime * 0.001
-    silverUniforms.uTime.value = currentTime * 0.001
 
     // Update screen
     updateSceneFromScroll()
@@ -389,20 +335,12 @@ export const createThreeHero = async () => {
     // Raycaster
     raycaster.setFromCamera(mouse, camera)
     const intersects = raycaster.intersectObject(logoHitBox)
-
-    // Hover
     hoverTarget = intersects.length > 0 ? 1 : 0
     document.body.style.cursor = hoverTarget ? "pointer" : "default"
 
     hoverProgress = THREE.MathUtils.damp(hoverProgress, hoverTarget, 4.5, delta)
 
     glassMaterial.uniforms.uHoverProgress.value = hoverProgress
-
-    // Click
-    clickProgress = THREE.MathUtils.damp(clickProgress, 0, 3.5, delta)
-
-    glassMaterial.uniforms.uClickProgress.value = clickProgress
-    silverUniforms.uClickProgress.value = clickProgress
 
     // Update logo
     scrollRotationBoost = THREE.MathUtils.damp(scrollRotationBoost, 0, 1.5, delta)
