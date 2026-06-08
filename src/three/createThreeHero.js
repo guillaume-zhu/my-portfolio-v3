@@ -239,9 +239,6 @@ export const createThreeHero = async () => {
       uClickWaveFrequency: { value: 8.0 },
       uClickWaveSpeed: { value: 8.0 },
 
-      // Fragment click animation
-      uClickDistortionBoost: { value: 1.5 },
-
       // Fragment hover animation
       uNoiseScale: { value: 2.0 },
       uNoiseSpeed: { value: 0.1 },
