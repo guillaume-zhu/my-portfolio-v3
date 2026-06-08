@@ -20,13 +20,17 @@ export const createThreeHero = async () => {
   // Scene
   const scene = new THREE.Scene()
 
-  // Rayscaster and animations targets
+  // Rayscaster and animations variables
   const raycaster = new THREE.Raycaster()
   const mouse = new THREE.Vector2()
 
   let hoverTarget = 0
   let hoverProgress = 0
   let clickProgress = 0
+  let clickTime = 0
+  let silverHiddenUntil = 0
+
+  const clickPosition = new THREE.Vector3()
 
   // Sizes & Events
   const sizes = {
@@ -57,13 +61,6 @@ export const createThreeHero = async () => {
   window.addEventListener("mousemove", (event) => {
     mouse.x = (event.clientX / sizes.width) * 2 - 1
     mouse.y = -(event.clientY / sizes.height) * 2 + 1
-  })
-
-  window.addEventListener("click", () => {
-    if (!hoverTarget) return
-    if (hoverProgress < 0.75) return
-
-    clickProgress = 1
   })
 
   /**
@@ -143,7 +140,7 @@ export const createThreeHero = async () => {
   const glassLogo = logo.clone(true)
   logoGroup.add(glassLogo)
 
-  // Hitbox
+  // Hitbox and click
   const logoBox = new THREE.Box3().setFromObject(logo)
   const logoSize = logoBox.getSize(new THREE.Vector3())
   const logoCenter = logoBox.getCenter(new THREE.Vector3())
@@ -158,25 +155,52 @@ export const createThreeHero = async () => {
   logoHitBox.position.copy(logoCenter)
   logoGroup.add(logoHitBox)
 
+  window.addEventListener("click", () => {
+    if (!hoverTarget) return
+    if (hoverProgress < 0.75) return
+
+    raycaster.setFromCamera(mouse, camera)
+
+    const clickIntersects = raycaster.intersectObject(logoHitBox)
+
+    if (clickIntersects.length === 0) return
+
+    clickPosition.copy(clickIntersects[0].point)
+    clickTime = performance.now() * 0.001
+
+    clickProgress = 1
+
+    silverHiddenUntil = clickTime + 0.4
+    silverMaterial.opacity = 0
+  })
+
   // Silver Material
   const silverMaterial = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
     metalness: 1,
     roughness: 0.4,
     envMapIntensity: 1.2,
+    transparent: true,
+    opacity: 1,
   })
 
   const silverUniforms = {
     uTime: { value: 0 },
     uClickProgress: { value: 0 },
+    uClickPosition: { value: new THREE.Vector3() },
+    uClickTime: { value: 0 },
+    uClickRadius: { value: 0.6 },
     uClickStrength: { value: 0.1 },
-    uClickWaveFrequency: { value: 8.0 },
-    uClickWaveSpeed: { value: 8.0 },
+    uClickWaveFrequency: { value: 6.0 },
+    uClickWaveSpeed: { value: 4.0 },
   }
 
   silverMaterial.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = silverUniforms.uTime
     shader.uniforms.uClickProgress = silverUniforms.uClickProgress
+    shader.uniforms.uClickPosition = silverUniforms.uClickPosition
+    shader.uniforms.uClickTime = silverUniforms.uClickTime
+    shader.uniforms.uClickRadius = silverUniforms.uClickRadius
     shader.uniforms.uClickStrength = silverUniforms.uClickStrength
     shader.uniforms.uClickWaveFrequency = silverUniforms.uClickWaveFrequency
     shader.uniforms.uClickWaveSpeed = silverUniforms.uClickWaveSpeed
@@ -188,6 +212,9 @@ export const createThreeHero = async () => {
 
         uniform float uTime;
         uniform float uClickProgress;
+        uniform vec3 uClickPosition;
+        uniform float uClickTime;
+        uniform float uClickRadius;
         uniform float uClickStrength;
         uniform float uClickWaveFrequency;
         uniform float uClickWaveSpeed;
@@ -197,16 +224,25 @@ export const createThreeHero = async () => {
     shader.vertexShader = shader.vertexShader.replace(
       "#include <begin_vertex>",
       `
-        vec3 transformed = vec3(position);
+    vec3 transformed = vec3(position);
 
-        float waveA = sin(position.y * uClickWaveFrequency + uTime * uClickWaveSpeed);
-        float waveB = sin(position.x * uClickWaveFrequency * 0.7 - uTime * uClickWaveSpeed * 0.6);
+    vec3 clickWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
 
-        float fluidWave = (waveA + waveB) * 0.5;
-        float fluidOffset = fluidWave * uClickStrength * uClickProgress;
+    float distanceToClick = distance(clickWorldPosition, uClickPosition);
 
-        transformed += normal * fluidOffset;
-      `,
+    float clickMask = 1.0 - smoothstep(0.0, uClickRadius, distanceToClick);
+    clickMask = pow(clickMask, 2.0);
+
+    float clickElapsedTime = uTime - uClickTime;
+
+    float ripple = sin(
+      distanceToClick * uClickWaveFrequency - clickElapsedTime * uClickWaveSpeed
+    );
+
+    float fluidOffset = ripple * clickMask * uClickStrength * uClickProgress;
+
+    transformed += normal * fluidOffset;
+  `,
     )
   }
 
@@ -230,14 +266,17 @@ export const createThreeHero = async () => {
       // Vertex hover animation
       uHoverProgress: { value: 0 },
       uOpacity: { value: 1.0 },
-      uSurfaceOffset: { value: 0.0005 },
+      uSurfaceOffset: { value: 0.005 },
       uTime: { value: 0 },
 
       // Vertex click animation
       uClickProgress: { value: 0 },
+      uClickPosition: { value: new THREE.Vector3() },
+      uClickTime: { value: 0 },
+      uClickRadius: { value: 0.6 },
       uClickStrength: { value: 0.1 },
-      uClickWaveFrequency: { value: 8.0 },
-      uClickWaveSpeed: { value: 8.0 },
+      uClickWaveFrequency: { value: 6.0 },
+      uClickWaveSpeed: { value: 4.0 },
 
       // Fragment click animation
       uClickDistortionBoost: { value: 1.5 },
@@ -245,7 +284,7 @@ export const createThreeHero = async () => {
       // Fragment hover animation
       uNoiseScale: { value: 2.0 },
       uNoiseSpeed: { value: 0.1 },
-      uRevealEdge: { value: 0.1 },
+      uRevealEdge: { value: 0.05 },
       uFresnelPower: { value: 1.2 },
 
       uDistortionStrength: { value: 0.025 },
@@ -406,6 +445,20 @@ export const createThreeHero = async () => {
 
     glassMaterial.uniforms.uClickProgress.value = clickProgress
     silverUniforms.uClickProgress.value = clickProgress
+
+    glassMaterial.uniforms.uClickPosition.value.copy(clickPosition)
+    silverUniforms.uClickPosition.value.copy(clickPosition)
+
+    glassMaterial.uniforms.uClickTime.value = clickTime
+    silverUniforms.uClickTime.value = clickTime
+
+    const currentSeconds = currentTime * 0.001
+
+    if (currentSeconds < silverHiddenUntil) {
+      silverMaterial.opacity = 0
+    } else {
+      silverMaterial.opacity = THREE.MathUtils.damp(silverMaterial.opacity, 1, 8, delta)
+    }
 
     // Update logo
     scrollRotationBoost = THREE.MathUtils.damp(scrollRotationBoost, 0, 1.5, delta)
