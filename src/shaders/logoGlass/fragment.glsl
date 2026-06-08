@@ -1,27 +1,44 @@
-uniform float uHoverProgress;
+// -------------------------------------------------------
+// Global
+// -------------------------------------------------------
 uniform float uOpacity;
 uniform float uTime;
 
-uniform vec3 uClickPosition;
-uniform float uClickTime;
-uniform float uClickRadius;
-uniform float uClickWaveFrequency;
-uniform float uClickWaveSpeed;
-uniform float uClickRippleStrength;
-uniform float uClickGlowStrength;
-uniform float uClickProgress;
-uniform float uClickRippleNoise;
+uniform sampler2D uSceneTexture;
+
+// -------------------------------------------------------
+// Hover / reveal
+// -------------------------------------------------------
+uniform float uHoverProgress;
 
 uniform float uNoiseScale;
 uniform float uNoiseSpeed;
 uniform float uRevealEdge;
 uniform float uFresnelPower;
 
+// -------------------------------------------------------
+// Click ripple
+// -------------------------------------------------------
+uniform float uClickProgress;
+uniform vec3 uClickPosition;
+uniform float uClickTime;
+
+uniform float uClickRadius;
+uniform float uClickWaveFrequency;
+uniform float uClickWaveSpeed;
+uniform float uClickRippleStrength;
+uniform float uClickGlowStrength;
+uniform float uClickRippleNoise;
+
+// -------------------------------------------------------
+// Refraction / chromatic
+// -------------------------------------------------------
 uniform float uDistortionStrength;
 uniform float uChromaticAberration;
 
-uniform sampler2D uSceneTexture;
-
+// -------------------------------------------------------
+// Varyings
+// -------------------------------------------------------
 varying vec3 vNormal;
 varying vec3 vPosition;
 varying vec4 vScreenPosition;
@@ -29,18 +46,35 @@ varying vec4 vScreenPosition;
 #include ../includes/noise.glsl;
 
 void main() {
+    // -------------------------------------------------------
+    // View / Fresnel
+    // -------------------------------------------------------
     vec3 normal = normalize(vNormal);
     vec3 viewDirection = normalize(cameraPosition - vPosition);
 
-    // Fresnel
     float facing = abs(dot(normal, viewDirection));
 
     float fresnel = pow(
     1.0 - clamp(facing, 0.0, 1.0),
     uFresnelPower
     );
+
+    // -------------------------------------------------------
+    // Hover reveal noise
+    // -------------------------------------------------------
+    // Noise
+    float organicNoise = noise(vPosition * uNoiseScale + vec3(0.0, uTime * uNoiseSpeed, 0.0));
+
+    // Reveal
+    float reveal = smoothstep(
+        1.0 - uHoverProgress,
+        1.0 - uHoverProgress + uRevealEdge,
+        organicNoise
+    );
     
-    // Click
+    // -------------------------------------------------------
+    // Click ripple
+    // -------------------------------------------------------
     float distanceToClick = distance(vPosition, uClickPosition);
 
     float clickMask = 1.0 - smoothstep(0.0, uClickRadius, distanceToClick);
@@ -62,27 +96,26 @@ void main() {
         (clickElapsedTime * uClickWaveSpeed)
     );
 
-    float clickWave = clickRipple * clickMask * uClickProgress * uHoverProgress;
+    float clickWave = 
+    clickRipple 
+    * clickMask 
+    * uClickProgress 
+    * uHoverProgress;
 
+    // Luminous ripple
     float rippleShape = abs(clickRipple);
     float rippleLine = smoothstep(0.99, 1.0, rippleShape);
     float rippleHalo = smoothstep(0.90, 1.0, rippleShape);
 
-    // Noise
-    float organicNoise = noise(vPosition * uNoiseScale + vec3(0.0, uTime * uNoiseSpeed, 0.0));
-
-    // Reveal
-    float reveal = smoothstep(
-        1.0 - uHoverProgress,
-        1.0 - uHoverProgress + uRevealEdge,
-        organicNoise
-    );
-
-    // ScreenUv
+    // -------------------------------------------------------
+    // Screen UV
+    // -------------------------------------------------------
     vec2 screenUv = vScreenPosition.xy / vScreenPosition.w;
     screenUv = screenUv * 0.5 + 0.5;
 
-    // Distortion
+    // -------------------------------------------------------
+    // Refraction / Distortion
+    // -------------------------------------------------------
     float distortionNoiseX = noise(
         vPosition * uNoiseScale + vec3(uTime * uNoiseSpeed, 0.0, 0.0)
     );
@@ -90,22 +123,31 @@ void main() {
         vPosition * uNoiseScale + vec3(12.4,uTime * uNoiseSpeed, 7.8)
     );
 
-    // Click Distortion
-    vec2 clickWaveDirection = normalize(vec2(
+    vec2 baseDistortionDirection = vec2(
         distortionNoiseX - 0.5,
         distortionNoiseY - 0.5
-    ) + vec2(0.0001));
+    );
+
+    // Click Distortion
+    vec2 clickWaveDirection = normalize(
+        baseDistortionDirection + vec2(0.0001)
+    );
 
     vec2 clickDistortion = clickWaveDirection * clickWave * uClickRippleStrength;
 
-    vec2 distortion = vec2(
-        distortionNoiseX - 0.5,
-        distortionNoiseY - 0.5
-    ) * uDistortionStrength * reveal * uHoverProgress + clickDistortion;
+    vec2 baseDistortion =
+        baseDistortionDirection
+        * uDistortionStrength
+        * reveal
+        * uHoverProgress;
+
+    vec2 distortion = baseDistortion + clickDistortion;
 
     vec2 distortedScreenUv = screenUv + distortion;
 
-    // Chromatic Aberration
+    // -------------------------------------------------------
+    // Chromatic aberration
+    // -------------------------------------------------------
     vec2 chromaticDirection = normalize(distortion + vec2(0.0001));
 
     float clickChromaticBoost = 1.0 + rippleHalo * clickMask * uClickProgress * 2.0;
@@ -118,7 +160,9 @@ void main() {
 
     vec3 sceneColor = vec3(red, green, blue);
     
-    // Ripple Glow
+    // -------------------------------------------------------
+    // Ripple glow
+    // -------------------------------------------------------
     vec3 rippleGlowColor = vec3(0.80, 0.95, 1.0);
 
     float rippleGlow = (rippleLine * 0.80 + rippleHalo * 0.15)
@@ -127,7 +171,9 @@ void main() {
     * uHoverProgress
     * uClickGlowStrength;
 
-    // Tint
+    // -------------------------------------------------------
+    // Tint / Final color
+    // -------------------------------------------------------
     vec3 glassTint = vec3(0.90, 0.95, 1);
 
     float tintStrength = mix(0.12, 0.28, fresnel);
