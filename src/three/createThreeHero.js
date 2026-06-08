@@ -12,6 +12,7 @@ export const createThreeHero = async () => {
   // Debug
   // const gui = new GUI()
 
+  // Loaders
   const textureLoader = new THREE.TextureLoader()
 
   // Canvas
@@ -26,6 +27,10 @@ export const createThreeHero = async () => {
 
   let hoverTarget = 0
   let hoverProgress = 0
+  let clickProgress = 0
+  let clickTime = 0
+
+  const clickPosition = new THREE.Vector3()
 
   // Sizes & Events
   const sizes = {
@@ -56,6 +61,22 @@ export const createThreeHero = async () => {
   window.addEventListener("mousemove", (event) => {
     mouse.x = (event.clientX / sizes.width) * 2 - 1
     mouse.y = -(event.clientY / sizes.height) * 2 + 1
+  })
+
+  window.addEventListener("click", () => {
+    if (!hoverTarget) return
+    if (hoverProgress < 0.75) return
+
+    raycaster.setFromCamera(mouse, camera)
+
+    const clickIntersects = raycaster.intersectObject(logoHitBox)
+
+    if (clickIntersects.length === 0) return
+
+    clickPosition.copy(clickIntersects[0].point)
+    clickTime = performance.now() * 0.001
+
+    clickProgress = 1
   })
 
   /**
@@ -175,9 +196,13 @@ export const createThreeHero = async () => {
     side: THREE.DoubleSide,
 
     uniforms: {
+      // Glass vertex offset
+      uSurfaceOffset: { value: 0.0005 },
+
+      // Hover fragment
       uHoverProgress: { value: 0 },
       uOpacity: { value: 1.0 },
-      uSurfaceOffset: { value: 0.0005 },
+
       uTime: { value: 0 },
 
       uNoiseScale: { value: 2.0 },
@@ -189,6 +214,16 @@ export const createThreeHero = async () => {
       uChromaticAberration: { value: 0.0045 },
 
       uSceneTexture: { value: sceneRenderTarget.texture },
+
+      // Click fragment
+      uClickProgress: { value: 0 },
+      uClickPosition: { value: new THREE.Vector3() },
+      uClickTime: { value: 0 },
+      uClickRadius: { value: 1.2 },
+      uClickWaveFrequency: { value: 12.0 },
+      uClickWaveSpeed: { value: 7.0 },
+      uClickRippleStrength: { value: 0.018 },
+      uClickGlowStrength: { value: 0.35 },
     },
   })
 
@@ -198,13 +233,6 @@ export const createThreeHero = async () => {
     child.material = glassMaterial
     child.renderOrder = 2
   })
-
-  // gui
-  //   .add(glassMaterial.uniforms.uChromaticAberration, "value")
-  //   .min(0)
-  //   .max(0.05)
-  //   .step(0.0001)
-  //   .name("chromatic aberration")
 
   // Rotation
   const logoRotationAxis = new THREE.Vector3(0.2, 1, 0.1).normalize()
@@ -335,12 +363,21 @@ export const createThreeHero = async () => {
     // Raycaster
     raycaster.setFromCamera(mouse, camera)
     const intersects = raycaster.intersectObject(logoHitBox)
+
+    // -- hover
     hoverTarget = intersects.length > 0 ? 1 : 0
     document.body.style.cursor = hoverTarget ? "pointer" : "default"
 
     hoverProgress = THREE.MathUtils.damp(hoverProgress, hoverTarget, 4.5, delta)
 
     glassMaterial.uniforms.uHoverProgress.value = hoverProgress
+
+    // -- click
+    clickProgress = THREE.MathUtils.damp(clickProgress, 0, 3.5, delta)
+
+    glassMaterial.uniforms.uClickProgress.value = clickProgress
+    glassMaterial.uniforms.uClickPosition.value.copy(clickPosition)
+    glassMaterial.uniforms.uClickTime.value = clickTime
 
     // Update logo
     scrollRotationBoost = THREE.MathUtils.damp(scrollRotationBoost, 0, 1.5, delta)
