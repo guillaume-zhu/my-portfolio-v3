@@ -10,7 +10,7 @@ export const createThreeHero = async () => {
    * Base
    */
   // Debug
-  // const gui = new GUI()
+  const gui = new GUI()
 
   // Loaders
   const textureLoader = new THREE.TextureLoader()
@@ -220,10 +220,11 @@ export const createThreeHero = async () => {
       uClickPosition: { value: new THREE.Vector3() },
       uClickTime: { value: 0 },
       uClickRadius: { value: 1.2 },
-      uClickWaveFrequency: { value: 12.0 },
+      uClickWaveFrequency: { value: 20.0 },
       uClickWaveSpeed: { value: 7.0 },
-      uClickRippleStrength: { value: 0.018 },
-      uClickGlowStrength: { value: 0.35 },
+      uClickRippleStrength: { value: 0.015 },
+      uClickGlowStrength: { value: 0.5 },
+      uClickRippleNoise: { value: 0.05 },
     },
   })
 
@@ -233,6 +234,8 @@ export const createThreeHero = async () => {
     child.material = glassMaterial
     child.renderOrder = 2
   })
+
+  const clickFolder = gui.addFolder("Click ripple")
 
   // Rotation
   const logoRotationAxis = new THREE.Vector3(0.2, 1, 0.1).normalize()

@@ -10,6 +10,7 @@ uniform float uClickWaveSpeed;
 uniform float uClickRippleStrength;
 uniform float uClickGlowStrength;
 uniform float uClickProgress;
+uniform float uClickRippleNoise;
 
 uniform float uNoiseScale;
 uniform float uNoiseSpeed;
@@ -46,13 +47,26 @@ void main() {
 
     float clickElapsedTime = uTime - uClickTime;
 
+    float rippleNoise = noise(
+    vPosition * uNoiseScale * 8.0
+    + vec3(0.0, uTime * 0.35, 4.2)
+    );
+
+    rippleNoise = (rippleNoise - 0.5) * uClickRippleNoise;
+
+    float warpedDistance = distanceToClick + rippleNoise;
+
     float clickRipple = sin(
-        (distanceToClick * uClickWaveFrequency)
+        (warpedDistance * uClickWaveFrequency)
         -
         (clickElapsedTime * uClickWaveSpeed)
     );
 
     float clickWave = clickRipple * clickMask * uClickProgress * uHoverProgress;
+
+    float rippleShape = abs(clickRipple);
+    float rippleLine = smoothstep(0.99, 1.0, rippleShape);
+    float rippleHalo = smoothstep(0.90, 1.0, rippleShape);
 
     // Noise
     float organicNoise = noise(vPosition * uNoiseScale + vec3(0.0, uTime * uNoiseSpeed, 0.0));
@@ -93,7 +107,10 @@ void main() {
 
     // Chromatic Aberration
     vec2 chromaticDirection = normalize(distortion + vec2(0.0001));
-    vec2 chromaticOffset = chromaticDirection * uChromaticAberration * reveal * uHoverProgress;
+
+    float clickChromaticBoost = 1.0 + rippleHalo * clickMask * uClickProgress * 2.0;
+
+    vec2 chromaticOffset = chromaticDirection * uChromaticAberration * clickChromaticBoost * reveal * uHoverProgress;
 
     float red = texture2D(uSceneTexture, distortedScreenUv + chromaticOffset).r;
     float green = texture2D(uSceneTexture, distortedScreenUv).g;
@@ -101,6 +118,14 @@ void main() {
 
     vec3 sceneColor = vec3(red, green, blue);
     
+    // Ripple Glow
+    vec3 rippleGlowColor = vec3(0.80, 0.95, 1.0);
+
+    float rippleGlow = (rippleLine * 0.80 + rippleHalo * 0.15)
+    * clickMask
+    * uClickProgress
+    * uHoverProgress
+    * uClickGlowStrength;
 
     // Tint
     vec3 glassTint = vec3(0.90, 0.95, 1);
@@ -108,6 +133,7 @@ void main() {
     float tintStrength = mix(0.12, 0.28, fresnel);
     
     vec3 finalColor = mix(sceneColor, glassTint, tintStrength);
+    finalColor += rippleGlowColor * rippleGlow;
 
     // Alpha
     float alpha = reveal * uHoverProgress * uOpacity;
