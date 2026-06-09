@@ -50,7 +50,7 @@ gsap.to(".hero-three__frame", {
     start: "top bottom-=500",
     end: "top bottom-=900",
     scrub: true,
-    markers: true,
+    markers: false,
   },
 })
 
@@ -63,16 +63,28 @@ document.fonts.ready.then(() => {
 
   const letters = document.querySelectorAll(".manifesto .letter")
   const distance = text.clientWidth - document.body.clientWidth
+  const overlapDistance = 1175
+  const pinDistance = Math.max(distance - overlapDistance, 1)
 
+  // 1. Pin only
+  ScrollTrigger.create({
+    trigger: ".manifesto .container",
+    start: "top top",
+    end: "+=" + pinDistance,
+    pin: true,
+    markers: false,
+  })
+
+  // 2. Text horizontal animation
   const scrollTween = gsap.to(text, {
     x: -distance,
     ease: "none",
     scrollTrigger: {
       trigger: ".manifesto .container",
-      pin: true,
+      start: "top top",
       end: "+=" + distance,
-      markers: false,
       scrub: true,
+      markers: false,
     },
   })
 
@@ -89,6 +101,31 @@ document.fonts.ready.then(() => {
         scrub: 0.5,
       },
     })
+  })
+
+  // Manifesto to trajectoire transition
+  const manifesto = document.querySelector(".manifesto")
+
+  gsap.to(".manifesto .container", {
+    scaleX: 0.98,
+    scaleY: 0.98,
+    borderRadius: "0px 0px 32px 32px",
+    ease: "none",
+
+    scrollTrigger: {
+      trigger: ".trajectoire",
+      start: "top bottom",
+      end: "top 50%",
+      scrub: true,
+      markers: false,
+
+      onUpdate: (self) => {
+        manifesto.classList.toggle("is-exiting", self.progress > 0)
+      },
+      onLeaveBack: () => {
+        manifesto.classList.remove("is-exiting")
+      },
+    },
   })
 })
 

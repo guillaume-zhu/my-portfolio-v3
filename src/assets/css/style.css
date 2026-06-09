@@ -63,6 +63,7 @@ body {
 .manifesto {
   overflow: hidden;
   margin-top: -500px;
+  background-color: var(--color-cream);
 }
 
 .manifesto .container {
@@ -71,10 +72,22 @@ body {
   height: 100vh;
   position: relative;
   width: 100%;
+
+  overflow: hidden;
+  border-radius: 0px;
+  transform-origin: center top;
+  will-change: transform, border-radius;
 }
 
-.text {
-  padding: 0 101vw;
+.manifesto.is-exiting {
+  background-color: var(--color-dark);
+}
+.manifesto.is-exiting .container {
+  background-color: var(--color-cream);
+}
+
+.manifesto .text {
+  padding: 0 101vw 0 101vw;
   display: flex;
   width: max-content;
   white-space: nowrap;
@@ -85,4 +98,10 @@ body {
 
 .manifesto .letter {
   display: inline-block;
+}
+
+/* -------- TRAJECTOIRE -------- */
+.trajectoire {
+  height: 100vh;
+  background-color: var(--color-dark);
 }
