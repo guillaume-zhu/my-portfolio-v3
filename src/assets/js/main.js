@@ -47,10 +47,10 @@ gsap.to(".hero-three__frame", {
 
   scrollTrigger: {
     trigger: ".manifesto",
-    start: "top bottom-=100",
-    end: "top bottom-=500",
+    start: "top bottom-=500",
+    end: "top bottom-=900",
     scrub: true,
-    markers: false,
+    markers: true,
   },
 })
 
@@ -71,7 +71,7 @@ document.fonts.ready.then(() => {
       trigger: ".manifesto .container",
       pin: true,
       end: "+=" + distance,
-      markers: true,
+      markers: false,
       scrub: true,
     },
   })

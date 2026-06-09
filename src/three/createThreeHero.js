@@ -10,7 +10,7 @@ export const createThreeHero = async () => {
    * Base
    */
   // Debug
-  const gui = new GUI()
+  // const gui = new GUI()
 
   // Loaders
   const textureLoader = new THREE.TextureLoader()
@@ -235,7 +235,7 @@ export const createThreeHero = async () => {
     child.renderOrder = 2
   })
 
-  const clickFolder = gui.addFolder("Click ripple")
+  // const clickFolder = gui.addFolder("Click ripple")
 
   // Rotation
   const logoRotationAxis = new THREE.Vector3(0.2, 1, 0.1).normalize()
