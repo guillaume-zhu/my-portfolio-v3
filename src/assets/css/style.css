@@ -101,7 +101,7 @@ body {
 }
 
 /* -------- TRAJECTOIRE -------- */
-.trajectoire {
+.trajectory {
   height: 100vh;
   background-color: var(--color-dark);
 }

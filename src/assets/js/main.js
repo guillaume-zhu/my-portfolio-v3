@@ -7,6 +7,9 @@ import { createThreeHero } from "../../three/createThreeHero"
 
 gsap.registerPlugin(ScrollTrigger)
 
+// ----------------------
+// Global setup
+// ----------------------
 const lenis = new Lenis({
   anchors: true,
 })
@@ -23,42 +26,75 @@ gsap.ticker.lagSmoothing(0)
 // Scene scroll animation
 // ----------------------
 const threeHero = await createThreeHero()
-const heroFrame = document.querySelector(".hero-three__frame")
 
-ScrollTrigger.create({
-  trigger: ".hero-three",
-  start: "top top",
-  end: "+=4000",
-  scrub: true,
-  pin: true,
-  markers: false,
-
-  onUpdate: (self) => {
-    threeHero.setScrollProgress(self.progress, self.getVelocity())
-  },
-})
-
-// Scene to Manifesto transition
-gsap.to(".hero-three__frame", {
-  scaleX: 0.98,
-  scaleY: 0.98,
-  borderRadius: "Opx 0px 32px 32px",
-  ease: "none",
-
-  scrollTrigger: {
-    trigger: ".manifesto",
-    start: "top bottom-=500",
-    end: "top bottom-=900",
-    scrub: true,
-    markers: false,
-  },
-})
+setupHeroScroll(threeHero)
+setupHeroToManifestoTransition()
 
 // ----------------------
-// Manifesto
+// Sections Animations
 // ----------------------
 document.fonts.ready.then(() => {
+  setupManifesto()
+  setupTrajectory()
+
+  ScrollTrigger.refresh()
+})
+
+// ----------------------
+// Functions
+// ----------------------
+
+// Scene Hero
+function setupHeroScroll(threeHero) {
+  ScrollTrigger.create({
+    trigger: ".hero-three",
+    start: "top top",
+    end: "+=4000",
+    scrub: true,
+    pin: true,
+    markers: false,
+
+    onUpdate: (self) => {
+      threeHero.setScrollProgress(self.progress, self.getVelocity())
+    },
+  })
+}
+// Hero to Manifesto transition
+function setupHeroToManifestoTransition() {
+  gsap.to(".hero-three__frame", {
+    scaleX: 0.98,
+    scaleY: 0.98,
+    borderRadius: "0px 0px 32px 32px",
+    ease: "none",
+
+    scrollTrigger: {
+      trigger: ".manifesto",
+      start: "top bottom-=500",
+      end: "top bottom-=900",
+      scrub: true,
+      markers: false,
+    },
+  })
+}
+
+// Wrap letters in span
+function wrapLettersInSpan(element) {
+  if (!element || element.dataset.splitted === "true") return
+
+  const text = element.textContent
+  element.innerHTML = text
+    .split("")
+    .map((char) => (char === " " ? "<span>&nbsp;</span>" : `<span class="letter">${char}</span>`))
+    .join("")
+
+  element.dataset.splitted = "true"
+}
+
+// Manifesto
+function setupManifesto() {
   const text = document.querySelector(".manifesto .text")
+  if (!text) return
+
   wrapLettersInSpan(text)
 
   const letters = document.querySelectorAll(".manifesto .letter")
@@ -103,7 +139,7 @@ document.fonts.ready.then(() => {
     })
   })
 
-  // Manifesto to trajectoire transition
+  // Manifesto to trajectory transition
   const manifesto = document.querySelector(".manifesto")
 
   gsap.to(".manifesto .container", {
@@ -113,7 +149,7 @@ document.fonts.ready.then(() => {
     ease: "none",
 
     scrollTrigger: {
-      trigger: ".trajectoire",
+      trigger: ".trajectory",
       start: "top bottom",
       end: "top 50%",
       scrub: true,
@@ -122,17 +158,13 @@ document.fonts.ready.then(() => {
       onUpdate: (self) => {
         manifesto.classList.toggle("is-exiting", self.progress > 0)
       },
+
       onLeaveBack: () => {
         manifesto.classList.remove("is-exiting")
       },
     },
   })
-})
-
-const wrapLettersInSpan = (element) => {
-  const text = element.textContent
-  element.innerHTML = text
-    .split("")
-    .map((char) => (char === " " ? "<span>&nbsp;</span>" : `<span class="letter">${char}</span>`))
-    .join("")
 }
+
+// Trajectory
+function setupTrajectory() {}
