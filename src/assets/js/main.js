@@ -167,4 +167,61 @@ function setupManifesto() {
 }
 
 // Trajectory
-function setupTrajectory() {}
+function setupTrajectory() {
+  const root = document.querySelector(".trajectory")
+  root.querySelectorAll(".container").forEach((container) => {
+    const title = container.querySelector(".title")
+    wrapLettersInSpan(title)
+
+    const dist = container.clientHeight - title.clientHeight
+
+    ScrollTrigger.create({
+      trigger: container,
+      pin: title,
+      start: "top top",
+      end: "+=" + dist,
+    })
+
+    const letters = container.querySelectorAll("span")
+    letters.forEach((letter) => {
+      const randomDistance = Math.random() * dist
+
+      gsap.from(letter, {
+        y: randomDistance,
+        ease: "none",
+        scrollTrigger: {
+          trigger: container,
+          start: "top top",
+          end: "+=" + randomDistance,
+          scrub: true,
+        },
+      })
+    })
+
+    gsap.to(title, {
+      scale: 0.6,
+      transformOrigin: "center center",
+      ease: "none",
+      scrollTrigger: {
+        trigger: container,
+        start: "top+=" + dist * 0.75 + " top",
+        end: "top+=" + dist + " top",
+        scrub: true,
+      },
+    })
+
+    const weightDuration = 200
+
+    gsap.to(title, {
+      fontWeight: 400,
+      ease: "none",
+      scrollTrigger: {
+        trigger: container,
+        start: "top+=" + dist + " top",
+        end: "top+=" + (dist + weightDuration) + " top",
+        scrub: true,
+        markers: false,
+      },
+    })
+  })
+}

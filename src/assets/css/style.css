@@ -102,6 +102,26 @@ body {
 
 /* -------- TRAJECTOIRE -------- */
 .trajectory {
-  height: 100vh;
   background-color: var(--color-dark);
+  padding: 0vh 2vw 100vh;
+}
+
+.trajectory .container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.trajectory .title {
+  color: var(--color-cream);
+  font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 12vw;
+  text-align: center;
+}
+
+.trajectory .title span {
+  display: inline-block;
+  will-change: transform;
 }
