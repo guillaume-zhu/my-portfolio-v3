@@ -101,6 +101,7 @@ body {
 }
 
 /* -------- TRAJECTOIRE -------- */
+/* Title */
 .trajectory {
   background-color: var(--color-dark);
   padding: 0vh 2vw 100vh;
@@ -124,4 +125,44 @@ body {
 .trajectory .title span {
   display: inline-block;
   will-change: transform;
+}
+
+/* Sentences */
+.trajectory-sentences__pin-height {
+  height: 700vh;
+}
+
+.trajectory-sentences__container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trajectory-sentences__center {
+  position: relative;
+  width: 100%;
+}
+
+.trajectory-sentences__sentence {
+  width: 100%;
+  text-align: center;
+  color: var(--color-cream);
+  font-size: 10vw;
+  line-height: 0.9;
+}
+
+.trajectory-sentences__sentence.is-two-lines {
+  margin-top: -0.45em;
+}
+
+.trajectory-sentences__sentence span {
+  display: inline-block;
+  will-change: transform;
+}
+
+.trajectory-sentences__sentence:not(:first-child) {
+  position: absolute;
+  top: 0;
+  left: 0;
 }

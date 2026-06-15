@@ -36,6 +36,7 @@ setupHeroToManifestoTransition()
 document.fonts.ready.then(() => {
   setupManifesto()
   setupTrajectory()
+  setupTrajectorySentences()
 
   ScrollTrigger.refresh()
 })
@@ -81,11 +82,19 @@ function setupHeroToManifestoTransition() {
 function wrapLettersInSpan(element) {
   if (!element || element.dataset.splitted === "true") return
 
-  const text = element.textContent
-  element.innerHTML = text
-    .split("")
-    .map((char) => (char === " " ? "<span>&nbsp;</span>" : `<span class="letter">${char}</span>`))
-    .join("")
+  const lines = element.innerHTML.trim().split(/<br\s*\/?>/i)
+
+  element.innerHTML = lines
+    .map((line) =>
+      line
+        .trim()
+        .split("")
+        .map((char) =>
+          char === " " ? "<span>&nbsp;</span>" : `<span class="letter">${char}</span>`,
+        )
+        .join(""),
+    )
+    .join("<br />")
 
   element.dataset.splitted = "true"
 }
@@ -166,7 +175,7 @@ function setupManifesto() {
   })
 }
 
-// Trajectory
+// Trajectory title
 function setupTrajectory() {
   const root = document.querySelector(".trajectory")
   root.querySelectorAll(".container").forEach((container) => {
@@ -199,7 +208,7 @@ function setupTrajectory() {
     })
 
     gsap.to(title, {
-      scale: 0.6,
+      scale: 0.5,
       transformOrigin: "center center",
       ease: "none",
       scrollTrigger: {
@@ -223,5 +232,86 @@ function setupTrajectory() {
         markers: false,
       },
     })
+  })
+}
+// Trajectory sentences
+function setupTrajectorySentences() {
+  const root = document.querySelector(".trajectory-sentences")
+  if (!root) return
+
+  const pinHeight = root.querySelector(".trajectory-sentences__pin-height")
+  const container = root.querySelector(".trajectory-sentences__container")
+  const sentences = root.querySelectorAll(".trajectory-sentences__sentence")
+
+  sentences.forEach((sentence) => {
+    wrapLettersInSpan(sentence)
+  })
+
+  // Pin
+  ScrollTrigger.create({
+    trigger: pinHeight,
+    start: "top top",
+    end: "bottom bottom",
+    pin: container,
+    markers: false,
+  })
+
+  // Timeline
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: pinHeight,
+      start: "top top",
+      end: "bottom bottom",
+      scrub: true,
+      markers: true,
+    },
+  })
+
+  sentences.forEach((sentence, index) => {
+    const nextSentence = sentences[index + 1]
+
+    if (!nextSentence) return
+
+    // Exit sentence
+    tl.to(sentence, {
+      yPercent: -50,
+      y: "-50vh",
+      ease: "power4.in",
+    })
+
+    // Exit letter stag
+    tl.to(
+      sentence.querySelectorAll("span"),
+      {
+        yPercent: -50,
+        y: "-50vh",
+        stagger: 0.02,
+        ease: "power2.in",
+      },
+      "<",
+    )
+
+    // Entry sentence
+    tl.from(
+      nextSentence,
+      {
+        yPercent: 50,
+        y: "50vh",
+        ease: "power4.out",
+      },
+      "<+=0.30",
+    )
+
+    // Entry letter stag
+    tl.from(
+      nextSentence.querySelectorAll("span"),
+      {
+        yPercent: 50,
+        y: "50vh",
+        ease: "power4.out",
+        stagger: 0.02,
+      },
+      "<",
+    )
   })
 }
