@@ -108,7 +108,7 @@ body.is-visual-fullscreen {
 /* Title */
 .trajectory {
   background-color: var(--color-dark);
-  padding: 0vh 2vw 100vh;
+  padding: 0vh 2vw 0vh;
 }
 
 .trajectory .container {
@@ -218,4 +218,10 @@ body.is-visual-fullscreen {
   right: 0;
   border-radius: 24px 0px 0px 24px;
   background-position: right center;
+}
+
+/* -------- TOOLKIT -------- */
+.toolkit {
+  height: 100vh;
+  background-color: var(--color-dark);
 }

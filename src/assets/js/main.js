@@ -37,6 +37,7 @@ document.fonts.ready.then(() => {
   setupManifesto()
   setupTrajectory()
   setupTrajectorySentences()
+  setupTrajectoryToToolkitTransition()
 
   ScrollTrigger.refresh()
 })
@@ -433,6 +434,37 @@ function setupTrajectorySentences() {
 
       // Hold final state
       tl.to({}, { duration: 0.4 })
+
+      // Change backgroud color for transition
+      tl.set(
+        root,
+        {
+          backgroundColor: "var(--color-black)",
+        },
+        ">",
+      )
     }
+  })
+}
+
+// Trajectory to Toolkit transition
+function setupTrajectoryToToolkitTransition() {
+  const trajectoryFrame = document.querySelector(".trajectory-sentences__container")
+  const toolkit = document.querySelector(".toolkit")
+
+  gsap.to(trajectoryFrame, {
+    scaleX: 0.98,
+    scaleY: 0.98,
+    borderRadius: "0px 0px 32px 32px",
+    transformOrigin: "center top",
+    ease: "none",
+
+    scrollTrigger: {
+      trigger: toolkit,
+      start: "top bottom",
+      end: "top 50%",
+      scrub: true,
+      markers: false,
+    },
   })
 }
