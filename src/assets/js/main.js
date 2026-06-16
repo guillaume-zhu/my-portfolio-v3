@@ -208,7 +208,7 @@ function setupTrajectory() {
     })
 
     gsap.to(title, {
-      scale: 0.5,
+      scale: 0.6,
       transformOrigin: "center center",
       ease: "none",
       scrollTrigger: {
@@ -234,6 +234,7 @@ function setupTrajectory() {
     })
   })
 }
+
 // Trajectory sentences
 function setupTrajectorySentences() {
   const root = document.querySelector(".trajectory-sentences")
@@ -243,11 +244,25 @@ function setupTrajectorySentences() {
   const container = root.querySelector(".trajectory-sentences__container")
   const sentences = root.querySelectorAll(".trajectory-sentences__sentence")
 
+  const visualLeft = root.querySelector(".trajectory-sentences__visual--left")
+  const visualRight = root.querySelector(".trajectory-sentences__visual--right")
+
+  // Initial visuals positions
+  gsap.set(visualLeft, {
+    xPercent: -100,
+    yPercent: -50,
+  })
+
+  gsap.set(visualRight, {
+    xPercent: 100,
+    yPercent: -50,
+  })
+
   sentences.forEach((sentence) => {
     wrapLettersInSpan(sentence)
   })
 
-  // Pin
+  // Pin full sequence
   ScrollTrigger.create({
     trigger: pinHeight,
     start: "top top",
@@ -263,12 +278,57 @@ function setupTrajectorySentences() {
       start: "top top",
       end: "bottom bottom",
       scrub: true,
-      markers: true,
+      markers: false,
     },
   })
 
   sentences.forEach((sentence, index) => {
     const nextSentence = sentences[index + 1]
+
+    const isNextDialogue = nextSentence?.classList.contains("is-dialogue")
+    const isNextBoth = nextSentence?.classList.contains("is-both")
+
+    // Switch to cream theme "Aujourd'hui"
+    if (isNextDialogue) {
+      tl.set(
+        [root],
+        {
+          backgroundColor: "var(--color-cream)",
+        },
+        "<+=0.2",
+      )
+
+      tl.set(
+        sentences,
+        {
+          color: "var(--color-dark)",
+        },
+        "<",
+      )
+    }
+
+    // Visuals enter
+    if (isNextBoth) {
+      tl.to(
+        visualLeft,
+        {
+          xPercent: -30,
+          opacity: 1,
+          ease: "power3.out",
+        },
+        "<+=0.15",
+      )
+
+      tl.to(
+        visualRight,
+        {
+          xPercent: 30,
+          opacity: 1,
+          ease: "power3.out",
+        },
+        "<",
+      )
+    }
 
     if (!nextSentence) return
 
@@ -276,7 +336,7 @@ function setupTrajectorySentences() {
     tl.to(sentence, {
       yPercent: -50,
       y: "-50vh",
-      ease: "power4.in",
+      ease: "power3.in",
     })
 
     // Exit letter stag
@@ -286,9 +346,9 @@ function setupTrajectorySentences() {
         yPercent: -50,
         y: "-50vh",
         stagger: 0.02,
-        ease: "power2.in",
+        ease: "power3.in",
       },
-      "<",
+      "<+=0.1",
     )
 
     // Entry sentence
@@ -297,9 +357,9 @@ function setupTrajectorySentences() {
       {
         yPercent: 50,
         y: "50vh",
-        ease: "power4.out",
+        ease: "power3.out",
       },
-      "<+=0.30",
+      "<+=0.10",
     )
 
     // Entry letter stag
@@ -308,10 +368,71 @@ function setupTrajectorySentences() {
       {
         yPercent: 50,
         y: "50vh",
-        ease: "power4.out",
+        ease: "power3.out",
         stagger: 0.02,
       },
       "<",
     )
+
+    // Final image sequence "les deux"
+    if (isNextBoth) {
+      // 1 join
+      tl.to(
+        visualLeft,
+        {
+          xPercent: 0,
+          width: "calc(50vw + 1px)",
+          ease: "power3.inOut",
+        },
+        "<",
+      )
+
+      tl.to(
+        visualRight,
+        {
+          xPercent: 0,
+          width: "calc(50vw + 1px)",
+          ease: "power3.inOut",
+        },
+        "<",
+      )
+
+      tl.set(
+        nextSentence,
+        {
+          color: "var(--color-cream)",
+        },
+        ">-=0.05",
+      )
+
+      // 2 fullscreen
+      tl.to(
+        [visualLeft, visualRight],
+        {
+          height: "100vh",
+          borderRadius: "0px",
+          ease: "power3.inOut",
+        },
+        ">+=0.2",
+      )
+
+      // Change UI mode
+      tl.to(
+        {},
+        {
+          duration: 0.001,
+          onStart: () => {
+            document.body.classList.add("is-visual-fullscreen")
+          },
+          onReverseComplete: () => {
+            document.body.classList.remove("is-visual-fullscreen")
+          },
+        },
+        "<",
+      )
+
+      // Hold final state
+      tl.to({}, { duration: 0.4 })
+    }
   })
 }

@@ -17,6 +17,10 @@ body {
   background-color: var(--color-cream);
 }
 
+body.is-visual-fullscreen {
+  --current-interface-color: var(--color-cream);
+}
+
 .tag {
   display: flex;
   justify-content: center;
@@ -129,7 +133,7 @@ body {
 
 /* Sentences */
 .trajectory-sentences__pin-height {
-  height: 700vh;
+  height: 1200vh;
 }
 
 .trajectory-sentences__container {
@@ -165,4 +169,53 @@ body {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+/* Viusal blocks */
+.trajectory-sentences {
+  background-color: var(--color-dark);
+  margin-left: -2vw;
+  margin-right: -2vw;
+  width: calc(100% + 4vw);
+  overflow: hidden;
+}
+
+.trajectory-sentences__container {
+  position: relative;
+  overflow: hidden;
+}
+
+.trajectory-sentences__center {
+  z-index: 2;
+  position: relative;
+}
+
+.trajectory-sentences__visuals {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.trajectory-sentences__visual {
+  position: absolute;
+  top: 50%;
+  width: 48vw;
+  height: 30vh;
+  background-image: url("/images/trajectory-bg2.webp");
+  background-size: 100vw 100vh;
+  background-repeat: no-repeat;
+  will-change: transform, width, height, opacity, border-radius;
+}
+
+.trajectory-sentences__visual--left {
+  left: 0;
+  border-radius: 0px 24px 24px 0px;
+  background-position: left center;
+}
+
+.trajectory-sentences__visual--right {
+  right: 0;
+  border-radius: 24px 0px 0px 24px;
+  background-position: right center;
 }
