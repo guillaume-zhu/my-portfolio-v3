@@ -224,4 +224,22 @@ body.is-visual-fullscreen {
 .toolkit {
   height: 100vh;
   background-color: var(--color-dark);
+  padding: 72px 24px;
+}
+
+.toolkit .title {
+  color: var(--color-cream);
+  font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 8vw;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.toolkit .subtitle {
+  color: var(--color-cream);
+  font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
+  font-weight: 300;
+  font-size: 2vw;
+  text-align: center;
 }

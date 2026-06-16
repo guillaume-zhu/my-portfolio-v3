@@ -451,14 +451,9 @@ function setupTrajectorySentences() {
 function setupTrajectoryToToolkitTransition() {
   const trajectoryFrame = document.querySelector(".trajectory-sentences__container")
   const toolkit = document.querySelector(".toolkit")
+  const toolkitTitle = document.querySelector(".toolkit .title")
 
-  gsap.to(trajectoryFrame, {
-    scaleX: 0.98,
-    scaleY: 0.98,
-    borderRadius: "0px 0px 32px 32px",
-    transformOrigin: "center top",
-    ease: "none",
-
+  const tl = gsap.timeline({
     scrollTrigger: {
       trigger: toolkit,
       start: "top bottom",
@@ -467,4 +462,25 @@ function setupTrajectoryToToolkitTransition() {
       markers: false,
     },
   })
+
+  tl.to(
+    trajectoryFrame,
+    {
+      scaleX: 0.98,
+      scaleY: 0.98,
+      borderRadius: "0px 0px 32px 32px",
+      transformOrigin: "center top",
+      ease: "none",
+    },
+    0,
+  )
+
+  tl.fromTo(
+    toolkitTitle,
+    {
+      fontWeight: 300,
+    },
+    { fontWeight: 700, ease: "none" },
+    0,
+  )
 }
