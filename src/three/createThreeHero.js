@@ -1,19 +1,19 @@
 import * as THREE from "three"
 import { GLTFLoader } from "three/examples/jsm/Addons.js"
-import GUI from "lil-gui"
 
 import logoGlassVertexShader from "../shaders/logoGlass/vertex.glsl"
 import logoGlassFragmentShader from "../shaders/logoGlass/fragment.glsl"
 
 export const createThreeHero = async () => {
-  /**
-   * Base
-   */
+  // ------------------------------------------------
+  // Base setup
+  // ------------------------------------------------
+
   // Debug
-  // const gui = new GUI()
 
   // Loaders
   const textureLoader = new THREE.TextureLoader()
+  const gltfLoader = new GLTFLoader()
 
   // Canvas
   const canvas = document.querySelector(".webgl")
@@ -21,76 +21,28 @@ export const createThreeHero = async () => {
   // Scene
   const scene = new THREE.Scene()
 
-  // Rayscaster
-  const raycaster = new THREE.Raycaster()
-  const mouse = new THREE.Vector2()
+  // ------------------------------------------------
+  // Sizes
+  // ------------------------------------------------
 
-  let hoverTarget = 0
-  let hoverProgress = 0
-  let clickProgress = 0
-  let clickTime = 0
-  let isInteractive = true
-
-  const clickPosition = new THREE.Vector3()
-
-  // Sizes & Events
   const sizes = {
     width: window.innerWidth,
     height: window.innerHeight,
     pixelRatio: Math.min(window.devicePixelRatio, 2),
   }
 
-  // -- Resize
-  window.addEventListener("resize", () => {
-    // Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
-    sizes.pixelRatio = Math.min(window.devicePixelRatio, 2)
+  // ------------------------------------------------
+  // Camera
+  // ------------------------------------------------
 
-    // Update camera
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
-
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(sizes.pixelRatio)
-
-    sceneRenderTarget.setSize(sizes.width * sizes.pixelRatio, sizes.height * sizes.pixelRatio)
-  })
-
-  // -- Mouse
-  window.addEventListener("mousemove", (event) => {
-    mouse.x = (event.clientX / sizes.width) * 2 - 1
-    mouse.y = -(event.clientY / sizes.height) * 2 + 1
-  })
-
-  window.addEventListener("click", () => {
-    if (!isInteractive) return
-    if (!hoverTarget) return
-    if (hoverProgress < 0.75) return
-
-    raycaster.setFromCamera(mouse, camera)
-
-    const clickIntersects = raycaster.intersectObject(logoHitBox)
-
-    if (clickIntersects.length === 0) return
-
-    clickPosition.copy(clickIntersects[0].point)
-    clickTime = performance.now() * 0.001
-
-    clickProgress = 1
-  })
-
-  /**
-   * Camera
-   */
   const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 0.1, 100)
   camera.position.set(0, 0, 6)
   scene.add(camera)
 
-  /**
-   * Renderer
-   */
+  // ------------------------------------------------
+  // Renderer
+  // ------------------------------------------------
+
   // Setup
   const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
@@ -103,7 +55,7 @@ export const createThreeHero = async () => {
   renderer.toneMapping = THREE.ACESFilmicToneMapping
   renderer.toneMappingExposure = 1
 
-  // Render Target
+  // Render Target texture for glass shader refraction
   const sceneRenderTarget = new THREE.WebGLRenderTarget(
     sizes.width * sizes.pixelRatio,
     sizes.height * sizes.pixelRatio,
@@ -112,9 +64,24 @@ export const createThreeHero = async () => {
     },
   )
 
-  /**
-   * Environment map
-   */
+  // ------------------------------------------------
+  // Interaction state
+  // ------------------------------------------------
+
+  // Rayscaster
+  const raycaster = new THREE.Raycaster()
+  const mouse = new THREE.Vector2()
+
+  let hoverTarget = 0
+  let hoverProgress = 0
+  let clickProgress = 0
+  let clickTime = 0
+  const clickPosition = new THREE.Vector3()
+  let isInteractive = true
+
+  // ------------------------------------------------
+  // Environment
+  // ------------------------------------------------
 
   const environmentTexture = await textureLoader.loadAsync("/textures/scene-gradient.webp")
 
@@ -131,9 +98,10 @@ export const createThreeHero = async () => {
 
   pmremGenerator.dispose()
 
-  /**
-   * Light
-   */
+  // ------------------------------------------------
+  // Light
+  // ------------------------------------------------
+
   const ambientLight = new THREE.AmbientLight(0xffffff, 1.2)
   scene.add(ambientLight)
 
@@ -141,12 +109,11 @@ export const createThreeHero = async () => {
   directionalLight.position.set(3, 4, 5)
   scene.add(directionalLight)
 
-  /**
-   * Logo Model
-   */
+  // ------------------------------------------------
+  // Logo Model
+  // ------------------------------------------------
 
   // Model group
-  const gltfLoader = new GLTFLoader()
   const gltf = await gltfLoader.loadAsync("/models/logo.glb")
 
   const logoGroup = new THREE.Group()
@@ -158,7 +125,13 @@ export const createThreeHero = async () => {
   const glassLogo = logo.clone(true)
   logoGroup.add(glassLogo)
 
-  // Hitbox
+  // Rotation
+  const logoRotationAxis = new THREE.Vector3(0.2, 1, 0.1).normalize()
+  const logoBaseRotationSpeed = 0.2
+
+  // ------------------------------------------------
+  // Logo Hitbox
+  // ------------------------------------------------
   const logoBox = new THREE.Box3().setFromObject(logo)
   const logoSize = logoBox.getSize(new THREE.Vector3())
   const logoCenter = logoBox.getCenter(new THREE.Vector3())
@@ -173,7 +146,11 @@ export const createThreeHero = async () => {
   logoHitBox.position.copy(logoCenter)
   logoGroup.add(logoHitBox)
 
-  // Silver Material
+  // ------------------------------------------------
+  // Logo materials
+  // ------------------------------------------------
+
+  // Base silver logo
   const silverMaterial = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
     metalness: 1,
@@ -188,7 +165,7 @@ export const createThreeHero = async () => {
     child.renderOrder = 1
   })
 
-  // Glass Shader Material
+  // Glass Shader logo
   const glassMaterial = new THREE.ShaderMaterial({
     vertexShader: logoGlassVertexShader,
     fragmentShader: logoGlassFragmentShader,
@@ -198,26 +175,26 @@ export const createThreeHero = async () => {
     side: THREE.DoubleSide,
 
     uniforms: {
-      // Glass vertex offset
+      // Vertex
       uSurfaceOffset: { value: 0.0005 },
 
-      // Hover fragment
-      uHoverProgress: { value: 0 },
-      uOpacity: { value: 1.0 },
-
+      // Global
       uTime: { value: 0 },
+      uOpacity: { value: 1.0 },
+      uSceneTexture: { value: sceneRenderTarget.texture },
 
+      // Hover / reveal
+      uHoverProgress: { value: 0 },
       uNoiseScale: { value: 2.0 },
       uNoiseSpeed: { value: 0.1 },
       uRevealEdge: { value: 0.1 },
       uFresnelPower: { value: 1.2 },
 
+      // Refraction / chromatic
       uDistortionStrength: { value: 0.025 },
       uChromaticAberration: { value: 0.0045 },
 
-      uSceneTexture: { value: sceneRenderTarget.texture },
-
-      // Click fragment
+      // Click ripple
       uClickProgress: { value: 0 },
       uClickPosition: { value: new THREE.Vector3() },
       uClickTime: { value: 0 },
@@ -237,15 +214,11 @@ export const createThreeHero = async () => {
     child.renderOrder = 2
   })
 
-  // const clickFolder = gui.addFolder("Click ripple")
+  // ------------------------------------------------
+  // Text planes
+  // ------------------------------------------------
 
-  // Rotation
-  const logoRotationAxis = new THREE.Vector3(0.2, 1, 0.1).normalize()
-  const logoBaseRotationSpeed = 0.2
-
-  /**
-   * Text planes
-   */
+  // Setup
   const createTextPlane = async ({ path, width, height, position, rotation }) => {
     const texture = await textureLoader.loadAsync(path)
 
@@ -269,7 +242,7 @@ export const createThreeHero = async () => {
     return mesh
   }
 
-  // Positions and scale
+  // Position & scale
   const multiplyer1 = 2
   const multiplyer2 = 0.85
   const multiplyer3 = 0.6
@@ -302,9 +275,10 @@ export const createThreeHero = async () => {
   textArt.material.opacity = 0
   textCreative.material.opacity = 0
 
-  /**
-   * Scroll logic
-   */
+  // ------------------------------------------------
+  // Scroll state
+  // ------------------------------------------------
+
   let scrollProgress = 0
   let scrollRotationBoost = 0
 
@@ -317,6 +291,9 @@ export const createThreeHero = async () => {
   const totalHeight = floorHeight * (floorCount - 1)
   const totalCameraAngle = Math.PI * 0.5
 
+  // ------------------------------------------------
+  // Scroll controls
+  // ------------------------------------------------
   const setScrollProgress = (value, velocity = 0) => {
     scrollProgress = value
 
@@ -350,27 +327,81 @@ export const createThreeHero = async () => {
     textCreative.material.opacity = roleTextOpacity
   }
 
-  /**
-   * Animate
-   */
+  const setInteractive = (value) => {
+    isInteractive = value
+
+    if (!isInteractive) {
+      hoverTarget = 0
+      document.body.style.cursor = "default"
+    }
+  }
+
+  // ------------------------------------------------
+  // Events
+  // ------------------------------------------------
+
+  // Resize
+  window.addEventListener("resize", () => {
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+    sizes.pixelRatio = Math.min(window.devicePixelRatio, 2)
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(sizes.pixelRatio)
+
+    sceneRenderTarget.setSize(sizes.width * sizes.pixelRatio, sizes.height * sizes.pixelRatio)
+  })
+
+  // Mouse
+  window.addEventListener("mousemove", (event) => {
+    mouse.x = (event.clientX / sizes.width) * 2 - 1
+    mouse.y = -(event.clientY / sizes.height) * 2 + 1
+  })
+
+  window.addEventListener("click", () => {
+    if (!isInteractive) return
+    if (!hoverTarget) return
+    if (hoverProgress < 0.75) return
+
+    raycaster.setFromCamera(mouse, camera)
+
+    const clickIntersects = raycaster.intersectObject(logoHitBox)
+
+    if (clickIntersects.length === 0) return
+
+    clickPosition.copy(clickIntersects[0].point)
+    clickTime = performance.now() * 0.001
+
+    clickProgress = 1
+  })
+
+  // ------------------------------------------------
+  // Animation loop
+  // ------------------------------------------------
   let previousTime = performance.now()
 
   const tick = (currentTime) => {
+    // Time
     const delta = (currentTime - previousTime) / 1000
     previousTime = currentTime
 
-    // Update glass logo shader
+    // Update shader uniforms
     glassMaterial.uniforms.uTime.value = currentTime * 0.001
 
-    // Update screen
+    // Scroll-driven scene update
     updateSceneFromScroll()
 
-    // Raycaster
+    // Hover interaction
     if (isInteractive) {
       raycaster.setFromCamera(mouse, camera)
       const intersects = raycaster.intersectObject(logoHitBox)
 
-      // -- hover
       hoverTarget = intersects.length > 0 ? 1 : 0
       document.body.style.cursor = hoverTarget ? "pointer" : "default"
     } else {
@@ -378,17 +409,16 @@ export const createThreeHero = async () => {
     }
 
     hoverProgress = THREE.MathUtils.damp(hoverProgress, hoverTarget, 4.5, delta)
-
     glassMaterial.uniforms.uHoverProgress.value = hoverProgress
 
-    // -- click
+    // Click ripple animation
     clickProgress = THREE.MathUtils.damp(clickProgress, 0, 3.5, delta)
 
     glassMaterial.uniforms.uClickProgress.value = clickProgress
     glassMaterial.uniforms.uClickPosition.value.copy(clickPosition)
     glassMaterial.uniforms.uClickTime.value = clickTime
 
-    // Update logo
+    // Update logo rotation
     scrollRotationBoost = THREE.MathUtils.damp(scrollRotationBoost, 0, 1.5, delta)
 
     const logoRotationSpeed = logoBaseRotationSpeed + scrollRotationBoost
@@ -418,14 +448,6 @@ export const createThreeHero = async () => {
     renderer,
     logoGroup,
     setScrollProgress,
-
-    setInteractive: (value) => {
-      isInteractive = value
-
-      if (!isInteractive) {
-        hoverTarget = 0
-        document.body.style.cursor = "default"
-      }
-    },
+    setInteractive,
   }
 }
