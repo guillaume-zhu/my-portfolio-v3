@@ -222,24 +222,81 @@ body.is-visual-fullscreen {
 
 /* -------- TOOLKIT -------- */
 .toolkit {
-  height: 100vh;
+  position: relative;
   background-color: var(--color-dark);
-  padding: 72px 24px;
+  color: var(--color-cream);
 }
 
-.toolkit .title {
-  color: var(--color-cream);
+/* Scroll distance */
+.toolkit__pin-height {
+  height: 500vh;
+}
+
+/* Pinned scene */
+.toolkit__container {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Section title */
+.toolkit__header {
+  position: absolute;
+  top: 8vh;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+
+.toolkit__title {
   font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
   font-weight: 700;
   font-size: 8vw;
-  text-align: center;
-  margin-bottom: 24px;
 }
 
-.toolkit .subtitle {
-  color: var(--color-cream);
+.toolkit__subtitle {
   font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 2vw;
   text-align: center;
+  margin-top: 2vh;
+}
+
+/* Invisible wheel */
+.toolkit__wheel {
+  position: relative;
+  width: 300%;
+  aspect-ratio: 1;
+  margin: 58vh 0 0 -100%;
+}
+
+/* Card slot */
+.toolkit__slot {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  transform-origin: center center;
+}
+.toolkit__slot.is-visible {
+  visibility: visible;
+}
+
+/* Card */
+.toolkit-card {
+  position: relative;
+  width: clamp(180px, 18vw, 350px);
+  aspect-ratio: 350/504;
+  margin: 0 auto;
+  transform: translateY(-50%);
+  will-change: transform;
+}
+.toolkit-card img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }

@@ -38,6 +38,7 @@ document.fonts.ready.then(() => {
   setupTrajectory()
   setupTrajectorySentences()
   setupTrajectoryToToolkitTransition()
+  setupToolkit()
 
   ScrollTrigger.refresh()
 })
@@ -451,7 +452,7 @@ function setupTrajectorySentences() {
 function setupTrajectoryToToolkitTransition() {
   const trajectoryFrame = document.querySelector(".trajectory-sentences__container")
   const toolkit = document.querySelector(".toolkit")
-  const toolkitTitle = document.querySelector(".toolkit .title")
+  const toolkitTitle = document.querySelector(".toolkit__title")
 
   const tl = gsap.timeline({
     scrollTrigger: {
@@ -483,4 +484,93 @@ function setupTrajectoryToToolkitTransition() {
     { fontWeight: 700, ease: "none" },
     0,
   )
+}
+
+// Toolkit
+function setupToolkit() {
+  const root = document.querySelector(".toolkit")
+  if (!root) return
+
+  const pinHeight = root.querySelector(".toolkit__pin-height")
+  const container = root.querySelector(".toolkit__container")
+  const wheel = root.querySelector(".toolkit__wheel--frontend")
+  const slots = root.querySelectorAll(".toolkit__wheel--frontend .toolkit__slot")
+  if (!pinHeight || !container || !wheel || !slots) return
+
+  const angle = 3.5
+  let currentIndex = 0
+
+  // Initial state
+  slots.forEach((slot, index) => {
+    slot.classList.toggle("is-visible", index === 0)
+
+    gsap.set(slot, {
+      rotation: index * angle,
+    })
+  })
+
+  gsap.set(wheel, {
+    rotation: 0,
+  })
+
+  // Scroll animation
+  ScrollTrigger.create({
+    trigger: pinHeight,
+    start: "top top",
+    end: "bottom bottom",
+    pin: container,
+    scrub: true,
+    markers: true,
+
+    onUpdate: (self) => {
+      const index = Math.min(Math.floor(self.progress * slots.length), slots.length - 1)
+
+      if (index === currentIndex) return
+
+      // Card and wheel animation + reactive index
+      if (index > currentIndex) {
+        for (let i = currentIndex + 1; i <= index; i++) {
+          slots[i].classList.add("is-visible")
+
+          gsap.fromTo(
+            slots[i],
+            {
+              scale: 0.94,
+            },
+            {
+              scale: 1,
+              ease: "elastic.out(0.6, 0.3)",
+              duration: 0.5,
+            },
+          )
+        }
+      } else {
+        for (let i = currentIndex; i > index; i--) {
+          slots[i].classList.remove("is-visible")
+        }
+      }
+
+      gsap.to(wheel, {
+        rotation: -(index * angle) / 2,
+        ease: "elastic.out(0.6,0.3)",
+        duration: 0.5,
+        overwrite: true,
+      })
+
+      currentIndex = index
+    },
+
+    // Reset out of scroll
+    onLeaveBack: () => {
+      currentIndex = 0
+
+      slots.forEach((slot, index) => {
+        slot.classList.toggle("is-visible", index === 0)
+      })
+
+      gsap.set(wheel, {
+        rotation: 0,
+      })
+    },
+  })
 }
