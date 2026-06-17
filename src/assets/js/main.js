@@ -488,6 +488,7 @@ function setupTrajectoryToToolkitTransition() {
 
 // Toolkit
 function setupToolkit() {
+  // DOM selections
   const root = document.querySelector(".toolkit")
   if (!root) return
 
@@ -495,10 +496,13 @@ function setupToolkit() {
   const container = root.querySelector(".toolkit__container")
   const wheel = root.querySelector(".toolkit__wheel--frontend")
   const slots = root.querySelectorAll(".toolkit__wheel--frontend .toolkit__slot")
-  if (!pinHeight || !container || !wheel || !slots) return
 
+  if (!pinHeight || !container || !wheel || !slots.length) return
+
+  // Settings
   const angle = 3.5
   let currentIndex = 0
+  const hoverZIndex = slots.length + 10
 
   // Initial state
   slots.forEach((slot, index) => {
@@ -506,11 +510,30 @@ function setupToolkit() {
 
     gsap.set(slot, {
       rotation: index * angle,
+      zIndex: index + 1,
     })
   })
 
   gsap.set(wheel, {
     rotation: 0,
+  })
+
+  // Hover z-index
+  slots.forEach((slot, index) => {
+    const card = slot.querySelector(".toolkit-card")
+    if (!card) return
+
+    card.addEventListener("pointerenter", () => {
+      gsap.set(slot, {
+        zIndex: hoverZIndex,
+      })
+    })
+
+    card.addEventListener("pointerleave", () => {
+      gsap.set(slot, {
+        zIndex: index + 1,
+      })
+    })
   })
 
   // Scroll animation

@@ -278,6 +278,7 @@ body.is-visual-fullscreen {
   inset: 0;
   visibility: hidden;
   transform-origin: center center;
+  pointer-events: none;
 }
 .toolkit__slot.is-visible {
   visibility: visible;
@@ -291,6 +292,12 @@ body.is-visual-fullscreen {
   margin: 0 auto;
   transform: translateY(-50%);
   will-change: transform;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+  pointer-events: auto;
+}
+.toolkit-card:hover {
+  transform: translateY(-54%) scale(1.04);
 }
 .toolkit-card img {
   position: absolute;
