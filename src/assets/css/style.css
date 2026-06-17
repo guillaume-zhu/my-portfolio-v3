@@ -229,7 +229,7 @@ body.is-visual-fullscreen {
 
 /* Scroll distance */
 .toolkit__pin-height {
-  height: 500vh;
+  height: 1000vh;
 }
 
 /* Pinned scene */
@@ -256,12 +256,21 @@ body.is-visual-fullscreen {
   font-size: 8vw;
 }
 
+.toolkit__subtitle-wrap {
+  position: relative;
+  height: 3.2em;
+  margin-top: 2vh;
+  overflow: hidden;
+}
+
 .toolkit__subtitle {
+  position: absolute;
+  inset: 0;
+  margin: 0;
   font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 2vw;
   text-align: center;
-  margin-top: 2vh;
 }
 
 /* Invisible wheel */
@@ -302,6 +311,44 @@ body.is-visual-fullscreen {
 .toolkit-card img {
   position: absolute;
   inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Flip */
+.toolkit-card--flip {
+  perspective: 2000px;
+}
+
+.toolkit-card__flipper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+}
+
+.toolkit-card__face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.toolkit-card__face--front {
+  transform: rotateY(0deg);
+}
+
+.toolkit-card__face--back {
+  transform: rotateY(180deg);
+}
+
+.toolkit-card__face img {
   display: block;
   width: 100%;
   height: 100%;

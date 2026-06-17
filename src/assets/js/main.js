@@ -513,14 +513,39 @@ function setupToolkit() {
   const wheel = root.querySelector(".toolkit__wheel--frontend")
   const slots = root.querySelectorAll(".toolkit__wheel--frontend .toolkit__slot")
 
-  if (!pinHeight || !container || !wheel || !slots.length) return
+  const transitionSlot = root.querySelector(".toolkit__slot--transition")
+  const flipCard = transitionSlot?.querySelector(".toolkit-card__flipper")
+
+  const subtitleFront = root.querySelector(".toolkit__subtitle--front")
+  const subtitleArt = root.querySelector(".toolkit__subtitle--art")
+
+  if (
+    !pinHeight ||
+    !container ||
+    !wheel ||
+    !slots.length ||
+    !transitionSlot ||
+    !flipCard ||
+    !subtitleFront ||
+    !subtitleArt
+  )
+    return
 
   // Settings
   const angle = 3.5
+
+  const frontDeckEnd = 0.45
+  const collapseEnd = 0.58
+  const flipEnd = 0.68
+  const subtitleOffset = 75
+
   let currentIndex = 0
+  let isCollapsed = false
+
   const hoverZIndex = slots.length + 10
 
   // Initial state
+  // --- card
   slots.forEach((slot, index) => {
     slot.classList.toggle("is-visible", index === 0)
 
@@ -530,8 +555,14 @@ function setupToolkit() {
     })
   })
 
+  // --- wheel
   gsap.set(wheel, {
     rotation: 0,
+  })
+
+  // --- flip card
+  gsap.set(flipCard, {
+    rotationY: 0,
   })
 
   // Hover z-index
@@ -552,6 +583,17 @@ function setupToolkit() {
     })
   })
 
+  // - Subtitle
+  gsap.set(subtitleFront, {
+    autoAlpha: 1,
+    y: 0,
+  })
+
+  gsap.set(subtitleArt, {
+    autoAlpha: 0,
+    y: subtitleOffset,
+  })
+
   // Scroll animation
   ScrollTrigger.create({
     trigger: pinHeight,
@@ -562,46 +604,114 @@ function setupToolkit() {
     markers: true,
 
     onUpdate: (self) => {
-      const index = Math.min(Math.floor(self.progress * slots.length), slots.length - 1)
+      const frontProgress = Math.min(self.progress / frontDeckEnd, 1)
+      const index = Math.min(Math.floor(frontProgress * slots.length), slots.length - 1)
 
-      if (index === currentIndex) return
+      if (index !== currentIndex) {
+        if (index > currentIndex) {
+          // Card and wheel animation + reactive index
+          for (let i = currentIndex + 1; i <= index; i++) {
+            slots[i].classList.add("is-visible")
 
-      // Card and wheel animation + reactive index
-      if (index > currentIndex) {
-        for (let i = currentIndex + 1; i <= index; i++) {
-          slots[i].classList.add("is-visible")
-
-          gsap.fromTo(
-            slots[i],
-            {
-              scale: 0.94,
-            },
-            {
-              scale: 1,
-              ease: "elastic.out(0.6, 0.3)",
-              duration: 0.5,
-            },
-          )
+            gsap.fromTo(
+              slots[i],
+              {
+                scale: 0.94,
+              },
+              {
+                scale: 1,
+                ease: "elastic.out(0.6, 0.3)",
+                duration: 0.5,
+              },
+            )
+          }
+        } else {
+          for (let i = currentIndex; i > index; i--) {
+            slots[i].classList.remove("is-visible")
+          }
         }
-      } else {
-        for (let i = currentIndex; i > index; i--) {
-          slots[i].classList.remove("is-visible")
-        }
+
+        currentIndex = index
       }
 
-      gsap.to(wheel, {
-        rotation: -(index * angle) / 2,
-        ease: "elastic.out(0.6,0.3)",
-        duration: 0.5,
-        overwrite: true,
+      if (self.progress < frontDeckEnd) {
+        gsap.to(wheel, {
+          rotation: -(index * angle) / 2,
+          ease: "elastic.out(0.6,0.3)",
+          duration: 0.5,
+          overwrite: true,
+        })
+
+        return
+      }
+
+      const collapseProgress = gsap.utils.clamp(
+        0,
+        1,
+        (self.progress - frontDeckEnd) / (collapseEnd - frontDeckEnd),
+      )
+
+      // gsap.killTweensOf(wheel)
+
+      slots.forEach((slot, slotIndex) => {
+        const openRotation = slotIndex * angle
+        const currentRotation = openRotation * (1 - collapseProgress)
+
+        gsap.set(slot, {
+          rotation: currentRotation,
+        })
       })
 
-      currentIndex = index
+      const openWheelRotation = -((slots.length - 1) * angle) / 2
+      const currentWheelRotation = openWheelRotation * (1 - collapseProgress)
+
+      gsap.set(wheel, {
+        rotation: currentWheelRotation,
+      })
+
+      if (self.progress >= collapseEnd && !isCollapsed) {
+        slots.forEach((slot) => {
+          if (slot !== transitionSlot) {
+            slot.classList.remove("is-visible")
+          }
+        })
+
+        transitionSlot.classList.add("is-visible")
+        isCollapsed = true
+      }
+
+      if (self.progress < collapseEnd && isCollapsed) {
+        slots.forEach((slot, index) => {
+          slot.classList.toggle("is-visible", index <= currentIndex)
+        })
+
+        isCollapsed = false
+      }
+
+      const flipProgress = gsap.utils.clamp(
+        0,
+        1,
+        (self.progress - collapseEnd) / (flipEnd - collapseEnd),
+      )
+
+      gsap.set(flipCard, {
+        rotationY: 180 * flipProgress,
+      })
+
+      gsap.set(subtitleFront, {
+        autoAlpha: 1 - flipProgress,
+        y: -subtitleOffset * flipProgress,
+      })
+      gsap.set(subtitleArt, {
+        autoAlpha: flipProgress,
+        y: subtitleOffset * (1 - flipProgress),
+      })
     },
 
     // Reset out of scroll
     onLeaveBack: () => {
       currentIndex = 0
+      isCollapsed = false
 
       slots.forEach((slot, index) => {
         slot.classList.toggle("is-visible", index === 0)
