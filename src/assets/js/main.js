@@ -504,7 +504,9 @@ function setupTrajectoryToToolkitTransition() {
 
 // Toolkit
 function setupToolkit() {
-  // DOM selections
+  // ----------------------
+  // 1. Dom selections
+  // ----------------------
   const root = document.querySelector(".toolkit")
   if (!root) return
 
@@ -531,70 +533,123 @@ function setupToolkit() {
   )
     return
 
-  // Settings
+  // ----------------------
+  // 2. Settings
+  // ----------------------
+  // Cards
   const angle = 3.5
+  const cardScalePop = 0.94
+  const cardEasePop = "elastic.out(0.6, 0.3)"
+  const cardDurationPop = 0.5
 
+  // Phases
   const frontDeckEnd = 0.45
   const collapseEnd = 0.58
   const flipEnd = 0.68
+
+  // Subtitle
   const subtitleOffset = 75
 
-  let currentIndex = 0
-  let isCollapsed = false
-
+  // Interactions
   const hoverZIndex = slots.length + 10
 
-  // Initial state
-  // --- card
-  slots.forEach((slot, index) => {
-    slot.classList.toggle("is-visible", index === 0)
+  // ----------------------
+  // 3. States
+  // ----------------------
+  let currentIndex = 0
+  let currentWheelIndex = 0
+  let isCollapsed = false
 
-    gsap.set(slot, {
-      rotation: index * angle,
-      zIndex: index + 1,
-    })
-  })
+  // ----------------------
+  // 4. Helpers
+  // ----------------------
+  // Convert progress into 0 -> 1
+  const getPhaseProgress = (progress, start, end) => {
+    return gsap.utils.clamp(0, 1, (progress - start) / (end - start))
+  }
 
-  // --- wheel
-  gsap.set(wheel, {
-    rotation: 0,
-  })
+  // ----------------------
+  // 5. Initial state functions
+  // ----------------------
+  function resetToolkitState() {
+    currentIndex = 0
+    currentWheelIndex = 0
+    isCollapsed = false
+  }
 
-  // --- flip card
-  gsap.set(flipCard, {
-    rotationY: 0,
-  })
+  function setInitialFrontendDeckState() {
+    // Cards
+    slots.forEach((slot, index) => {
+      slot.classList.toggle("is-visible", index === 0)
 
-  // Hover z-index
-  slots.forEach((slot, index) => {
-    const card = slot.querySelector(".toolkit-card")
-    if (!card) return
-
-    card.addEventListener("pointerenter", () => {
       gsap.set(slot, {
-        zIndex: hoverZIndex,
-      })
-    })
-
-    card.addEventListener("pointerleave", () => {
-      gsap.set(slot, {
+        rotation: index * angle,
         zIndex: index + 1,
+        scale: 1,
       })
     })
-  })
 
-  // - Subtitle
-  gsap.set(subtitleFront, {
-    autoAlpha: 1,
-    y: 0,
-  })
+    // Wheel
+    gsap.set(wheel, {
+      rotation: 0,
+    })
+  }
 
-  gsap.set(subtitleArt, {
-    autoAlpha: 0,
-    y: subtitleOffset,
-  })
+  function setInitialTransitionState() {
+    // Flip
+    gsap.set(flipCard, {
+      rotationY: 0,
+    })
 
-  // Scroll animation
+    // Subtitle
+    gsap.set(subtitleFront, {
+      autoAlpha: 1,
+      y: 0,
+    })
+    gsap.set(subtitleArt, {
+      autoAlpha: 0,
+      y: subtitleOffset,
+    })
+  }
+
+  function setInitialState() {
+    resetToolkitState()
+    setInitialFrontendDeckState()
+    setInitialTransitionState()
+  }
+
+  // ----------------------
+  // 6. Interctions
+  // ----------------------
+  // Hover cards
+  function setupCardHover() {
+    slots.forEach((slot, index) => {
+      const card = slot.querySelector(".toolkit-card")
+      if (!card) return
+
+      card.addEventListener("pointerenter", () => {
+        gsap.set(slot, {
+          zIndex: hoverZIndex,
+        })
+      })
+
+      card.addEventListener("pointerleave", () => {
+        gsap.set(slot, {
+          zIndex: index + 1,
+        })
+      })
+    })
+  }
+
+  // ----------------------
+  // 7. Init
+  // ----------------------
+  setInitialState()
+  setupCardHover()
+
+  // ----------------------
+  // 8. Scroll animation
+  // ----------------------
   ScrollTrigger.create({
     trigger: pinHeight,
     start: "top top",
@@ -604,24 +659,30 @@ function setupToolkit() {
     markers: true,
 
     onUpdate: (self) => {
+      // ----------------------
+      // 1. Front deck index
+      // ----------------------
       const frontProgress = Math.min(self.progress / frontDeckEnd, 1)
       const index = Math.min(Math.floor(frontProgress * slots.length), slots.length - 1)
 
+      // ----------------------
+      // 2. Front cards visibility
+      // ----------------------
+      // Change card visibility when the index changes
       if (index !== currentIndex) {
         if (index > currentIndex) {
-          // Card and wheel animation + reactive index
           for (let i = currentIndex + 1; i <= index; i++) {
             slots[i].classList.add("is-visible")
 
             gsap.fromTo(
               slots[i],
               {
-                scale: 0.94,
+                scale: cardScalePop,
               },
               {
                 scale: 1,
-                ease: "elastic.out(0.6, 0.3)",
-                duration: 0.5,
+                ease: cardEasePop,
+                duration: cardDurationPop,
               },
             )
           }
@@ -634,24 +695,30 @@ function setupToolkit() {
         currentIndex = index
       }
 
+      // ----------------------
+      // 3. Front deck wheel opening
+      // ----------------------
+      // Negative rotation to keep deck centered
       if (self.progress < frontDeckEnd) {
-        gsap.to(wheel, {
-          rotation: -(index * angle) / 2,
-          ease: "elastic.out(0.6,0.3)",
-          duration: 0.5,
-          overwrite: true,
-        })
+        if (index !== currentWheelIndex) {
+          gsap.to(wheel, {
+            rotation: -(index * angle) / 2,
+            ease: cardEasePop,
+            duration: cardDurationPop,
+            overwrite: true,
+          })
+
+          currentWheelIndex = index
+        }
 
         return
       }
 
-      const collapseProgress = gsap.utils.clamp(
-        0,
-        1,
-        (self.progress - frontDeckEnd) / (collapseEnd - frontDeckEnd),
-      )
-
-      // gsap.killTweensOf(wheel)
+      // ----------------------
+      // 4. Front deck collapse
+      // ----------------------
+      // Cards collapse to center between frontDeckEnd and collapseEnd
+      const collapseProgress = getPhaseProgress(self.progress, frontDeckEnd, collapseEnd)
 
       slots.forEach((slot, slotIndex) => {
         const openRotation = slotIndex * angle
@@ -669,6 +736,10 @@ function setupToolkit() {
         rotation: currentWheelRotation,
       })
 
+      // ----------------------
+      // 5. Collapse visibility
+      // ----------------------
+      // After collapse, keep only Shopify/Figma card visible
       if (self.progress >= collapseEnd && !isCollapsed) {
         slots.forEach((slot) => {
           if (slot !== transitionSlot) {
@@ -680,6 +751,7 @@ function setupToolkit() {
         isCollapsed = true
       }
 
+      // Scroll back, restore Front cards visible
       if (self.progress < collapseEnd && isCollapsed) {
         slots.forEach((slot, index) => {
           slot.classList.toggle("is-visible", index <= currentIndex)
@@ -688,16 +760,17 @@ function setupToolkit() {
         isCollapsed = false
       }
 
-      const flipProgress = gsap.utils.clamp(
-        0,
-        1,
-        (self.progress - collapseEnd) / (flipEnd - collapseEnd),
-      )
+      // ----------------------
+      // 6. Flip + subtitle transition
+      // ----------------------
+      const flipProgress = getPhaseProgress(self.progress, collapseEnd, flipEnd)
 
+      // Flip card
       gsap.set(flipCard, {
         rotationY: 180 * flipProgress,
       })
 
+      // Switch subtitle
       gsap.set(subtitleFront, {
         autoAlpha: 1 - flipProgress,
         y: -subtitleOffset * flipProgress,
@@ -710,16 +783,7 @@ function setupToolkit() {
 
     // Reset out of scroll
     onLeaveBack: () => {
-      currentIndex = 0
-      isCollapsed = false
-
-      slots.forEach((slot, index) => {
-        slot.classList.toggle("is-visible", index === 0)
-      })
-
-      gsap.set(wheel, {
-        rotation: 0,
-      })
+      setInitialState()
     },
   })
 }
