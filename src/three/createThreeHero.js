@@ -29,6 +29,7 @@ export const createThreeHero = async () => {
   let hoverProgress = 0
   let clickProgress = 0
   let clickTime = 0
+  let isInteractive = true
 
   const clickPosition = new THREE.Vector3()
 
@@ -64,6 +65,7 @@ export const createThreeHero = async () => {
   })
 
   window.addEventListener("click", () => {
+    if (!isInteractive) return
     if (!hoverTarget) return
     if (hoverProgress < 0.75) return
 
@@ -222,7 +224,7 @@ export const createThreeHero = async () => {
       uClickRadius: { value: 1.2 },
       uClickWaveFrequency: { value: 20.0 },
       uClickWaveSpeed: { value: 7.0 },
-      uClickRippleStrength: { value: 0.015 },
+      uClickRippleStrength: { value: 0.02 },
       uClickGlowStrength: { value: 0.5 },
       uClickRippleNoise: { value: 0.05 },
     },
@@ -296,7 +298,7 @@ export const createThreeHero = async () => {
     rotation: { x: 0, y: -Math.PI * 0.5, z: 0 },
   })
 
-  textName.material.opcaity = 1
+  textName.material.opacity = 1
   textArt.material.opacity = 0
   textCreative.material.opacity = 0
 
@@ -364,12 +366,16 @@ export const createThreeHero = async () => {
     updateSceneFromScroll()
 
     // Raycaster
-    raycaster.setFromCamera(mouse, camera)
-    const intersects = raycaster.intersectObject(logoHitBox)
+    if (isInteractive) {
+      raycaster.setFromCamera(mouse, camera)
+      const intersects = raycaster.intersectObject(logoHitBox)
 
-    // -- hover
-    hoverTarget = intersects.length > 0 ? 1 : 0
-    document.body.style.cursor = hoverTarget ? "pointer" : "default"
+      // -- hover
+      hoverTarget = intersects.length > 0 ? 1 : 0
+      document.body.style.cursor = hoverTarget ? "pointer" : "default"
+    } else {
+      hoverTarget = 0
+    }
 
     hoverProgress = THREE.MathUtils.damp(hoverProgress, hoverTarget, 4.5, delta)
 
@@ -412,5 +418,14 @@ export const createThreeHero = async () => {
     renderer,
     logoGroup,
     setScrollProgress,
+
+    setInteractive: (value) => {
+      isInteractive = value
+
+      if (!isInteractive) {
+        hoverTarget = 0
+        document.body.style.cursor = "default"
+      }
+    },
   }
 }

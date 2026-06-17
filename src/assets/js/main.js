@@ -57,6 +57,22 @@ function setupHeroScroll(threeHero) {
     pin: true,
     markers: false,
 
+    onEnter: () => {
+      threeHero.setInteractive(true)
+    },
+
+    onEnterBack: () => {
+      threeHero.setInteractive(true)
+    },
+
+    onLeave: () => {
+      threeHero.setInteractive(false)
+    },
+
+    onLeaveBack: () => {
+      threeHero.setInteractive(false)
+    },
+
     onUpdate: (self) => {
       threeHero.setScrollProgress(self.progress, self.getVelocity())
     },
