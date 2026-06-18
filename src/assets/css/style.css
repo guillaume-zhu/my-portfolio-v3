@@ -315,7 +315,11 @@ body.is-visual-fullscreen {
   will-change: transform;
   cursor: pointer;
   transition: transform 0.25s ease;
+  pointer-events: none;
+}
+.toolkit__wheel.is-interactive .toolkit-card {
   pointer-events: auto;
+  cursor: pointer;
 }
 .toolkit-card:hover {
   transform: translateY(-54%) scale(1.04);

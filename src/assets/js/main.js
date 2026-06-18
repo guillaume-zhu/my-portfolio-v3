@@ -603,6 +603,8 @@ function setupToolkit() {
       })
     })
 
+    wheel.classList.add("is-interactive")
+
     // Wheel
     gsap.set(wheel, {
       rotation: 0,
@@ -621,6 +623,8 @@ function setupToolkit() {
         scale: 1,
       })
     })
+
+    artWheel.classList.remove("is-interactive")
 
     gsap.set(artWheel, {
       rotation: 0,
@@ -695,6 +699,24 @@ function setupToolkit() {
     markers: true,
 
     onUpdate: (self) => {
+      // ----------------------
+      // 0. Decks visibility & interactive state
+      // ----------------------
+      const isArtDeckActive = self.progress >= flipEnd
+
+      gsap.set(artWheel, {
+        autoAlpha: isArtDeckActive ? 1 : 0,
+        pointerEvents: isArtDeckActive ? "auto" : "none",
+      })
+
+      gsap.set(wheel, {
+        autoAlpha: isArtDeckActive ? 0 : 1,
+        pointerEvents: isArtDeckActive ? "none" : "auto",
+      })
+
+      artWheel.classList.toggle("is-interactive", isArtDeckActive)
+      wheel.classList.toggle("is-interactive", !isArtDeckActive)
+
       // ----------------------
       // 1. Front deck index
       // ----------------------
@@ -814,20 +836,6 @@ function setupToolkit() {
       gsap.set(subtitleArt, {
         autoAlpha: flipProgress,
         y: subtitleOffset * (1 - flipProgress),
-      })
-
-      // ----------------------
-      // 7. Front -> Art deck relay
-      // ----------------------
-      const isArtDeckActive = self.progress >= flipEnd
-
-      gsap.set(artWheel, {
-        autoAlpha: isArtDeckActive ? 1 : 0,
-        pointerEvents: isArtDeckActive ? 1 : 0,
-      })
-      gsap.set(wheel, {
-        autoAlpha: isArtDeckActive ? 0 : 1,
-        pointerEvents: isArtDeckActive ? 0 : 1,
       })
 
       // ----------------------
