@@ -523,6 +523,10 @@ function setupToolkit() {
   const subtitleFront = root.querySelector(".toolkit__subtitle--front")
   const subtitleArt = root.querySelector(".toolkit__subtitle--art")
 
+  const artTransitionCard = artWheel?.querySelector(".toolkit-card--transition")
+  const artTransitionSlot = artTransitionCard?.closest(".toolkit__slot")
+  const artTransitionReveal = artTransitionCard?.querySelector(".toolkit-card__cream-reveal")
+
   if (
     !pinHeight ||
     !container ||
@@ -530,6 +534,9 @@ function setupToolkit() {
     !slots.length ||
     !artWheel ||
     !artSlots.length ||
+    !artTransitionCard ||
+    !artTransitionSlot ||
+    !artTransitionReveal ||
     !transitionSlot ||
     !flipCard ||
     !subtitleFront ||
@@ -547,10 +554,14 @@ function setupToolkit() {
   const cardDurationPop = 0.5
 
   // Phases
-  const frontDeckEnd = 0.35
-  const collapseEnd = 0.45
-  const flipEnd = 0.55
-  const artDeckEnd = 0.9
+  const frontDeckEnd = 0.28
+  const collapseEnd = 0.38
+  const flipEnd = 0.48
+  const artDeckEnd = 0.76
+  const finalCollapseEnd = 0.86
+  const cardLiftEnd = 0.9
+  const cardPlayEnd = 0.95
+  const fullscreenStart = 0.98
   const finalTransitionEnd = 1
 
   // Subtitle
@@ -558,6 +569,13 @@ function setupToolkit() {
 
   // Interactions
   const hoverZIndex = slots.length + 10
+
+  // Final transition card
+  const transitionCardMaxScale = 1.5
+  const transitionCardLiftEase = gsap.parseEase("power4.inOut")
+  const transitionCardPLayEase = gsap.parseEase("power3.in")
+  const transitionCardFullscreenScale = 8
+  const transitionCardFullScreenEase = gsap.parseEase("power3.in")
 
   // ----------------------
   // 3. States
@@ -622,6 +640,13 @@ function setupToolkit() {
         zIndex: index + 1,
         scale: 1,
       })
+    })
+
+    gsap.set(artTransitionCard, {
+      scale: 1,
+    })
+    gsap.set(artTransitionReveal, {
+      autoAlpha: 0,
     })
 
     artWheel.classList.remove("is-interactive")
@@ -883,6 +908,115 @@ function setupToolkit() {
       }
 
       currentArtWheelIndex = artIndex
+
+      // ----------------------
+      // 10. Art Direction deck collpase
+      // ----------------------
+      if (self.progress >= artDeckEnd) {
+        const finalCollapseProgress = getPhaseProgress(self.progress, artDeckEnd, finalCollapseEnd)
+
+        gsap.killTweensOf(artWheel)
+
+        artSlots.forEach((slot, slotIndex) => {
+          const openRotation = slotIndex * angle
+          const currentRotation = openRotation * (1 - finalCollapseProgress)
+
+          gsap.set(slot, {
+            rotation: currentRotation,
+          })
+        })
+
+        const openArtWheelRotation = -((artSlots.length - 1) * angle) / 2
+        const currentArtWheelRotation = openArtWheelRotation * (1 - finalCollapseProgress)
+
+        gsap.set(artWheel, {
+          rotation: currentArtWheelRotation,
+        })
+
+        gsap.set(artTransitionSlot, {
+          zIndex: artSlots.length + 20,
+        })
+      }
+
+      // ----------------------
+      // 11. Transition card lift
+      // ----------------------
+      if (self.progress >= finalCollapseEnd && self.progress < cardLiftEnd) {
+        const liftProgress = getPhaseProgress(self.progress, finalCollapseEnd, cardLiftEnd)
+        const easedLiftProgress = transitionCardLiftEase(liftProgress)
+
+        const liftScale = gsap.utils.interpolate(1, transitionCardMaxScale, easedLiftProgress)
+
+        gsap.set(artTransitionCard, {
+          scale: liftScale,
+        })
+      }
+
+      // ----------------------
+      // 12. Transition card play
+      // ----------------------
+      if (self.progress >= cardLiftEnd && self.progress < cardPlayEnd) {
+        const playProgress = getPhaseProgress(self.progress, cardLiftEnd, cardPlayEnd)
+        const easedPlayProgress = transitionCardPLayEase(playProgress)
+
+        const playScale = gsap.utils.interpolate(transitionCardMaxScale, 1, easedPlayProgress)
+
+        gsap.set(artTransitionCard, {
+          scale: playScale,
+        })
+      }
+
+      // ----------------------
+      // 13. Transition card cream reveal
+      // ----------------------
+      if (self.progress >= finalCollapseEnd && self.progress < cardPlayEnd) {
+        const revealProgress = getPhaseProgress(self.progress, finalCollapseEnd, cardPlayEnd)
+
+        gsap.set(artTransitionReveal, {
+          autoAlpha: revealProgress,
+        })
+      }
+
+      if (self.progress >= cardPlayEnd) {
+        gsap.set(artTransitionReveal, {
+          autoAlpha: 1,
+        })
+      }
+
+      // ----------------------
+      // 14. Transition card hold
+      // ----------------------
+      if (self.progress >= cardPlayEnd && self.progress < fullscreenStart) {
+        gsap.set(artTransitionCard, {
+          scale: 1,
+        })
+
+        gsap.set(artTransitionReveal, {
+          autoAlpha: 1,
+        })
+      }
+
+      // ----------------------
+      // 15. Transition card fullscreen
+      // ----------------------
+      if (self.progress >= cardPlayEnd) {
+        const fullScreenProgress = getPhaseProgress(
+          self.progress,
+          fullscreenStart,
+          finalTransitionEnd,
+        )
+        const easedFullscreenProgress = transitionCardFullScreenEase(fullScreenProgress)
+
+        const fullscreenScale = gsap.utils.interpolate(
+          1,
+          transitionCardFullscreenScale,
+          fullScreenProgress,
+        )
+
+        gsap.set(artTransitionCard, {
+          scale: fullscreenScale,
+        })
+      }
     },
 
     // Reset out of scroll

@@ -314,7 +314,7 @@ body.is-visual-fullscreen {
   transform: translateY(-50%);
   will-change: transform;
   cursor: pointer;
-  transition: transform 0.25s ease;
+  transition: transform 0.2s ease-out;
   pointer-events: none;
 }
 .toolkit__wheel.is-interactive .toolkit-card {
@@ -369,4 +369,14 @@ body.is-visual-fullscreen {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+/* Final transition */
+.toolkit-card__cream-reveal {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-cream);
+  opacity: 0;
+  pointer-events: none;
+  border-radius: 20px;
 }
