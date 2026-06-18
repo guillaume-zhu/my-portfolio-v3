@@ -275,10 +275,22 @@ body.is-visual-fullscreen {
 
 /* Invisible wheel */
 .toolkit__wheel {
-  position: relative;
+  position: absolute;
+  top: 58vh;
+  left: -100%;
   width: 300%;
   aspect-ratio: 1;
-  margin: 58vh 0 0 -100%;
+  margin: 0;
+}
+
+.toolkit__wheel--frontend {
+  z-index: 1;
+}
+
+.toolkit__wheel--art-direction {
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Card slot */

@@ -495,7 +495,7 @@ function setupTrajectoryToToolkitTransition() {
   tl.fromTo(
     toolkitTitle,
     {
-      fontWeight: 300,
+      fontWeight: 500,
     },
     { fontWeight: 700, ease: "none" },
     0,
@@ -514,6 +514,8 @@ function setupToolkit() {
   const container = root.querySelector(".toolkit__container")
   const wheel = root.querySelector(".toolkit__wheel--frontend")
   const slots = root.querySelectorAll(".toolkit__wheel--frontend .toolkit__slot")
+  const artWheel = root.querySelector(".toolkit__wheel--art-direction")
+  const artSlots = root.querySelectorAll(".toolkit__wheel--art-direction .toolkit__slot")
 
   const transitionSlot = root.querySelector(".toolkit__slot--transition")
   const flipCard = transitionSlot?.querySelector(".toolkit-card__flipper")
@@ -526,6 +528,8 @@ function setupToolkit() {
     !container ||
     !wheel ||
     !slots.length ||
+    !artWheel ||
+    !artSlots.length ||
     !transitionSlot ||
     !flipCard ||
     !subtitleFront ||
@@ -543,9 +547,11 @@ function setupToolkit() {
   const cardDurationPop = 0.5
 
   // Phases
-  const frontDeckEnd = 0.45
-  const collapseEnd = 0.58
-  const flipEnd = 0.68
+  const frontDeckEnd = 0.35
+  const collapseEnd = 0.45
+  const flipEnd = 0.55
+  const artDeckEnd = 0.9
+  const finalTransitionEnd = 1
 
   // Subtitle
   const subtitleOffset = 75
@@ -558,6 +564,10 @@ function setupToolkit() {
   // ----------------------
   let currentIndex = 0
   let currentWheelIndex = 0
+
+  let currentArtIndex = 0
+  let currentArtWheelIndex = 0
+
   let isCollapsed = false
 
   // ----------------------
@@ -574,6 +584,10 @@ function setupToolkit() {
   function resetToolkitState() {
     currentIndex = 0
     currentWheelIndex = 0
+
+    currentArtIndex = 0
+    currentArtWheelIndex = 0
+
     isCollapsed = false
   }
 
@@ -592,6 +606,26 @@ function setupToolkit() {
     // Wheel
     gsap.set(wheel, {
       rotation: 0,
+      autoAlpha: 1,
+      pointerEvents: "auto",
+    })
+  }
+
+  function setInitialArtDeckState() {
+    artSlots.forEach((slot, index) => {
+      slot.classList.toggle("is-visible", index === 0)
+
+      gsap.set(slot, {
+        rotation: index * angle,
+        zIndex: index + 1,
+        scale: 1,
+      })
+    })
+
+    gsap.set(artWheel, {
+      rotation: 0,
+      autoAlpha: 0,
+      pointerEvents: "none",
     })
   }
 
@@ -615,6 +649,7 @@ function setupToolkit() {
   function setInitialState() {
     resetToolkitState()
     setInitialFrontendDeckState()
+    setInitialArtDeckState()
     setInitialTransitionState()
   }
 
@@ -622,8 +657,8 @@ function setupToolkit() {
   // 6. Interctions
   // ----------------------
   // Hover cards
-  function setupCardHover() {
-    slots.forEach((slot, index) => {
+  function setupCardHover(deckSlots) {
+    deckSlots.forEach((slot, index) => {
       const card = slot.querySelector(".toolkit-card")
       if (!card) return
 
@@ -645,7 +680,8 @@ function setupToolkit() {
   // 7. Init
   // ----------------------
   setInitialState()
-  setupCardHover()
+  setupCardHover(slots)
+  setupCardHover(artSlots)
 
   // ----------------------
   // 8. Scroll animation
@@ -779,6 +815,66 @@ function setupToolkit() {
         autoAlpha: flipProgress,
         y: subtitleOffset * (1 - flipProgress),
       })
+
+      // ----------------------
+      // 7. Front -> Art deck relay
+      // ----------------------
+      const isArtDeckActive = self.progress >= flipEnd
+
+      gsap.set(artWheel, {
+        autoAlpha: isArtDeckActive ? 1 : 0,
+        pointerEvents: isArtDeckActive ? 1 : 0,
+      })
+      gsap.set(wheel, {
+        autoAlpha: isArtDeckActive ? 0 : 1,
+        pointerEvents: isArtDeckActive ? 0 : 1,
+      })
+
+      // ----------------------
+      // 8. Art Direction card visibility
+      // ----------------------
+      const artProgress = getPhaseProgress(self.progress, flipEnd, artDeckEnd)
+      const artIndex = Math.min(Math.floor(artProgress * artSlots.length), artSlots.length - 1)
+
+      if (artIndex !== currentArtIndex) {
+        if (artIndex > currentArtIndex) {
+          for (let i = currentArtIndex + 1; i <= artIndex; i++) {
+            artSlots[i].classList.add("is-visible")
+
+            gsap.fromTo(
+              artSlots[i],
+              {
+                scale: cardScalePop,
+              },
+              {
+                scale: 1,
+                ease: cardEasePop,
+                duration: cardDurationPop,
+              },
+            )
+          }
+        } else {
+          for (let i = currentArtIndex; i > artIndex; i--) {
+            artSlots[i].classList.remove("is-visible")
+          }
+        }
+
+        currentArtIndex = artIndex
+      }
+
+      // ----------------------
+      // 9. Art Direction wheel opening
+      // ----------------------
+      if (artIndex !== currentArtWheelIndex) {
+        gsap.to(artWheel, {
+          rotation: -(artIndex * angle) / 2,
+          ease: cardEasePop,
+          duration: cardDurationPop,
+          overwrite: true,
+        })
+      }
+
+      currentArtWheelIndex = artIndex
     },
 
     // Reset out of scroll
