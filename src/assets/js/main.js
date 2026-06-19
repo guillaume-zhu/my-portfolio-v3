@@ -4,6 +4,7 @@ import Lenis from "lenis"
 import "lenis/dist/lenis.css"
 
 import { createThreeHero } from "../../three/createThreeHero"
+import { createToolkitReveal } from "../../three/createToolkitReveal"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -26,6 +27,7 @@ gsap.ticker.lagSmoothing(0)
 // Scene scroll animation
 // ----------------------
 const threeHero = await createThreeHero()
+const toolkitReveal = createToolkitReveal()
 
 setupHeroScroll(threeHero)
 setupHeroToManifestoTransition()
@@ -38,7 +40,7 @@ document.fonts.ready.then(() => {
   setupTrajectory()
   setupTrajectorySentences()
   setupTrajectoryToToolkitTransition()
-  setupToolkit()
+  setupToolkit(toolkitReveal)
 
   ScrollTrigger.refresh()
 })
@@ -503,7 +505,7 @@ function setupTrajectoryToToolkitTransition() {
 }
 
 // Toolkit
-function setupToolkit() {
+function setupToolkit(toolkitReveal) {
   // ----------------------
   // 1. Dom selections
   // ----------------------
@@ -525,7 +527,6 @@ function setupToolkit() {
 
   const artTransitionCard = artWheel?.querySelector(".toolkit-card--transition")
   const artTransitionSlot = artTransitionCard?.closest(".toolkit__slot")
-  const artTransitionReveal = artTransitionCard?.querySelector(".toolkit-card__cream-reveal")
 
   if (
     !pinHeight ||
@@ -536,11 +537,11 @@ function setupToolkit() {
     !artSlots.length ||
     !artTransitionCard ||
     !artTransitionSlot ||
-    !artTransitionReveal ||
     !transitionSlot ||
     !flipCard ||
     !subtitleFront ||
-    !subtitleArt
+    !subtitleArt ||
+    !toolkitReveal
   )
     return
 
@@ -574,8 +575,7 @@ function setupToolkit() {
   const transitionCardMaxScale = 1.5
   const transitionCardLiftEase = gsap.parseEase("power4.inOut")
   const transitionCardPLayEase = gsap.parseEase("power3.in")
-  const transitionCardFullscreenScale = 8
-  const transitionCardFullScreenEase = gsap.parseEase("power3.in")
+  const transitionRevealEase = gsap.parseEase("power2.inOut")
 
   // ----------------------
   // 3. States
@@ -645,9 +645,6 @@ function setupToolkit() {
     gsap.set(artTransitionCard, {
       scale: 1,
     })
-    gsap.set(artTransitionReveal, {
-      autoAlpha: 0,
-    })
 
     artWheel.classList.remove("is-interactive")
 
@@ -680,6 +677,8 @@ function setupToolkit() {
     setInitialFrontendDeckState()
     setInitialArtDeckState()
     setInitialTransitionState()
+
+    toolkitReveal.setProgress(0)
   }
 
   // ----------------------
@@ -969,54 +968,26 @@ function setupToolkit() {
       // ----------------------
       // 13. Transition card cream reveal
       // ----------------------
-      if (self.progress >= finalCollapseEnd && self.progress < cardPlayEnd) {
-        const revealProgress = getPhaseProgress(self.progress, finalCollapseEnd, cardPlayEnd)
-
-        gsap.set(artTransitionReveal, {
-          autoAlpha: revealProgress,
-        })
-      }
-
-      if (self.progress >= cardPlayEnd) {
-        gsap.set(artTransitionReveal, {
-          autoAlpha: 1,
-        })
-      }
 
       // ----------------------
       // 14. Transition card hold
       // ----------------------
-      if (self.progress >= cardPlayEnd && self.progress < fullscreenStart) {
+      if (self.progress >= cardPlayEnd) {
         gsap.set(artTransitionCard, {
           scale: 1,
         })
 
-        gsap.set(artTransitionReveal, {
-          autoAlpha: 1,
-        })
+        toolkitReveal.setOriginFromElement(artTransitionCard)
       }
 
       // ----------------------
-      // 15. Transition card fullscreen
+      // 15. Fullscreen shader reveal
       // ----------------------
-      if (self.progress >= cardPlayEnd) {
-        const fullScreenProgress = getPhaseProgress(
-          self.progress,
-          fullscreenStart,
-          finalTransitionEnd,
-        )
-        const easedFullscreenProgress = transitionCardFullScreenEase(fullScreenProgress)
+      const revealProgress = getPhaseProgress(self.progress, fullscreenStart, finalTransitionEnd)
 
-        const fullscreenScale = gsap.utils.interpolate(
-          1,
-          transitionCardFullscreenScale,
-          fullScreenProgress,
-        )
+      const easedRevealProgress = transitionRevealEase(revealProgress)
 
-        gsap.set(artTransitionCard, {
-          scale: fullscreenScale,
-        })
-      }
+      toolkitReveal.setProgress(easedRevealProgress)
     },
 
     // Reset out of scroll
