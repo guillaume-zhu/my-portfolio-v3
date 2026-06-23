@@ -4,6 +4,7 @@ import Lenis from "lenis"
 import "lenis/dist/lenis.css"
 
 import { createThreeHero } from "../../three/createThreeHero"
+import { createToolkitCardReveal } from "../../three/createToolkitCardReveal"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -527,6 +528,8 @@ function setupToolkit() {
   const artTransitionSlot = artTransitionCard?.closest(".toolkit__slot")
   const artTransitionReveal = artTransitionCard?.querySelector(".toolkit-card__cream-reveal")
 
+  const cardReveal = createToolkitCardReveal(artTransitionReveal)
+
   if (
     !pinHeight ||
     !container ||
@@ -646,7 +649,7 @@ function setupToolkit() {
       scale: 1,
     })
     gsap.set(artTransitionReveal, {
-      autoAlpha: 0,
+      autoAlpha: 1,
     })
 
     artWheel.classList.remove("is-interactive")
@@ -680,6 +683,8 @@ function setupToolkit() {
     setInitialFrontendDeckState()
     setInitialArtDeckState()
     setInitialTransitionState()
+
+    cardReveal.setProgress(0)
   }
 
   // ----------------------
@@ -969,19 +974,9 @@ function setupToolkit() {
       // ----------------------
       // 13. Transition card cream reveal
       // ----------------------
-      if (self.progress >= finalCollapseEnd && self.progress < cardPlayEnd) {
-        const revealProgress = getPhaseProgress(self.progress, finalCollapseEnd, cardPlayEnd)
+      const revealProgress = getPhaseProgress(self.progress, cardPlayEnd, fullscreenStart)
 
-        gsap.set(artTransitionReveal, {
-          autoAlpha: revealProgress,
-        })
-      }
-
-      if (self.progress >= cardPlayEnd) {
-        gsap.set(artTransitionReveal, {
-          autoAlpha: 1,
-        })
-      }
+      cardReveal.setProgress(revealProgress)
 
       // ----------------------
       // 14. Transition card hold
@@ -990,16 +985,12 @@ function setupToolkit() {
         gsap.set(artTransitionCard, {
           scale: 1,
         })
-
-        gsap.set(artTransitionReveal, {
-          autoAlpha: 1,
-        })
       }
 
       // ----------------------
       // 15. Transition card fullscreen
       // ----------------------
-      if (self.progress >= cardPlayEnd) {
+      if (self.progress >= fullscreenStart) {
         const fullScreenProgress = getPhaseProgress(
           self.progress,
           fullscreenStart,
@@ -1010,7 +1001,7 @@ function setupToolkit() {
         const fullscreenScale = gsap.utils.interpolate(
           1,
           transitionCardFullscreenScale,
-          fullScreenProgress,
+          easedFullscreenProgress,
         )
 
         gsap.set(artTransitionCard, {
