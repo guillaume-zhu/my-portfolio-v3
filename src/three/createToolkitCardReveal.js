@@ -48,20 +48,6 @@ export function createToolkitCardReveal(canvas) {
     },
   }
 
-  //   const gui = new GUI({
-  //     title: "Toolkit reveal",
-  //   })
-
-  //   const noiseFolder = gui.addFolder("Noise")
-
-  //   noiseFolder.add(uniforms.uNoiseScale, "value", 1, 20, 0.1).name("Scale")
-
-  //   noiseFolder.add(uniforms.uNoiseStrength, "value", 0, 1.0, 0.0001).name("Strength")
-
-  //   noiseFolder.add(uniforms.uNoiseSpeedX, "value", -2, 2, 0.01).name("Speed X")
-
-  //   noiseFolder.add(uniforms.uNoiseSpeedY, "value", -0.5, 0.5, 0.01).name("Speed Y")
-
   // --------------
   // 4. Shader plane
   // --------------
@@ -121,11 +107,12 @@ export function createToolkitCardReveal(canvas) {
     renderer.setSize(width, height, false)
 
     render()
-    tick()
   }
 
   window.addEventListener("resize", resize)
+
   resize()
+  tick()
 
   // --------------
   // 8. Controls

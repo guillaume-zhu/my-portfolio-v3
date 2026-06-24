@@ -81,4 +81,6 @@ void main() {
         uCreamColor,
         reveal
     );
+
+    #include <colorspace_fragment>
 }

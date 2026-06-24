@@ -558,13 +558,13 @@ function setupToolkit() {
 
   // Phases
   const frontDeckEnd = 0.28
-  const collapseEnd = 0.38
-  const flipEnd = 0.48
-  const artDeckEnd = 0.76
-  const finalCollapseEnd = 0.86
-  const cardLiftEnd = 0.9
-  const cardPlayEnd = 0.95
-  const fullscreenStart = 0.98
+  const collapseEnd = 0.33
+  const flipEnd = 0.43
+  const artDeckEnd = 0.71
+  const finalCollapseEnd = 0.76
+  const cardLiftEnd = 0.82
+  const cardPlayEnd = 0.87
+  const fullscreenStart = 0.97
   const finalTransitionEnd = 1
 
   // Subtitle
@@ -726,7 +726,7 @@ function setupToolkit() {
     end: "bottom bottom",
     pin: container,
     scrub: true,
-    markers: true,
+    markers: false,
 
     onUpdate: (self) => {
       // ----------------------
