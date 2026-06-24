@@ -229,7 +229,7 @@ body.is-visual-fullscreen {
 
 /* Scroll distance */
 .toolkit__pin-height {
-  height: 1400vh;
+  height: 1000vh;
 }
 
 /* Pinned scene */
@@ -384,4 +384,75 @@ body.is-visual-fullscreen {
   opacity: 0;
   border-radius: 20px;
   pointer-events: none;
+}
+
+/* -------- PROJECTS -------- */
+.projects {
+  position: relative;
+  background-color: var(--color-cream);
+  color: var(--color-dark);
+}
+
+/* Pin */
+.projects__pin-height {
+  height: 600vh;
+}
+
+.projects__container {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Title */
+.projects__title {
+  position: absolute;
+  top: 8vh;
+  left: 0;
+  width: 100%;
+
+  font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
+  font-size: 8vw;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Projects list */
+.projects__list {
+  position: absolute;
+  top: 31vh;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 2em;
+}
+
+.projects__link {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: fit-content;
+  color: inherit;
+  font-family: "Satoshi-VariableItalic", Arial, Helvetica, sans-serif;
+  font-size: clamp(48px, 5.2vw, 86px);
+  font-style: italic;
+  font-weight: 400;
+  text-decoration: none;
+  white-space: none;
+}
+
+/* Projects letters */
+.project-letter {
+  position: relative;
+  display: inline-block;
+  transform-origin: center center;
+  will-change: transform;
+}
+.project-letter__content {
+  position: relative;
+  display: inline-block;
+  transform-origin: center center;
+  will-change: transform;
 }

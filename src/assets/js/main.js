@@ -2,6 +2,7 @@ import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import Lenis from "lenis"
 import "lenis/dist/lenis.css"
+import Matter from "matter-js"
 
 import { createThreeHero } from "../../three/createThreeHero"
 import { createToolkitCardReveal } from "../../three/createToolkitCardReveal"
@@ -40,6 +41,7 @@ document.fonts.ready.then(() => {
   setupTrajectorySentences()
   setupTrajectoryToToolkitTransition()
   setupToolkit()
+  setupProjects()
 
   ScrollTrigger.refresh()
 })
@@ -116,6 +118,27 @@ function wrapLettersInSpan(element) {
     .join("<br />")
 
   element.dataset.splitted = "true"
+}
+// Wrap project letters
+function wrapProjectLetters(element) {
+  const text = element.textContent.trim()
+
+  element.setAttribute("aria-label", text)
+
+  element.innerHTML = text
+    .split("")
+    .map((char) => {
+      const content = char === " " ? "&nbsp;" : char
+
+      return `
+    <span class="project-letter" aria-hidden="true">
+      <span class="project-letter__content">
+        ${content}
+      </span>
+    </span>
+    `
+    })
+    .join("")
 }
 
 // Manifesto
@@ -529,23 +552,6 @@ function setupToolkit() {
   const artTransitionReveal = artTransitionCard?.querySelector(".toolkit-card__cream-reveal")
 
   const cardReveal = createToolkitCardReveal(artTransitionReveal)
-
-  if (
-    !pinHeight ||
-    !container ||
-    !wheel ||
-    !slots.length ||
-    !artWheel ||
-    !artSlots.length ||
-    !artTransitionCard ||
-    !artTransitionSlot ||
-    !artTransitionReveal ||
-    !transitionSlot ||
-    !flipCard ||
-    !subtitleFront ||
-    !subtitleArt
-  )
-    return
 
   // ----------------------
   // 2. Settings
@@ -1015,4 +1021,342 @@ function setupToolkit() {
       setInitialState()
     },
   })
+}
+
+// Projects
+function setupProjects() {
+  // ----------------------
+  // 1. Dom selections
+  // ----------------------
+  const root = document.querySelector(".projects")
+  const pinHeight = root.querySelector(".projects__pin-height")
+  const container = root.querySelector(".projects__container")
+
+  const title = root.querySelector(".projects__title")
+  const links = root.querySelectorAll(".projects__link")
+
+  links.forEach((link) => {
+    wrapProjectLetters(link)
+  })
+
+  // ----------------------
+  // 2. Matter.js initialisation
+  // ----------------------
+  const { Engine, Composite, Bodies, Body, Constraint } = Matter
+
+  const engine = Engine.create()
+  engine.world.gravity.y = 0.5
+
+  const collisionGroup = Body.nextGroup(true)
+  const letterBodies = []
+
+  function createProjectPhysics() {
+    // Reset DOM transformations before measuring
+    links.forEach((link) => {
+      const letters = link.querySelectorAll(".project-letter")
+
+      letters.forEach((letter) => {
+        letter.style.transform = ""
+      })
+    })
+
+    Composite.clear(engine.world, false)
+    Engine.clear(engine)
+
+    letterBodies.length = 0
+
+    const currentScrollY = window.scrollY
+
+    links.forEach((link) => {
+      const projectLetters = link.querySelectorAll(".project-letter")
+
+      const projectLetterBodies = []
+
+      const middleIndex = (projectLetters.length - 1) / 2
+
+      // Create bodies and anchors
+      projectLetters.forEach((letter, index) => {
+        const rect = letter.getBoundingClientRect()
+
+        if (rect.width === 0 || rect.height === 0) return
+
+        const centerX = rect.left + rect.width / 2
+
+        const centerY = rect.top + currentScrollY + rect.height / 2
+
+        const body = Bodies.rectangle(centerX, centerY, rect.width, rect.height, {
+          frictionAir: 0.05,
+          restitution: 0.3,
+          density: 0.001,
+
+          collisionFilter: {
+            group: collisionGroup,
+          },
+        })
+
+        const anchor = Constraint.create({
+          pointA: {
+            x: centerX,
+            y: centerY,
+          },
+          bodyB: body,
+          stiffness: 0.005,
+          damping: 0.004,
+          length: 0,
+        })
+
+        const normalizedDistance =
+          middleIndex === 0 ? 0 : Math.abs(index - middleIndex) / middleIndex
+
+        const letterData = {
+          element: letter,
+          body,
+          anchor,
+          initialX: centerX,
+          initialY: centerY,
+          width: rect.width,
+          weight: normalizedDistance,
+        }
+
+        projectLetterBodies.push(letterData)
+        letterBodies.push(letterData)
+
+        Composite.add(engine.world, [body, anchor])
+      })
+
+      // Link letters from this project
+      for (let index = 0; index < projectLetterBodies.length - 1; index++) {
+        const currentLetter = projectLetterBodies[index]
+
+        const nextLetter = projectLetterBodies[index + 1]
+
+        const connection = Constraint.create({
+          bodyA: currentLetter.body,
+          bodyB: nextLetter.body,
+
+          pointA: {
+            x: currentLetter.width / 2,
+            y: 0,
+          },
+
+          pointB: {
+            x: -nextLetter.width / 2,
+            y: 0,
+          },
+
+          stiffness: 0.6,
+          length: 0,
+        })
+
+        Composite.add(engine.world, connection)
+      }
+    })
+  }
+
+  createProjectPhysics()
+
+  // Resize
+  let resizeTimeout
+
+  function handleProjectsResize() {
+    clearTimeout(resizeTimeout)
+
+    resizeTimeout = setTimeout(() => {
+      ScrollTrigger.refresh()
+      createProjectPhysics()
+    }, 200)
+  }
+
+  window.addEventListener("resize", handleProjectsResize)
+
+  // ----------------------
+  // Matter.js controls
+  // ----------------------
+  let isSettling = false
+
+  // Update project physics on every frame
+  function updateProjectPhysics() {
+    Engine.update(engine, 1000 / 60)
+
+    letterBodies.forEach((letter) => {
+      // Reduce excessive rotations
+      Body.setAngle(letter.body, letter.body.angle * 0.97)
+
+      Body.setAngularVelocity(letter.body, letter.body.angularVelocity * 0.95)
+
+      // Convert Matter.js position into a DOM offset
+      const offsetX = letter.body.position.x - letter.initialX
+
+      const offsetY = letter.body.position.y - letter.initialY
+
+      letter.element.style.transform = `
+      translate3d(${offsetX}px, ${offsetY}px, 0)
+      rotate(${letter.body.angle}rad)
+    `
+    })
+
+    // Do not check the resting state during normal interaction
+    if (!isSettling) return
+
+    // Check whether every letter has nearly returned to rest
+    const areLettersSettled = letterBodies.every((letter) => {
+      const distanceX = Math.abs(letter.body.position.x - letter.initialX)
+
+      const distanceY = Math.abs(letter.body.position.y - letter.initialY)
+
+      const velocity = Math.hypot(letter.body.velocity.x, letter.body.velocity.y)
+
+      const angularVelocity = Math.abs(letter.body.angularVelocity)
+
+      const anchorDistance = Math.abs(letter.anchor.pointA.y - letter.initialY)
+
+      return (
+        distanceX < 0.25 &&
+        distanceY < 0.25 &&
+        velocity < 0.02 &&
+        angularVelocity < 0.002 &&
+        anchorDistance < 0.1
+      )
+    })
+
+    if (!areLettersSettled) return
+
+    // Snap the imperceptible remaining fraction to the exact origin
+    letterBodies.forEach((letter) => {
+      Body.setPosition(letter.body, {
+        x: letter.initialX,
+        y: letter.initialY,
+      })
+
+      Body.setVelocity(letter.body, {
+        x: 0,
+        y: 0,
+      })
+
+      Body.setAngle(letter.body, 0)
+      Body.setAngularVelocity(letter.body, 0)
+
+      letter.anchor.pointA.y = letter.initialY
+      letter.element.style.transform = ""
+    })
+
+    isSettling = false
+
+    gsap.ticker.remove(updateProjectPhysics)
+  }
+
+  function startProjectPhysics() {
+    isSettling = false
+
+    engine.world.gravity.y = 0.5
+
+    letterBodies.forEach((letter) => {
+      gsap.killTweensOf(letter.anchor.pointA)
+    })
+
+    // Prevent the function from being added twice
+    gsap.ticker.remove(updateProjectPhysics)
+    gsap.ticker.add(updateProjectPhysics)
+  }
+
+  function settleAndStopProjectPhysics() {
+    isSettling = true
+
+    // Prevent gravity from fighting against the return to origin
+    engine.world.gravity.y = 0
+
+    letterBodies.forEach((letter) => {
+      gsap.to(letter.anchor.pointA, {
+        y: letter.initialY,
+        duration: 0.35,
+        ease: "power3.out",
+        overwrite: true,
+      })
+    })
+  }
+
+  // ----------------------
+  // 3. Initial state
+  // ----------------------
+  gsap.set(title, {
+    autoAlpha: 0,
+    yPercent: 40,
+  })
+
+  gsap.set(links, {
+    autoAlpha: 0,
+    yPercent: 35,
+  })
+
+  // ----------------------
+  // 4. ScrollTrigger Pin
+  // ----------------------
+  ScrollTrigger.create({
+    trigger: pinHeight,
+    start: "top top",
+    end: "bottom bottom",
+    pin: container,
+    markers: false,
+
+    onEnter: startProjectPhysics,
+
+    onEnterBack: startProjectPhysics,
+
+    onLeave: settleAndStopProjectPhysics,
+
+    onLeaveBack: settleAndStopProjectPhysics,
+
+    onUpdate: (self) => {
+      const velocity = self.getVelocity()
+
+      letterBodies.forEach((letter) => {
+        letter.anchor.pointA.y = letter.initialY + velocity * 0.08 * letter.weight
+      })
+    },
+  })
+
+  // ----------------------
+  // 5. Timeline
+  // ----------------------
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: pinHeight,
+      start: "top top",
+      end: "bottom bottom",
+      scrub: true,
+      markers: true,
+    },
+  })
+
+  // ----------------------
+  // 6. Animations
+  // ----------------------
+  // Title
+  tl.to(title, {
+    autoAlpha: 1,
+    yPercent: 0,
+    duration: 0.4,
+    ease: "power3.out",
+  })
+
+  // Links
+  tl.to(
+    links,
+    {
+      autoAlpha: 1,
+      yPercent: 0,
+      duration: 0.5,
+      stagger: 0.18,
+      ease: "power3.out",
+    },
+    ">",
+  )
+
+  // Hold
+  tl.to(
+    {},
+    {
+      duration: 0.8,
+    },
+  )
 }
