@@ -2,10 +2,10 @@ import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import Lenis from "lenis"
 import "lenis/dist/lenis.css"
-import Matter from "matter-js"
 
 import { createThreeHero } from "../../three/createThreeHero"
 import { createToolkitCardReveal } from "../../three/createToolkitCardReveal"
+import { createProjectLetterPhysics } from "./projects/createProjectLetterPhysics"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -1040,240 +1040,9 @@ function setupProjects() {
   })
 
   // ----------------------
-  // 2. Matter.js initialisation
+  // 2. Project physics
   // ----------------------
-  const { Engine, Composite, Bodies, Body, Constraint } = Matter
-
-  const engine = Engine.create()
-  engine.world.gravity.y = 0.5
-
-  const collisionGroup = Body.nextGroup(true)
-  const letterBodies = []
-
-  function createProjectPhysics() {
-    // Reset DOM transformations before measuring
-    links.forEach((link) => {
-      const letters = link.querySelectorAll(".project-letter")
-
-      letters.forEach((letter) => {
-        letter.style.transform = ""
-      })
-    })
-
-    Composite.clear(engine.world, false)
-    Engine.clear(engine)
-
-    letterBodies.length = 0
-
-    const currentScrollY = window.scrollY
-
-    links.forEach((link) => {
-      const projectLetters = link.querySelectorAll(".project-letter")
-
-      const projectLetterBodies = []
-
-      const middleIndex = (projectLetters.length - 1) / 2
-
-      // Create bodies and anchors
-      projectLetters.forEach((letter, index) => {
-        const rect = letter.getBoundingClientRect()
-
-        if (rect.width === 0 || rect.height === 0) return
-
-        const centerX = rect.left + rect.width / 2
-
-        const centerY = rect.top + currentScrollY + rect.height / 2
-
-        const body = Bodies.rectangle(centerX, centerY, rect.width, rect.height, {
-          frictionAir: 0.05,
-          restitution: 0.3,
-          density: 0.001,
-
-          collisionFilter: {
-            group: collisionGroup,
-          },
-        })
-
-        const anchor = Constraint.create({
-          pointA: {
-            x: centerX,
-            y: centerY,
-          },
-          bodyB: body,
-          stiffness: 0.005,
-          damping: 0.004,
-          length: 0,
-        })
-
-        const normalizedDistance =
-          middleIndex === 0 ? 0 : Math.abs(index - middleIndex) / middleIndex
-
-        const letterData = {
-          element: letter,
-          body,
-          anchor,
-          initialX: centerX,
-          initialY: centerY,
-          width: rect.width,
-          weight: normalizedDistance,
-        }
-
-        projectLetterBodies.push(letterData)
-        letterBodies.push(letterData)
-
-        Composite.add(engine.world, [body, anchor])
-      })
-
-      // Link letters from this project
-      for (let index = 0; index < projectLetterBodies.length - 1; index++) {
-        const currentLetter = projectLetterBodies[index]
-
-        const nextLetter = projectLetterBodies[index + 1]
-
-        const connection = Constraint.create({
-          bodyA: currentLetter.body,
-          bodyB: nextLetter.body,
-
-          pointA: {
-            x: currentLetter.width / 2,
-            y: 0,
-          },
-
-          pointB: {
-            x: -nextLetter.width / 2,
-            y: 0,
-          },
-
-          stiffness: 0.6,
-          length: 0,
-        })
-
-        Composite.add(engine.world, connection)
-      }
-    })
-  }
-
-  createProjectPhysics()
-
-  // Resize
-  let resizeTimeout
-
-  function handleProjectsResize() {
-    clearTimeout(resizeTimeout)
-
-    resizeTimeout = setTimeout(() => {
-      ScrollTrigger.refresh()
-      createProjectPhysics()
-    }, 200)
-  }
-
-  window.addEventListener("resize", handleProjectsResize)
-
-  // ----------------------
-  // Matter.js controls
-  // ----------------------
-  let isSettling = false
-
-  // Update project physics on every frame
-  function updateProjectPhysics() {
-    Engine.update(engine, 1000 / 60)
-
-    letterBodies.forEach((letter) => {
-      // Reduce excessive rotations
-      Body.setAngle(letter.body, letter.body.angle * 0.97)
-
-      Body.setAngularVelocity(letter.body, letter.body.angularVelocity * 0.95)
-
-      // Convert Matter.js position into a DOM offset
-      const offsetX = letter.body.position.x - letter.initialX
-
-      const offsetY = letter.body.position.y - letter.initialY
-
-      letter.element.style.transform = `
-      translate3d(${offsetX}px, ${offsetY}px, 0)
-      rotate(${letter.body.angle}rad)
-    `
-    })
-
-    // Do not check the resting state during normal interaction
-    if (!isSettling) return
-
-    // Check whether every letter has nearly returned to rest
-    const areLettersSettled = letterBodies.every((letter) => {
-      const distanceX = Math.abs(letter.body.position.x - letter.initialX)
-
-      const distanceY = Math.abs(letter.body.position.y - letter.initialY)
-
-      const velocity = Math.hypot(letter.body.velocity.x, letter.body.velocity.y)
-
-      const angularVelocity = Math.abs(letter.body.angularVelocity)
-
-      const anchorDistance = Math.abs(letter.anchor.pointA.y - letter.initialY)
-
-      return (
-        distanceX < 0.25 &&
-        distanceY < 0.25 &&
-        velocity < 0.02 &&
-        angularVelocity < 0.002 &&
-        anchorDistance < 0.1
-      )
-    })
-
-    if (!areLettersSettled) return
-
-    // Snap the imperceptible remaining fraction to the exact origin
-    letterBodies.forEach((letter) => {
-      Body.setPosition(letter.body, {
-        x: letter.initialX,
-        y: letter.initialY,
-      })
-
-      Body.setVelocity(letter.body, {
-        x: 0,
-        y: 0,
-      })
-
-      Body.setAngle(letter.body, 0)
-      Body.setAngularVelocity(letter.body, 0)
-
-      letter.anchor.pointA.y = letter.initialY
-      letter.element.style.transform = ""
-    })
-
-    isSettling = false
-
-    gsap.ticker.remove(updateProjectPhysics)
-  }
-
-  function startProjectPhysics() {
-    isSettling = false
-
-    engine.world.gravity.y = 0.5
-
-    letterBodies.forEach((letter) => {
-      gsap.killTweensOf(letter.anchor.pointA)
-    })
-
-    // Prevent the function from being added twice
-    gsap.ticker.remove(updateProjectPhysics)
-    gsap.ticker.add(updateProjectPhysics)
-  }
-
-  function settleAndStopProjectPhysics() {
-    isSettling = true
-
-    // Prevent gravity from fighting against the return to origin
-    engine.world.gravity.y = 0
-
-    letterBodies.forEach((letter) => {
-      gsap.to(letter.anchor.pointA, {
-        y: letter.initialY,
-        duration: 0.35,
-        ease: "power3.out",
-        overwrite: true,
-      })
-    })
-  }
+  const projectPhysics = createProjectLetterPhysics(links)
 
   // ----------------------
   // 3. Initial state
@@ -1298,20 +1067,24 @@ function setupProjects() {
     pin: container,
     markers: false,
 
-    onEnter: startProjectPhysics,
+    onEnter: () => {
+      projectPhysics.start()
+    },
 
-    onEnterBack: startProjectPhysics,
+    onEnterBack: () => {
+      projectPhysics.start()
+    },
 
-    onLeave: settleAndStopProjectPhysics,
+    onLeave: () => {
+      projectPhysics.settleAndStop()
+    },
 
-    onLeaveBack: settleAndStopProjectPhysics,
+    onLeaveBack: () => {
+      projectPhysics.settleAndStop()
+    },
 
     onUpdate: (self) => {
-      const velocity = self.getVelocity()
-
-      letterBodies.forEach((letter) => {
-        letter.anchor.pointA.y = letter.initialY + velocity * 0.08 * letter.weight
-      })
+      projectPhysics.setScrollVelocity(self.getVelocity())
     },
   })
 
