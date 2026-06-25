@@ -253,7 +253,7 @@ body.is-visual-fullscreen {
 .toolkit__title {
   font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
   font-weight: 700;
-  font-size: 8vw;
+  font-size: 6vw;
 }
 
 .toolkit__subtitle-wrap {
@@ -412,7 +412,7 @@ body.is-visual-fullscreen {
   width: 100%;
 
   font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
-  font-size: 8vw;
+  font-size: 6vw;
   font-weight: 700;
   text-align: center;
 }
@@ -420,13 +420,13 @@ body.is-visual-fullscreen {
 /* Projects list */
 .projects__list {
   position: absolute;
-  top: 31vh;
+  top: 26vh;
   left: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  gap: 2em;
+  gap: 3em;
 }
 
 .projects__link {
@@ -436,7 +436,7 @@ body.is-visual-fullscreen {
   width: fit-content;
   color: inherit;
   font-family: "Satoshi-VariableItalic", Arial, Helvetica, sans-serif;
-  font-size: clamp(48px, 5.2vw, 86px);
+  font-size: clamp(50px, 7vw, 88px);
   font-style: italic;
   font-weight: 400;
   text-decoration: none;
@@ -453,6 +453,25 @@ body.is-visual-fullscreen {
 .project-letter__content {
   position: relative;
   display: inline-block;
-  transform-origin: center center;
-  will-change: transform;
+}
+
+.project-letter__content:has(.project-letter__image) {
+  color: transparent;
+}
+.project-letter__image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: block;
+  width: 7vw;
+  object-fit: cover;
+  pointer-events: none;
+  border-radius: 1vw;
+}
+.project-letter__image.is-square {
+  aspect-ratio: 1/1;
+}
+.project-letter__image.is-portrait {
+  aspect-ratio: 4/5;
 }

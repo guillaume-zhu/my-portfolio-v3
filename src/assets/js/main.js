@@ -6,6 +6,7 @@ import "lenis/dist/lenis.css"
 import { createThreeHero } from "../../three/createThreeHero"
 import { createToolkitCardReveal } from "../../three/createToolkitCardReveal"
 import { createProjectLetterPhysics } from "./projects/createProjectLetterPhysics"
+import { setupProjectImageHover } from "./projects/setupProjectImageHover"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -1024,6 +1025,7 @@ function setupToolkit() {
 }
 
 // Projects
+
 function setupProjects() {
   // ----------------------
   // 1. Dom selections
@@ -1035,17 +1037,34 @@ function setupProjects() {
   const title = root.querySelector(".projects__title")
   const links = root.querySelectorAll(".projects__link")
 
+  // ----------------------
+  // 2. Device capabilities
+  // ----------------------
+
+  const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches
+
+  // ----------------------
+  // 2. Letters setup
+  // ----------------------
   links.forEach((link) => {
     wrapProjectLetters(link)
   })
 
   // ----------------------
-  // 2. Project physics
+  // 4. Letters hover
+  // ----------------------
+
+  if (canHover) {
+    setupProjectImageHover(links)
+  }
+
+  // ----------------------
+  // 5. Project physics
   // ----------------------
   const projectPhysics = createProjectLetterPhysics(links)
 
   // ----------------------
-  // 3. Initial state
+  // 6. Initial state
   // ----------------------
   gsap.set(title, {
     autoAlpha: 0,
@@ -1058,7 +1077,7 @@ function setupProjects() {
   })
 
   // ----------------------
-  // 4. ScrollTrigger Pin
+  // 7. ScrollTrigger Pin
   // ----------------------
   ScrollTrigger.create({
     trigger: pinHeight,
@@ -1089,7 +1108,7 @@ function setupProjects() {
   })
 
   // ----------------------
-  // 5. Timeline
+  // 8. Timeline
   // ----------------------
   const tl = gsap.timeline({
     scrollTrigger: {
@@ -1102,7 +1121,7 @@ function setupProjects() {
   })
 
   // ----------------------
-  // 6. Animations
+  // 6. Title and links global Animations
   // ----------------------
   // Title
   tl.to(title, {
