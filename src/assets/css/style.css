@@ -449,10 +449,12 @@ body.is-visual-fullscreen {
   display: inline-block;
   transform-origin: center center;
   will-change: transform;
+  pointer-events: none;
 }
 .project-letter__content {
   position: relative;
   display: inline-block;
+  pointer-events: auto;
 }
 
 .project-letter__content:has(.project-letter__image) {
