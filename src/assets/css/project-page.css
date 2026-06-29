@@ -1,0 +1,170 @@
+@import "./satoshi.css";
+@import "./cabinet-grotesk.css";
+@import "./typography.css";
+@import "./variables.css";
+
+/* -------- PROJECT PAGE -------- */
+.project-page {
+  min-height: 100vh;
+  background-color: var(--project-background);
+  color: var(--project-color);
+}
+
+.project-page[data-theme="dark"] {
+  --project-background: var(--color-dark);
+  --project-color: var(--color-cream);
+}
+
+/* -------- PROJECT SCROLL -------- */
+.project-scroll {
+  width: 100%;
+}
+.project-scroll__pin-height {
+  min-height: 100vh;
+}
+.project-scroll__container {
+  width: 100%;
+  height: 100vh;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.project-scroll__container::-webkit-scrollbar {
+  display: none;
+}
+.project-scroll__track {
+  display: flex;
+  width: max-content;
+  height: 100%;
+  padding: 1vw;
+  box-sizing: border-box;
+}
+
+/* -------- PROJECT PANELS -------- */
+.project-panel {
+  position: relative;
+  flex: 0 0 auto;
+  height: 100%;
+  border: 1px solid red;
+}
+
+.project-panel--intro {
+  width: 80vw;
+}
+.project-panel--context {
+  width: 35vw;
+}
+.project-panel--ellipse {
+  width: 70vw;
+}
+.project-panel--gallery {
+  width: 100vw;
+}
+.project-panel--next {
+  width: 100vw;
+}
+
+/* -------- PROJECT INTRO -------- */
+.project-intro {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: blue;
+}
+.project-intro__visual {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  object-fit: cover;
+}
+.project-intro__visual--primary {
+  background-color: blueviolet;
+  left: 0;
+  border-radius: 1.5vw 0 0 1.5vw;
+}
+.project-intro__visual--secondary {
+  background-color: pink;
+  right: 0;
+  border-radius: 0 1.5vw 1.5vw 0;
+}
+
+.project-intro__title {
+  font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 8vw;
+  position: absolute;
+  z-index: 4;
+  line-height: 80%;
+  top: 20vh;
+  right: -15vw;
+}
+
+/* -------- PROJECT CONTEXT -------- */
+.project-context {
+  width: 100%;
+  height: 100%;
+  background-color: rgb(96, 96, 96);
+  position: relative;
+}
+
+.project-context__categories {
+  width: fit-content;
+  border: 1px solid orange;
+  position: absolute;
+  top: 20vh;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1.75em;
+}
+
+.project-context__category {
+  width: fit-content;
+  border: 2px solid var(--project-color);
+  border-radius: 999px;
+  font-size: clamp(20px, 1.25vw, 20px);
+  font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
+  font-weight: 500;
+  padding: 0.6em 1em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.project-context__texts {
+  position: absolute;
+  width: 70%;
+  border: 1px solid orange;
+  bottom: 15vh;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+}
+
+.project-context__text {
+  font-size: clamp(20px, 1.25vw, 20px);
+  font-family: "Satoshi-Variable", Arial, Helvetica, sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* -------- PROJECT ELLIPSE -------- */
+.project-ellipse {
+  width: 100%;
+  height: 100%;
+  background-color: grey;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.project-ellipse__visual {
+  width: 70%;
+  aspect-ratio: 2/1;
+  background-color: white;
+  border-radius: 999px;
+  object-fit: cover;
+}
