@@ -187,8 +187,9 @@
 .project-gallery__slide {
   width: 100%;
   position: relative;
-  border: 1px solid aqua;
+  /* border: 1px solid aqua; */
   flex: 0;
+  overflow: hidden;
 }
 
 .project-gallery__media {
@@ -197,22 +198,6 @@
   width: 100%;
   height: 100%;
   border-radius: 20px;
-}
-
-.project-gallery__slide:nth-child(1) .project-gallery__media {
-}
-
-.project-gallery__slide:nth-child(2) .project-gallery__media {
-}
-
-.project-gallery__slide:nth-child(3) .project-gallery__media {
-  background-color: blueviolet;
-}
-
-.project-gallery__slide:nth-child(4) .project-gallery__media {
-  background-color: pink;
-}
-
-.project-gallery__slide:nth-child(5) .project-gallery__media {
-  background-color: orange;
+  object-fit: cover;
+  display: block;
 }

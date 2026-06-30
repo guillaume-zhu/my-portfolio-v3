@@ -1,7 +1,21 @@
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import Lenis from "lenis"
+import "lenis/dist/lenis.css"
 
 gsap.registerPlugin(ScrollTrigger)
+
+const lenis = new Lenis({
+  anchors: true,
+})
+
+lenis.on("scroll", ScrollTrigger.update)
+
+gsap.ticker.add((time) => {
+  lenis.raf(time * 1000)
+})
+
+gsap.ticker.lagSmoothing(0)
 
 const galleryData = setupProjectGallery()
 setupProjectScroll(galleryData)
@@ -40,7 +54,7 @@ function setupProjectScroll(galleryData) {
       end: () => `+=${getScrollDistance() + galleryScrollDistance}`,
       scrub: true,
       pin: container,
-      markers: true,
+      markers: false,
       invalidateOnRefresh: true,
     },
   })
@@ -53,10 +67,15 @@ function setupProjectScroll(galleryData) {
   })
 
   // Gallery -> Gallery end
-  pageTimeline.to(
-    {},
+  pageTimeline.fromTo(
+    galleryData.timeline,
     {
+      progress: 0,
+    },
+    {
+      progress: 1,
       duration: galleryScrollDistance,
+      ease: "none",
     },
   )
 
@@ -69,12 +88,10 @@ function setupProjectScroll(galleryData) {
 }
 
 function setupProjectGallery() {
-  const gallery = document.querySelector(".project-gallery")
-
-  if (!gallery) return
   // ----------------------
   // 1. DOM selections
   // ----------------------
+  const gallery = document.querySelector(".project-gallery")
   const slidesContainer = gallery.querySelector(".project-gallery__slides")
   const slides = [...gallery.querySelectorAll(".project-gallery__slide")]
 
@@ -82,7 +99,7 @@ function setupProjectGallery() {
   // 2. Settings
   // ----------------------
   const flexValues = [0.1, 0.12, 0.56, 0.12, 0.1]
-  const clipPathValues = [15, 5, 0, 5, 15]
+  const clipPathValues = [15, 5, 0, 5, 15, 15]
 
   // ----------------------
   // 3. Calculated values
@@ -111,8 +128,78 @@ function setupProjectGallery() {
   // ----------------------
   // 5. Animation timeline
   // ----------------------
+  const galleryTimeline = gsap.timeline({
+    paused: true,
+
+    defaults: {
+      duration: 1,
+      ease: "none",
+    },
+  })
+
+  // ----------------------
+  // 6. Exit/Entry animation
+  // ----------------------
+  for (let step = 0; step < totalSteps; step++) {
+    const outgoingMedia = slides[step].querySelector(".project-gallery__media")
+
+    // Flex out
+    galleryTimeline.to(
+      slides[step],
+      {
+        flex: 0,
+      },
+      step,
+    )
+
+    // ClipPath out
+    galleryTimeline.to(
+      outgoingMedia,
+      {
+        clipPath: "inset(0 15% round 20px)",
+      },
+      step,
+    )
+
+    // Go up
+    galleryTimeline.to(
+      slidesContainer,
+      {
+        y: `-=${0.01 * window.innerHeight}`,
+      },
+      step,
+    )
+
+    // Attribute visible slide
+    for (let position = 0; position < 5; position++) {
+      const slideIndex = step + 1 + position
+      const media = slides[slideIndex].querySelector(".project-gallery__media")
+
+      // Flex in
+      galleryTimeline.to(
+        slides[slideIndex],
+        {
+          flex: flexValues[position],
+        },
+        step,
+      )
+
+      // ClipPath in
+      galleryTimeline.fromTo(
+        media,
+        {
+          clipPath: `inset(0 ${clipPathValues[position + 1]}% round 20px)`,
+        },
+        {
+          clipPath: `inset(0 ${clipPathValues[position]}% round 20px)`,
+        },
+        step,
+      )
+    }
+  }
 
   return {
     totalSteps,
+    timeline: galleryTimeline,
   }
 }
