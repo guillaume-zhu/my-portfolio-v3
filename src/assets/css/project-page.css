@@ -25,7 +25,7 @@
 .project-scroll__container {
   width: 100%;
   height: 100vh;
-  overflow-x: auto;
+  overflow-x: hidden;
   overflow-y: hidden;
   scrollbar-width: none;
 }
@@ -36,7 +36,6 @@
   display: flex;
   width: max-content;
   height: 100%;
-  padding: 1vw;
   box-sizing: border-box;
 }
 
@@ -50,6 +49,7 @@
 
 .project-panel--intro {
   width: 80vw;
+  padding: 1vw;
 }
 .project-panel--context {
   width: 35vw;
@@ -69,7 +69,6 @@
   width: 100%;
   height: 100%;
   position: relative;
-  background-color: blue;
 }
 .project-intro__visual {
   position: absolute;
@@ -112,7 +111,7 @@
   width: fit-content;
   border: 1px solid orange;
   position: absolute;
-  top: 20vh;
+  top: 24vh;
   right: 0;
   display: flex;
   flex-direction: column;
@@ -135,9 +134,9 @@
 
 .project-context__texts {
   position: absolute;
-  width: 70%;
+  width: 62%;
   border: 1px solid orange;
-  bottom: 15vh;
+  bottom: 18vh;
   right: 0;
   display: flex;
   flex-direction: column;
@@ -167,4 +166,53 @@
   background-color: white;
   border-radius: 999px;
   object-fit: cover;
+}
+
+/* -------- PROJECT GALLERY -------- */
+.project-gallery {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.project-gallery__slides {
+  height: 100%;
+  width: 50vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+}
+
+.project-gallery__slide {
+  width: 100%;
+  position: relative;
+  border: 1px solid aqua;
+  flex: 0;
+}
+
+.project-gallery__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+}
+
+.project-gallery__slide:nth-child(1) .project-gallery__media {
+}
+
+.project-gallery__slide:nth-child(2) .project-gallery__media {
+}
+
+.project-gallery__slide:nth-child(3) .project-gallery__media {
+  background-color: blueviolet;
+}
+
+.project-gallery__slide:nth-child(4) .project-gallery__media {
+  background-color: pink;
+}
+
+.project-gallery__slide:nth-child(5) .project-gallery__media {
+  background-color: orange;
 }
