@@ -274,3 +274,58 @@
 .project-next__media {
   will-change: transform;
 }
+
+/* -------- PROJECT BACK -------- */
+.project-back {
+  position: fixed;
+  right: 2vw;
+  bottom: 2vw;
+  z-index: 100;
+
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: var(--project-color);
+  border: 2px solid currentColor;
+  border-radius: 999px;
+
+  text-decoration: none;
+
+  transition:
+    width 0.55s cubic-bezier(0.77, 0, 0.18, 1),
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.project-back__icon {
+  overflow: visible;
+  transform: translateX(23px);
+
+  transition: transform 0.55s cubic-bezier(0.77, 0, 0.18, 1);
+}
+
+.project-back__shaft {
+  transform-box: fill-box;
+  transform-origin: left center;
+  transform: scaleX(0.28);
+
+  transition: transform 0.55s cubic-bezier(0.77, 0, 0.18, 1);
+}
+
+.project-back:hover {
+  width: 112px;
+  color: var(--project-background);
+  background-color: var(--project-color);
+}
+
+.project-back:hover .project-back__shaft {
+  transform: scaleX(1);
+}
+
+.project-back:hover .project-back__icon {
+  transform: translateX(0);
+}
