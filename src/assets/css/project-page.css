@@ -103,7 +103,6 @@
 .project-context {
   width: 100%;
   height: 100%;
-  background-color: rgb(96, 96, 96);
   position: relative;
 }
 
@@ -154,7 +153,6 @@
 .project-ellipse {
   width: 100%;
   height: 100%;
-  background-color: grey;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -163,7 +161,6 @@
 .project-ellipse__visual {
   width: 70%;
   aspect-ratio: 2/1;
-  background-color: white;
   border-radius: 999px;
   object-fit: cover;
 }
@@ -200,4 +197,80 @@
   border-radius: 20px;
   object-fit: cover;
   display: block;
+}
+
+/* -------- PROJECT NEXT -------- */
+.project-next {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.project-next__link {
+  position: relative;
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.project-next__title {
+  position: relative;
+  width: max-content;
+  font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
+  font-size: 10vw;
+  font-weight: 700;
+  line-height: 0.9;
+}
+
+.project-next__word,
+.project-next__right {
+  display: inline-block;
+}
+
+.project-next__right {
+  position: relative;
+}
+.project-next__project-name {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5em;
+  white-space: nowrap;
+  font-family: "Satoshi-Variable", Arial, Helvetica, sans-serif;
+  font-size: clamp(14px, 2vw, 32px);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.project-next__medias {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.project-next__media {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: auto;
+  height: 15vw;
+  display: block;
+  border-radius: clamp(12px, 1.2vw, 22px);
+  transform: scale(0);
+  transform-origin: center;
+  z-index: 1;
+}
+.project-next__media--logo {
+  z-index: 2;
+  max-width: 15vw;
+  height: auto;
+  border-radius: 0;
+}
+
+.project-next__word--left,
+.project-next__right,
+.project-next__media {
+  will-change: transform;
 }

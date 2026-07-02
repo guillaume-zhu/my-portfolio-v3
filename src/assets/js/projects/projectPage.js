@@ -5,6 +5,9 @@ import "lenis/dist/lenis.css"
 
 gsap.registerPlugin(ScrollTrigger)
 
+// ----------------------
+// 1. Lenis
+// ----------------------
 const lenis = new Lenis({
   anchors: true,
 })
@@ -17,9 +20,23 @@ gsap.ticker.add((time) => {
 
 gsap.ticker.lagSmoothing(0)
 
-const galleryData = setupProjectGallery()
-setupProjectScroll(galleryData)
+// ----------------------
+// 2. Init
+// ----------------------
+document.fonts.ready.then(() => {
+  const galleryData = setupProjectGallery()
 
+  setupProjectScroll(galleryData)
+  setupProjectNext()
+
+  ScrollTrigger.refresh()
+})
+
+// ----------------------
+// 3. Functions
+// ----------------------
+
+// Project scroll
 function setupProjectScroll(galleryData) {
   // ----------------------
   // 1. DOM selections
@@ -87,6 +104,7 @@ function setupProjectScroll(galleryData) {
   })
 }
 
+// Project gallery
 function setupProjectGallery() {
   // ----------------------
   // 1. DOM selections
@@ -202,4 +220,126 @@ function setupProjectGallery() {
     totalSteps,
     timeline: galleryTimeline,
   }
+}
+
+// Project next
+function setupProjectNext() {
+  // ----------------------
+  // 1. DOM selections
+  // ----------------------
+  const root = document.querySelector(".project-next")
+  const link = root.querySelector(".project-next__link")
+  const left = root.querySelector(".project-next__word--left")
+  const right = root.querySelector(".project-next__right")
+  const mediasContainer = root.querySelector(".project-next__medias")
+  const medias = root.querySelectorAll(".project-next__media")
+
+  // ----------------------
+  // 2. Animation timeline
+  // ----------------------
+  const nextTimeline = gsap.timeline({
+    paused: true,
+  })
+
+  // ----------------------
+  // 3. Text positions
+  // ----------------------
+  const rootRect = root.getBoundingClientRect()
+  const leftRect = left.getBoundingClientRect()
+  const rightRect = right.getBoundingClientRect()
+
+  const margin = 0.1 * root.clientWidth
+
+  const leftCurrentLeft = leftRect.left - rootRect.left
+  const leftTargetLeft = margin
+  const leftDistance = leftTargetLeft - leftCurrentLeft
+
+  const rightCurrentRight = rightRect.right - rootRect.left
+  const rightTargetRight = root.clientWidth - margin
+  const rightDistance = rightTargetRight - rightCurrentRight
+
+  nextTimeline.to(left, {
+    x: leftDistance,
+    duration: 0.8,
+    ease: "expo.inOut",
+  })
+  nextTimeline.to(
+    right,
+    {
+      x: rightDistance,
+      duration: 0.8,
+      ease: "expo.inOut",
+    },
+    "<",
+  )
+
+  // ----------------------
+  // 4. Media center position
+  // ----------------------
+  const leftFinalRight = leftRect.right + leftDistance
+  const rightFinalLeft = rightRect.left + rightDistance
+
+  const centerXViewport = (leftFinalRight + rightFinalLeft) / 2
+  const centerYViewport = (leftRect.top + leftRect.bottom) / 2
+
+  const mediasContainerRect = mediasContainer.getBoundingClientRect()
+
+  const mediaStartX = centerXViewport - mediasContainerRect.left
+  const mediaStartY = centerYViewport - mediasContainerRect.top
+
+  // ----------------------
+  // 5. Media distribution
+  // ----------------------
+  const yPercentMin = -150
+  const yPercentMax = 50
+  const mediaCount = medias.length
+
+  nextTimeline.fromTo(
+    medias,
+    {
+      display: "none",
+      scale: 0.8,
+      rotate: () => {
+        return (Math.random() - 0.5) * 10
+      },
+      x: mediaStartX,
+      y: mediaStartY,
+      xPercent: () => {
+        return -50 + (Math.random() - 0.5) * 120
+      },
+      yPercent: (index) => {
+        return yPercentMin + (index / (mediaCount - 1)) * (yPercentMax - yPercentMin)
+      },
+    },
+    {
+      display: "block",
+      scale: () => {
+        return Math.random() / 5 + 1
+      },
+      rotate: () => {
+        return (Math.random() - 0.5) * 10
+      },
+      duration: 0.3,
+      ease: "back.out(2)",
+      stagger: {
+        each: 0.045,
+        from: "random",
+      },
+    },
+    "<0.3",
+  )
+
+  // ----------------------
+  // 6. Hover interactions
+  // ----------------------
+  function handleMouseEnter() {
+    nextTimeline.play()
+  }
+
+  function handleMouseLeave() {
+    nextTimeline.reverse()
+  }
+
+  link.addEventListener("mouseenter", handleMouseEnter)
+  link.addEventListener("mouseleave", handleMouseLeave)
 }
