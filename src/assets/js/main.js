@@ -11,6 +11,21 @@ import { setupProjectImageHover } from "./projects/setupProjectImageHover"
 gsap.registerPlugin(ScrollTrigger)
 
 // ----------------------
+// Cross-page navigation
+// ----------------------
+
+// Store the requested section before removing the hash from the URL
+const initialHash = window.location.hash
+const shouldOpenProjects = initialHash === "#projects"
+
+// Prevent the browser from scrolling to an outdated position before ScrollTrigger has created all the pin spacing
+if (shouldOpenProjects) {
+  history.scrollRestoration = "manual"
+
+  history.replaceState(null, "", window.location.pathname + window.location.search)
+}
+
+// ----------------------
 // Global setup
 // ----------------------
 const lenis = new Lenis({
@@ -42,9 +57,34 @@ document.fonts.ready.then(() => {
   setupTrajectorySentences()
   setupTrajectoryToToolkitTransition()
   setupToolkit()
-  setupProjects()
+  const projectsTimeline = setupProjects()
 
   ScrollTrigger.refresh()
+
+  // Update Lenis with final document height with GSAP pin spacers
+  lenis.resize()
+
+  if (shouldOpenProjects) {
+    // Wait one frame before reading final ScrollTrigger positions
+    requestAnimationFrame(() => {
+      const targetScroll = projectsTimeline.scrollTrigger.labelToScroll("projects-visible")
+
+      lenis.scrollTo(targetScroll, {
+        immediate: true,
+        force: true,
+      })
+
+      ScrollTrigger.update()
+
+      history.replaceState(
+        null,
+        "",
+        `${window.location.pathname}${window.location.search}#projects`,
+      )
+
+      history.scrollRestoration = "auto"
+    })
+  }
 })
 
 // ----------------------
@@ -1116,7 +1156,7 @@ function setupProjects() {
       start: "top top",
       end: "bottom bottom",
       scrub: true,
-      markers: true,
+      markers: false,
     },
   })
 
@@ -1148,7 +1188,12 @@ function setupProjects() {
   tl.to(
     {},
     {
-      duration: 0.4,
+      duration: 0.2,
     },
   )
+
+  // Cross-page navigation target after final physics
+  tl.addLabel("projects-visible")
+
+  return tl
 }
