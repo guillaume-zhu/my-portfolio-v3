@@ -233,14 +233,14 @@ function addProjectContentRevals(pageTimeline, root, container) {
   // ----------------------
   const context = root.querySelector(".project-context")
   const contextPanel = context.closest(".project-panel--context")
-  const texts = context.querySelectorAll(".project-context__text")
+  const revealElements = context.querySelectorAll(".project-context__text, .project-context__link")
   const categories = context.querySelectorAll(".project-context__category")
   const ellipse = root.querySelector(".project-ellipse")
 
   // ----------------------
   // 2. Split text
   // ----------------------
-  const textSplit = SplitText.create(texts, {
+  const contentSplit = SplitText.create(revealElements, {
     type: "lines",
     linesClass: "project-context__line",
   })
@@ -275,10 +275,10 @@ function addProjectContentRevals(pageTimeline, root, container) {
   // 5. Text lines reveal
   // ----------------------
   const contextRevealDuration = getContextRevealEnd() - getContextRevealStart()
-  const lineDuration = contextRevealDuration / textSplit.lines.length
+  const lineDuration = contextRevealDuration / contentSplit.lines.length
 
   pageTimeline.to(
-    textSplit.lines,
+    contentSplit.lines,
     {
       maskImage: "linear-gradient(90deg, #000 100%, transparent 125%)",
       webkitMaskImage: "linear-gradient(90deg, #000 100%, transparent 125%)",

@@ -14,6 +14,10 @@
   --project-background: var(--color-dark);
   --project-color: var(--color-cream);
 }
+.project-page[data-theme="cream"] {
+  --project-background: var(--color-cream);
+  --project-color: var(--color-dark);
+}
 
 /* -------- PROJECT SCROLL -------- */
 .project-scroll {
@@ -44,7 +48,7 @@
   position: relative;
   flex: 0 0 auto;
   height: 100%;
-  border: 1px solid red;
+  /* border: 1px solid red; */
 }
 
 .project-panel--intro {
@@ -133,13 +137,21 @@
 
 .project-context__texts {
   position: absolute;
-  width: 62%;
-  /* border: 1px solid orange */
-  bottom: 18vh;
+  width: min(62%, 460px);
+  /* border: 1px solid orange; */
+  top: 46vh;
+  bottom: 8vh;
   right: 0;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 2em;
+}
+
+.project-context--with-links .project-context__texts {
+  top: 48vh;
+  bottom: 8vh;
+  width: min(64%, 520px);
 }
 
 .project-context__text {
@@ -154,6 +166,28 @@
   -webkit-mask-image: linear-gradient(90deg, #000 -25%, transparent 0%);
 }
 
+.project-context__links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.project-context__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.project-context__link--experience {
+  font-size: 1.25rem;
+}
+
+.project-context__link--credits {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
 /* -------- PROJECT ELLIPSE -------- */
 .project-ellipse {
   width: 100%;
