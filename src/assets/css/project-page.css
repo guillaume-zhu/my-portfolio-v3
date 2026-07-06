@@ -19,6 +19,11 @@
   --project-color: var(--color-dark);
 }
 
+.project-intro__title,
+.project-next__title {
+  letter-spacing: var(--letter-spacing-display);
+}
+
 /* -------- PROJECT SCROLL -------- */
 .project-scroll {
   width: 100%;
@@ -282,6 +287,7 @@
   font-size: clamp(14px, 2vw, 32px);
   font-weight: 400;
   line-height: 1;
+  letter-spacing: 0;
 }
 
 .project-next__medias {

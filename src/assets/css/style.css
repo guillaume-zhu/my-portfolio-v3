@@ -30,6 +30,14 @@ body.is-visual-fullscreen {
   border: 2px solid var(--color-dark);
 }
 
+.manifesto .text,
+.trajectory .title,
+.trajectory-sentences__sentence,
+.toolkit__title,
+.projects__title {
+  letter-spacing: var(--letter-spacing-display);
+}
+
 /* -------- HERO THREE SECTION -------- */
 .hero-three {
   position: relative;
