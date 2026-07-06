@@ -1,9 +1,10 @@
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { SplitText } from "gsap/SplitText"
 import Lenis from "lenis"
 import "lenis/dist/lenis.css"
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger, SplitText)
 
 // ----------------------
 // 1. Lenis
@@ -102,6 +103,9 @@ function setupProjectScroll(galleryData) {
     duration: () => getRemainingDistance(),
     ease: "none",
   })
+
+  // Context text reveal
+  addProjectContentRevals(pageTimeline, root, container)
 }
 
 // Project gallery
@@ -220,6 +224,108 @@ function setupProjectGallery() {
     totalSteps,
     timeline: galleryTimeline,
   }
+}
+
+// Project content reveal
+function addProjectContentRevals(pageTimeline, root, container) {
+  // ----------------------
+  // 1. DOM selections
+  // ----------------------
+  const context = root.querySelector(".project-context")
+  const contextPanel = context.closest(".project-panel--context")
+  const texts = context.querySelectorAll(".project-context__text")
+  const categories = context.querySelectorAll(".project-context__category")
+  const ellipse = root.querySelector(".project-ellipse")
+
+  // ----------------------
+  // 2. Split text
+  // ----------------------
+  const textSplit = SplitText.create(texts, {
+    type: "lines",
+    linesClass: "project-context__line",
+  })
+
+  // ----------------------
+  // 3. Initial states
+  // ----------------------
+  gsap.set(categories, {
+    opacity: 0,
+    y: 20,
+  })
+  gsap.set(ellipse, {
+    opacity: 0,
+    y: 20,
+  })
+
+  // ----------------------
+  // 4. Timing calcutation
+  // ----------------------
+
+  const getContextLeft = () => {
+    return contextPanel.offsetLeft + context.offsetLeft
+  }
+  const getContextRevealStart = () => {
+    return getContextLeft() + context.offsetWidth - container.clientWidth
+  }
+  const getContextRevealEnd = () => {
+    return getContextLeft() + context.offsetWidth / 2 - container.clientWidth / 2
+  }
+
+  // ----------------------
+  // 5. Text lines reveal
+  // ----------------------
+  const contextRevealDuration = getContextRevealEnd() - getContextRevealStart()
+  const lineDuration = contextRevealDuration / textSplit.lines.length
+
+  pageTimeline.to(
+    textSplit.lines,
+    {
+      maskImage: "linear-gradient(90deg, #000 100%, transparent 125%)",
+      webkitMaskImage: "linear-gradient(90deg, #000 100%, transparent 125%)",
+      duration: lineDuration,
+      ease: "power1.inOut",
+      stagger: {
+        each: lineDuration,
+      },
+    },
+    getContextRevealStart(),
+  )
+
+  // ----------------------
+  // 6. Categories reveal
+  // ----------------------
+  const categoryDuration = contextRevealDuration * 0.2
+  const categoryStagger = contextRevealDuration * 0.08
+
+  pageTimeline.to(
+    categories,
+    {
+      opacity: 1,
+      y: 0,
+      duration: categoryDuration,
+      ease: "power2.out",
+      stagger: {
+        each: categoryStagger,
+      },
+    },
+    getContextRevealStart(),
+  )
+
+  // ----------------------
+  // 7. Ellipse reveal
+  // ----------------------
+  const ellipseDuration = contextRevealDuration * 0.4
+
+  pageTimeline.to(
+    ellipse,
+    {
+      opacity: 1,
+      y: 0,
+      duration: ellipseDuration,
+      ease: "power2.out",
+    },
+    getContextRevealEnd(),
+  )
 }
 
 // Project next
