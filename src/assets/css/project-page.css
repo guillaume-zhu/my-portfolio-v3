@@ -108,6 +108,10 @@
   right: -15vw;
 }
 
+.project-intro__title--one-line {
+  margin-top: 5vh;
+}
+
 /* -------- PROJECT CONTEXT -------- */
 .project-context {
   width: 100%;
@@ -312,6 +316,10 @@
   max-width: 15vw;
   height: auto;
   border-radius: 0;
+}
+
+.project-next__media--logo--ornate {
+  max-width: 20vw;
 }
 
 .project-next__word--left,
