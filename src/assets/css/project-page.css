@@ -87,12 +87,10 @@
   object-fit: cover;
 }
 .project-intro__visual--primary {
-  background-color: blueviolet;
   left: 0;
   border-radius: 1.5vw 0 0 1.5vw;
 }
 .project-intro__visual--secondary {
-  background-color: pink;
   right: 0;
   border-radius: 0 1.5vw 1.5vw 0;
 }
@@ -186,8 +184,29 @@
 }
 
 .project-context__link {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
   color: inherit;
   text-decoration: none;
+}
+
+.project-context__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.15em;
+  width: 100%;
+  height: 1px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s cubic-bezier(0.77, 0, 0.18, 1);
+}
+
+.project-context__link:hover::after,
+.project-context__link:focus-visible::after {
+  transform: scaleX(1);
 }
 
 .project-context__link--experience {
@@ -197,8 +216,6 @@
 .project-context__link--credits {
   font-size: 0.75rem;
   opacity: 0.6;
-  text-decoration: underline;
-  text-underline-offset: 0.25em;
 }
 /* -------- PROJECT ELLIPSE -------- */
 .project-ellipse {
