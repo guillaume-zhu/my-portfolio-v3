@@ -106,6 +106,9 @@
   line-height: 80%;
   top: 20vh;
   right: -15vw;
+  opacity: 0;
+  transform: translateY(40px);
+  will-change: transform, opacity;
 }
 
 .project-intro__title--one-line {

@@ -25,6 +25,8 @@ gsap.ticker.lagSmoothing(0)
 // 2. Init
 // ----------------------
 document.fonts.ready.then(() => {
+  setupProjectIntro()
+
   const galleryData = setupProjectGallery()
 
   setupProjectScroll(galleryData)
@@ -326,6 +328,19 @@ function addProjectContentRevals(pageTimeline, root, container) {
     },
     getContextRevealEnd(),
   )
+}
+
+// Intro
+function setupProjectIntro() {
+  const title = document.querySelector(".project-intro__title")
+
+  gsap.to(title, {
+    opacity: 1,
+    y: 0,
+    duration: 1.1,
+    delay: 0.15,
+    ease: "power3.out",
+  })
 }
 
 // Project next
