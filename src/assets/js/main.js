@@ -68,7 +68,10 @@ document.fonts.ready.then(() => {
   setupTrajectorySentences()
   setupTrajectoryToToolkitTransition()
   setupToolkit()
+
   const projectsTimeline = setupProjects()
+
+  setupNextSection()
 
   ScrollTrigger.refresh()
 
@@ -1254,4 +1257,153 @@ function setupProjects() {
   })
 
   return tl
+}
+
+// What's next section
+function setupNextSection() {
+  // ----------------------
+  // 1. DOM selections
+  // ----------------------
+  const root = document.querySelector(".next-section")
+  if (!root) return
+
+  const pinHeight = root.querySelector(".next-section__pin-height")
+  const container = root.querySelector(".next-section__container")
+  const intro = root.querySelector(".next-section__intro")
+
+  const svg = root.querySelector(".next-section__svg")
+  const path = root.querySelector("#nextPath")
+  const textPath = root.querySelector("#nextTextPath")
+  const creamTextPart = root.querySelector("#nextTextCream")
+  const gradientTextPart = root.querySelector("#nextTextGradientPart")
+
+  // ----------------------
+  // 2. SVG dimensions
+  // ----------------------
+  const viewBox = svg.viewBox.baseVal
+  const viewBoxWidth = viewBox.width
+  const viewBoxHeight = viewBox.height
+
+  svg.style.aspectRatio = viewBoxWidth / viewBoxHeight
+
+  const svgWidth = svg.getBoundingClientRect().width
+  const containerWidth = container.getBoundingClientRect().width
+
+  const scaleFactor = containerWidth / svgWidth
+
+  // ----------------------
+  // 3. SVG camera position
+  // ----------------------
+  const position = {
+    x: 0,
+    y: 0,
+  }
+
+  function updateViewBox() {
+    svg.setAttribute("viewBox", `${position.x} ${position.y} ${viewBoxWidth} ${viewBoxHeight}`)
+  }
+
+  // ----------------------
+  // 4. Smooth viewBox movement
+  // ----------------------
+  const tweenOptions = {
+    duration: 0.2,
+    ease: "power1",
+    onUpdate: updateViewBox,
+  }
+
+  const xTo = gsap.quickTo(position, "x", tweenOptions)
+  const yTo = gsap.quickTo(position, "y", tweenOptions)
+
+  // ----------------------
+  // 5. Text preparation
+  // ----------------------
+  const creamFullText = creamTextPart.textContent.trim() + " "
+  const gradientFullText = gradientTextPart.textContent.trim()
+
+  const creamCharacters = creamFullText.split("")
+  const gradientCharacters = gradientFullText.split("")
+
+  const totalCharacters = creamCharacters.length + gradientCharacters.length
+
+  creamTextPart.textContent = creamFullText
+  gradientTextPart.textContent = gradientFullText
+
+  const textLength = textPath.getComputedTextLength()
+
+  creamTextPart.textContent = ""
+  gradientTextPart.textContent = ""
+
+  // ----------------------
+  // 6. Path points generation
+  // ----------------------
+  const stepCount = 1000
+  const points = []
+
+  for (let i = 0; i < stepCount; i++) {
+    const progress = i / (stepCount - 1)
+    const length = progress * textLength
+    const point = path.getPointAtLength(length)
+
+    points.push({
+      x: point.x,
+      y: point.y,
+    })
+  }
+
+  // ----------------------
+  // 7. Intro fade
+  // ----------------------
+  gsap.to(intro, {
+    autoAlpha: 0,
+    y: -30,
+    ease: "power2.out",
+
+    scrollTrigger: {
+      trigger: pinHeight,
+      start: "top top",
+      end: "top+=25% top",
+      scrub: true,
+      markers: false,
+    },
+  })
+
+  // ----------------------
+  // 8. Pinned scroll section
+  // ----------------------
+  ScrollTrigger.create({
+    trigger: pinHeight,
+    start: "top top",
+    end: "bottom bottom",
+    pin: container,
+    scrub: true,
+    markers: false,
+
+    onUpdate: (self) => {
+      const pathStart = 0.28
+      const pathProgress = gsap.utils.clamp(0, 1, (self.progress - pathStart) / (1 - pathStart))
+
+      const pointIndex = Math.floor(pathProgress * (points.length - 1))
+      const point = points[pointIndex]
+
+      xTo(point.x - (viewBoxWidth * scaleFactor) / 2)
+      yTo(point.y - viewBoxHeight / 2 - 30)
+
+      const visibleCharacters = Math.floor(pathProgress * totalCharacters)
+
+      const visibleCreamCharacters = Math.min(visibleCharacters, creamCharacters.length)
+      const visibleGradientCharacters = Math.max(0, visibleCharacters - creamCharacters.length)
+
+      const nextCreamText = creamCharacters.slice(0, visibleCreamCharacters).join("")
+      const nextGradientText = gradientCharacters.slice(0, visibleGradientCharacters).join("")
+
+      if (creamTextPart.textContent !== nextCreamText) {
+        creamTextPart.textContent = nextCreamText
+      }
+
+      if (gradientTextPart.textContent !== nextGradientText) {
+        gradientTextPart.textContent = nextGradientText
+      }
+    },
+  })
 }
