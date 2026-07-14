@@ -1192,7 +1192,14 @@ function setupProjects() {
     },
 
     onUpdate: (self) => {
-      projectPhysics.setScrollVelocity(self.getVelocity())
+      const scrollVelocity = self.getVelocity()
+
+      if (Math.abs(scrollVelocity) > 4000) {
+        projectPhysics.setScrollVelocity(0)
+        return
+      }
+
+      projectPhysics.setScrollVelocity(scrollVelocity)
     },
   })
 
@@ -1233,16 +1240,18 @@ function setupProjects() {
     ">",
   )
 
-  // Hold
-  tl.to(
-    {},
-    {
-      duration: 0.2,
-    },
-  )
-
   // Cross-page navigation target after final physics
   tl.addLabel("projects-visible")
+
+  // Projects to what's next section transition
+  tl.to(container, {
+    scaleX: 0.98,
+    scaleY: 0.98,
+    borderRadius: "0px 0px 32px 32px",
+    transformOrigin: "center top",
+    duration: 0.2,
+    ease: "none",
+  })
 
   return tl
 }

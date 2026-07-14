@@ -397,8 +397,7 @@ body.is-visual-fullscreen {
 /* -------- PROJECTS -------- */
 .projects {
   position: relative;
-  background-color: var(--color-cream);
-  color: var(--color-dark);
+  background-color: var(--color-dark);
 }
 
 /* Pin */
@@ -410,6 +409,13 @@ body.is-visual-fullscreen {
   position: relative;
   height: 100vh;
   overflow: hidden;
+
+  background-color: var(--color-cream);
+  color: var(--color-dark);
+
+  border-radius: 0px;
+  transform-origin: center top;
+  will-change: transform, border-radius;
 }
 
 /* Title */
@@ -504,4 +510,26 @@ body.is-visual-fullscreen {
 
 .page-transition--dark {
   background-color: var(--color-dark);
+}
+
+/* -------- NEXT SECTION -------- */
+.next-section {
+  min-height: 100vh;
+  background-color: var(--color-dark);
+  color: var(--color-cream);
+}
+
+.next-section__container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 20vh;
+}
+
+.next-section__title {
+  font-family: "Satoshi-Variable", Arial, Helvetica, sans-serif;
+  font-size: clamp(32px, 3vw, 64px);
+  font-weight: 400;
+  line-height: 1;
 }
