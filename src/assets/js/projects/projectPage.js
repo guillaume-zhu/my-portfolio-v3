@@ -235,6 +235,7 @@ function addProjectContentRevals(pageTimeline, root, container) {
   // ----------------------
   const context = root.querySelector(".project-context")
   const contextPanel = context.closest(".project-panel--context")
+  const textsContainer = context.querySelector(".project-context__texts")
   const revealElements = context.querySelectorAll(".project-context__text, .project-context__link")
   const categories = context.querySelectorAll(".project-context__category")
   const ellipse = root.querySelector(".project-ellipse")
@@ -250,6 +251,9 @@ function addProjectContentRevals(pageTimeline, root, container) {
   // ----------------------
   // 3. Initial states
   // ----------------------
+  gsap.set(textsContainer, {
+    visibility: "visible",
+  })
   gsap.set(categories, {
     opacity: 0,
     y: 20,
@@ -333,14 +337,40 @@ function addProjectContentRevals(pageTimeline, root, container) {
 // Intro
 function setupProjectIntro() {
   const title = document.querySelector(".project-intro__title")
+  const visuals = document.querySelectorAll(".project-intro__visual")
+  const backLink = document.querySelector(".project-back")
 
-  gsap.to(title, {
-    opacity: 1,
-    y: 0,
-    duration: 1.1,
-    delay: 0.15,
-    ease: "power3.out",
+  const introTimeline = gsap.timeline({
+    defaults: {
+      ease: "power3.out",
+    },
   })
+
+  introTimeline.to(visuals, {
+    opacity: 1,
+    scale: 1,
+    duration: 2,
+    stagger: 0.08,
+  })
+
+  introTimeline.to(
+    title,
+    {
+      opacity: 1,
+      y: 0,
+      duration: 2,
+    },
+    "<+=0.25",
+  )
+
+  introTimeline.to(
+    backLink,
+    {
+      opacity: 1,
+      duration: 2,
+    },
+    "<+=0.25",
+  )
 }
 
 // Project next

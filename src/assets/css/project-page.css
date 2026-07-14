@@ -3,6 +3,17 @@
 @import "./typography.css";
 @import "./variables.css";
 
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
 /* -------- PROJECT PAGE -------- */
 .project-page {
   min-height: 100vh;
@@ -85,6 +96,10 @@
   width: 50%;
   height: 100%;
   object-fit: cover;
+
+  opacity: 0;
+  transform: scale(1.04);
+  will-change: transform, opacity;
 }
 .project-intro__visual--primary {
   left: 0;
@@ -143,12 +158,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  opacity: 0;
+  will-change: opacity, transform;
 }
 
 .project-context__texts {
   position: absolute;
   width: min(62%, 460px);
-  /* border: 1px solid orange; */
   top: 46vh;
   bottom: 8vh;
   right: 0;
@@ -156,6 +172,7 @@
   flex-direction: column;
   justify-content: center;
   gap: 2em;
+  visibility: hidden;
 }
 
 .project-context--with-links .project-context__texts {
@@ -361,6 +378,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
+  opacity: 0;
+  will-change: opacity;
 
   color: var(--project-color);
   border: 2px solid currentColor;
