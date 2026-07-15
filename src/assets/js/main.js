@@ -195,6 +195,10 @@ function wrapProjectLetters(element) {
     })
     .join("")
 }
+// Convert progress into 0 -> 1 between two values
+function getPhaseProgress(progress, start, end) {
+  return gsap.utils.clamp(0, 1, (progress - start) / (end - start))
+}
 
 // Manifesto
 function setupManifesto() {
@@ -1273,9 +1277,13 @@ function setupNextSection() {
 
   const svg = root.querySelector(".next-section__svg")
   const path = root.querySelector("#nextPath")
+  const text = root.querySelector(".next-section__text")
   const textPath = root.querySelector("#nextTextPath")
   const creamTextPart = root.querySelector("#nextTextCream")
   const gradientTextPart = root.querySelector("#nextTextGradientPart")
+
+  const orb = root.querySelector("#nextOrb")
+  const footer = root.querySelector(".next-footer")
 
   // ----------------------
   // 2. SVG dimensions
@@ -1292,12 +1300,19 @@ function setupNextSection() {
   const scaleFactor = containerWidth / svgWidth
 
   // ----------------------
-  // 3. SVG camera position
+  // 3. SVG camera position & Initial state
   // ----------------------
   const position = {
     x: 0,
     y: 0,
   }
+
+  gsap.set(orb, {
+    autoAlpha: 0,
+  })
+  gsap.set(footer, {
+    clipPath: "circle(0px at 50% 50%)",
+  })
 
   function updateViewBox() {
     svg.setAttribute("viewBox", `${position.x} ${position.y} ${viewBoxWidth} ${viewBoxHeight}`)
@@ -1319,7 +1334,9 @@ function setupNextSection() {
   // 5. Text preparation
   // ----------------------
   const creamFullText = creamTextPart.textContent.trim() + " "
-  const gradientFullText = gradientTextPart.textContent.trim()
+  const gradientFullText = gradientTextPart.textContent.trim().replace(/\.$/, "")
+
+  const gradientMeasureText = `${gradientFullText}.`
 
   const creamCharacters = creamFullText.split("")
   const gradientCharacters = gradientFullText.split("")
@@ -1327,22 +1344,26 @@ function setupNextSection() {
   const totalCharacters = creamCharacters.length + gradientCharacters.length
 
   creamTextPart.textContent = creamFullText
-  gradientTextPart.textContent = gradientFullText
+  gradientTextPart.textContent = gradientMeasureText
+  const textLengthWithDot = textPath.getComputedTextLength()
 
+  gradientTextPart.textContent = gradientFullText
   const textLength = textPath.getComputedTextLength()
+
+  const orbLength = textLength + (textLengthWithDot - textLength) / 2
 
   creamTextPart.textContent = ""
   gradientTextPart.textContent = ""
 
   // ----------------------
-  // 6. Path points generation
+  // 6. Path points generation & Helpers
   // ----------------------
   const stepCount = 1000
   const points = []
 
   for (let i = 0; i < stepCount; i++) {
     const progress = i / (stepCount - 1)
-    const length = progress * textLength
+    const length = progress * orbLength
     const point = path.getPointAtLength(length)
 
     points.push({
@@ -1351,12 +1372,50 @@ function setupNextSection() {
     })
   }
 
+  const orbPoint = path.getPointAtLength(orbLength)
+
+  gsap.set(orb, {
+    attr: {
+      cx: orbPoint.x,
+      cy: orbPoint.y,
+    },
+    autoAlpha: 0,
+  })
+
+  // Get footer center SVG -> XY point
+  function getFooterCenterAsSvgPoint() {
+    const footerRect = footer.getBoundingClientRect()
+
+    const svgPoint = svg.createSVGPoint()
+
+    svgPoint.x = footerRect.left + footerRect.width / 2
+    svgPoint.y = footerRect.top + footerRect.height / 2
+
+    const screenMatrix = svg.getScreenCTM()
+
+    if (!screenMatrix) return orbPoint
+
+    return svgPoint.matrixTransform(screenMatrix.inverse())
+  }
+
+  // Get middle free space above footer
+  function getTextLiftY() {
+    const containerRect = container.getBoundingClientRect()
+    const footerRect = footer.getBoundingClientRect()
+
+    const topAreaHeight = footerRect.top - containerRect.top
+    const topAreaCenterY = topAreaHeight / 2
+    const containerCenterY = containerRect.height / 2
+
+    return topAreaCenterY - containerCenterY
+  }
+
   // ----------------------
   // 7. Intro fade
   // ----------------------
   gsap.to(intro, {
     autoAlpha: 0,
-    y: -30,
+    // y: -30,
     ease: "power2.out",
 
     scrollTrigger: {
@@ -1367,6 +1426,35 @@ function setupNextSection() {
       markers: false,
     },
   })
+
+  // ----------------------
+  // 8. Scroll settings
+  // ----------------------
+  // Text path progression
+  const pathStart = 0.28
+  const pathEnd = 0.82
+
+  // Orb transition
+  const orbRevealStart = 0.06
+
+  const orbMoveStart = 0.3
+  const orbMoveEnd = 0.6
+
+  const orbStartRadius = 12
+  const orbEndRadius = 12
+
+  // Text movement
+  const textLiftStart = orbMoveStart
+  const textLiftEnd = orbMoveEnd
+  const textLiftY = -200
+
+  // Footer reveal when orb at center of footer
+  const footerRevealStart = orbMoveEnd
+  const footerRevealEnd = 1
+
+  // Orb fade when footer reveal reach orb same radius
+  const orbFadeRadiusStart = orbEndRadius * 0.85
+  const orbFadeRadiusEnd = orbEndRadius * 1.35
 
   // ----------------------
   // 8. Pinned scroll section
@@ -1380,15 +1468,18 @@ function setupNextSection() {
     markers: false,
 
     onUpdate: (self) => {
-      const pathStart = 0.28
-      const pathProgress = gsap.utils.clamp(0, 1, (self.progress - pathStart) / (1 - pathStart))
+      // Progress phases
+      const pathProgress = getPhaseProgress(self.progress, pathStart, pathEnd)
+      const finalProgress = getPhaseProgress(self.progress, pathEnd, 1)
 
+      // Camera follows path
       const pointIndex = Math.floor(pathProgress * (points.length - 1))
       const point = points[pointIndex]
 
       xTo(point.x - (viewBoxWidth * scaleFactor) / 2)
       yTo(point.y - viewBoxHeight / 2 - 30)
 
+      // Text reveal
       const visibleCharacters = Math.floor(pathProgress * totalCharacters)
 
       const visibleCreamCharacters = Math.min(visibleCharacters, creamCharacters.length)
@@ -1404,6 +1495,63 @@ function setupNextSection() {
       if (gradientTextPart.textContent !== nextGradientText) {
         gradientTextPart.textContent = nextGradientText
       }
+
+      // Orb visibility
+      const isOrbVisible = finalProgress > orbRevealStart
+
+      // Text natural scroll movement
+      const textLiftProgress = getPhaseProgress(finalProgress, textLiftStart, textLiftEnd)
+
+      gsap.set(text, {
+        autoAlpha: 1,
+        y: textLiftY * textLiftProgress,
+      })
+
+      // Orb movement
+      const orbMoveProgress = getPhaseProgress(finalProgress, orbMoveStart, orbMoveEnd)
+
+      const footerCenterPoint = getFooterCenterAsSvgPoint()
+
+      const orbX = gsap.utils.interpolate(orbPoint.x, footerCenterPoint.x, orbMoveProgress)
+      const orbY = gsap.utils.interpolate(orbPoint.y, footerCenterPoint.y, orbMoveProgress)
+      const orbRadius = gsap.utils.interpolate(orbStartRadius, orbEndRadius, orbMoveProgress)
+      const orbColor = gsap.utils.interpolate("#ff6b4a", "#9b7cff", orbMoveProgress)
+
+      // Footer reveal starts after orb movement
+      const footerRevealProgress = getPhaseProgress(
+        finalProgress,
+        footerRevealStart,
+        footerRevealEnd,
+      )
+
+      const footerRevealRadius = gsap.utils.interpolate(
+        0,
+        Math.hypot(footer.offsetWidth, footer.offsetHeight),
+        footerRevealProgress,
+      )
+
+      gsap.set(footer, {
+        clipPath: `circle(${footerRevealRadius}px at 50% 50%)`,
+        webkitClipPath: `circle(${footerRevealRadius}px at 50% 50%)`,
+        pointerEvents: footerRevealProgress > 0.95 ? "auto" : "none",
+      })
+
+      // Orb fades only when the footer circle reaches roughly the orb radius
+      const orbFadeProgress = getPhaseProgress(
+        footerRevealRadius,
+        orbFadeRadiusStart,
+        orbFadeRadiusEnd,
+      )
+
+      gsap.set(orb, {
+        autoAlpha: isOrbVisible ? 1 - orbFadeProgress : 0,
+        attr: {
+          cx: orbX,
+          cy: orbY,
+          r: orbRadius,
+          fill: orbColor,
+        },
+      })
     },
   })
 }
