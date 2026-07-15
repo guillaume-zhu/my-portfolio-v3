@@ -1533,10 +1533,10 @@ function setupNextSection() {
       gsap.set(footer, {
         clipPath: `circle(${footerRevealRadius}px at 50% 50%)`,
         webkitClipPath: `circle(${footerRevealRadius}px at 50% 50%)`,
-        pointerEvents: footerRevealProgress > 0.95 ? "auto" : "none",
+        pointerEvents: footerRevealProgress > 0.4 ? "auto" : "none",
       })
 
-      // Orb fades only when the footer circle reaches roughly the orb radius
+      // Orb fades only when footer circle reaches orb radius
       const orbFadeProgress = getPhaseProgress(
         footerRevealRadius,
         orbFadeRadiusStart,

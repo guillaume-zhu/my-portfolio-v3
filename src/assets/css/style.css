@@ -38,6 +38,40 @@ body.is-visual-fullscreen {
   letter-spacing: var(--letter-spacing-display);
 }
 
+/* -------- TEXT LINKS -------- */
+.text-link {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+
+  color: inherit;
+  text-decoration: none;
+}
+
+.text-link::after {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  bottom: -0.15em;
+
+  width: 100%;
+  height: 1px;
+
+  background-color: currentColor;
+
+  transform: scaleX(0);
+  transform-origin: left center;
+
+  transition: transform 0.35s ease;
+  pointer-events: none;
+}
+
+.text-link:hover::after,
+.text-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
 /* -------- HERO THREE SECTION -------- */
 .hero-three {
   position: relative;
@@ -559,6 +593,7 @@ body.is-visual-fullscreen {
 
   transform: translate(0, -50%);
   overflow: visible;
+  pointer-events: none;
 }
 
 .next-section__text {
@@ -650,7 +685,7 @@ body.is-visual-fullscreen {
 
   font-family: "Satoshi-Variable", Arial, Helvetica, sans-serif;
   font-size: clamp(16px, 1.1vw, 20px);
-  font-weight: 400;
+  font-weight: 300;
 }
 
 .next-footer__meta-link {
@@ -673,6 +708,7 @@ body.is-visual-fullscreen {
   min-width: clamp(110px, 8vw, 160px);
   flex-direction: column;
   gap: clamp(8px, 1.3vh, 18px);
+  align-items: flex-start;
 }
 
 .next-footer__group-title {
@@ -688,8 +724,28 @@ body.is-visual-fullscreen {
   color: inherit;
 
   font-family: "Satoshi-Variable", Arial, Helvetica, sans-serif;
-  font-size: clamp(20px, 1.35vw, 24px);
-  font-weight: 400;
+  font-size: clamp(20px, 1.2vw, 24px);
+  font-weight: 300;
   line-height: 1.2;
   text-decoration: none;
+}
+
+/* -------- PLAYGROUND LINK -------- */
+.playground-link {
+  display: inline-block;
+  width: fit-content;
+
+  letter-spacing: 0;
+  font-weight: 400;
+
+  transition:
+    letter-spacing 0.35s ease,
+    font-weight 0.35s ease,
+    opacity 0.35s ease;
+}
+
+.playground-link:hover,
+.playground-link:focus-visible {
+  letter-spacing: 0.02em;
+  font-weight: 700;
 }
