@@ -39,7 +39,7 @@
       </section>
 
       <!-------- TRAJECTOIRY SECTION -------->
-      <section class="trajectory">
+      <section class="trajectory" id="parcours">
         <section class="entry">
           <div class="container">
             <h2 class="title">Trajectoire</h2>
@@ -80,7 +80,7 @@
       </section>
 
       <!-------- TOOLKIT SECTION -------->
-      <section class="toolkit">
+      <section class="toolkit" id="toolkit">
         <div class="toolkit__pin-height">
           <div class="toolkit__container">
             <div class="toolkit__header">
@@ -305,14 +305,47 @@
             </svg>
 
             <!-------- FOOTER REVEAL -------->
-            <footer class="next-footer" aria-label="Contact">
-              <div class="next-footer__background"></div>
+            <footer class="next-footer" aria-label="Pied de page">
+              <div class="next-footer__background" aria-hidden="true"></div>
 
               <div class="next-footer__content">
-                <p class="next-footer__eyebrow">Available for opportunities</p>
-                <a class="next-footer__title" href="mailto:ton-email@example.com">
-                  Let’s create together
-                </a>
+                <div class="next-footer__inner">
+                  <div class="next-footer__main">
+                    <p class="next-footer__headline">
+                      Disponible pour une alternance<br />
+                      en front-end créatif <br />
+                      dès octobre 2026
+                    </p>
+
+                    <div class="next-footer__meta">
+                      <a href="/mentions-legales/" class="next-footer__meta-link"
+                        >Mentions légales</a
+                      >
+                      <p>© 2026 Guillaume Zhu</p>
+                    </div>
+                  </div>
+
+                  <nav class="next-footer__nav" aria-label="Navigation du pied de page">
+                    <div class="next-footer__group">
+                      <p class="next-footer__group-title">Explorer</p>
+
+                      <a href="#parcours">Parcours</a>
+                      <a href="#toolkit">Toolkit</a>
+                      <a href="#projects">Projets</a>
+                      <a href="/playground/">Playground</a>
+                    </div>
+
+                    <div class="next-footer__group">
+                      <p class="next-footer__group-title">Contact</p>
+
+                      <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer"
+                        >LinkedIn</a
+                      >
+                      <a href="https://github.com/" target="_blank" rel="noreferrer">GitHub</a>
+                      <a href="mailto:ton-email@example.com">Email</a>
+                    </div>
+                  </nav>
+                </div>
               </div>
             </footer>
           </div>
