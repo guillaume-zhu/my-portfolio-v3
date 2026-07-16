@@ -9,6 +9,7 @@ gsap.registerPlugin(Observer)
 const stage = document.querySelector(".playground-sphere__stage")
 const medias = stage.querySelectorAll(".playground-sphere__media")
 const totalMedias = medias.length
+let introProgress = 0
 
 // ----------------------
 // 2. Sphere config
@@ -111,9 +112,33 @@ function getTransformedPosition(index) {
 function renderMedias() {
   medias.forEach((media, index) => {
     const [x, y, z] = getTransformedPosition(index)
-    const rot = getOrientationMatrix(x, -y, z)
 
-    const position = `translate3d(${x * radius}px, ${-y * radius}px, ${z * radius}px)`
+    // Final card direction when fully placed on sphere
+    const finalDirX = x
+    const finalDirY = -y
+    const finalDirZ = z
+
+    // Blend start direction (0,0,1) to final direction
+    const blendX = finalDirX * introProgress
+    const blendY = finalDirY * introProgress
+    const blendZ = finalDirZ * introProgress + (1 - introProgress)
+
+    // Calculate and normalize direction
+    const blendLen = Math.hypot(blendX, blendY, blendZ) || 1
+    const dirX = blendX / blendLen
+    const dirY = blendY / blendLen
+    const dirZ = blendZ / blendLen
+
+    // Calculate final orientation on sphere to be tangeant
+    const rot = getOrientationMatrix(dirX, dirY, dirZ)
+
+    // Translation grows from 0 to full radius
+    const tx = x * radius * introProgress
+    const ty = -y * radius * introProgress
+    const tz = z * radius * introProgress
+
+    // Apply transformation to CSS
+    const position = `translate3d(${tx}px, ${ty}px, ${tz}px)`
     const orientation = `matrix3d(${rot[0]},${rot[3]},${rot[6]},0,${rot[1]},${rot[4]},${rot[7]},0,${rot[2]},${rot[5]},${rot[8]},0,0,0,0,1)`
 
     media.style.transform = `${position} ${orientation} scaleX(-1)`
@@ -398,3 +423,48 @@ stage.addEventListener("click", onMediaClick)
 // 19. Center the closest card immediately on page load
 // ----------------------
 snapToClosest(true)
+
+// ----------------------
+// 20. Intro animation: explode cards from center to their sphere position
+// ----------------------
+gsapObs.disable()
+
+const intro = { progress: 0 }
+let isObserverEnabled = false
+const introTimeline = gsap.timeline({
+  delay: 0.2,
+})
+
+gsap.set(stage, {
+  scale: 0.8,
+})
+
+introTimeline.to(
+  stage,
+  {
+    scale: 1,
+    duration: 1.4,
+    ease: "power3.out",
+  },
+  0,
+)
+
+introTimeline.to(
+  intro,
+  {
+    progress: 1,
+    duration: 3,
+    ease: "power4.out",
+
+    onUpdate: () => {
+      introProgress = intro.progress
+      renderMedias()
+
+      if (!isObserverEnabled && introProgress >= 0.7) {
+        isObserverEnabled = true
+        gsapObs.enable()
+      }
+    },
+  },
+  0,
+)
