@@ -6,8 +6,8 @@
 body {
   min-height: 100dvh;
 
-  background-color: var(--color-dark);
-  color: var(--color-cream);
+  background-color: var(--color-cream);
+  color: var(--color-dark);
 
   font-family: "Satoshi-Variable", Arial, Helvetica, sans-serif;
 }
@@ -26,6 +26,8 @@ body {
 }
 
 .playground-sphere {
+  --caption-gap: 24px;
+
   position: relative;
 
   width: 100%;
@@ -56,27 +58,135 @@ body {
 }
 
 .playground-sphere__media {
+  --card-width: clamp(340px, 20vw, 440px);
+  --card-height: calc(var(--card-width) * 0.75);
+
   position: absolute;
-  background-color: red;
 
-  width: 14vw;
-  height: 14vw;
+  width: var(--card-width);
+  height: var(--card-height);
 
-  margin-top: -7vw;
-  margin-left: -7vw;
+  margin-left: calc(var(--card-width) * -0.5);
+  margin-top: calc(var(--card-height) * -0.5);
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border: 1px solid currentColor;
-  border-radius: 8px;
+  overflow: hidden;
 
-  font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
-  font-size: clamp(24px, 3vw, 56px);
-  font-weight: 500;
+  border-radius: 8px;
 
   user-select: none;
   transform-style: preserve-3d;
   backface-visibility: hidden;
+  cursor: pointer;
+
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.playground-sphere__media--first {
+  opacity: 1;
+}
+
+.playground-sphere__visual {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .playground-sphere__visual {
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .playground-sphere__media:hover .playground-sphere__visual {
+    transform: scale(1.2);
+  }
+}
+
+.playground-sphere__caption {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: min(90vw, 720px);
+  margin-left: calc(min(90vw, 720px) * -0.5);
+
+  text-align: center;
+  pointer-events: none;
+
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition:
+    opacity 0.5s ease,
+    visibility 0s linear 0.5s;
+
+  will-change: transform, opacity;
+}
+
+.playground-sphere__caption.is-visible {
+  opacity: 1;
+  visibility: visible;
+
+  transition:
+    opacity 0.5s ease,
+    visibility 0s;
+}
+
+.playground-sphere__caption-title {
+  margin: 0;
+
+  font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
+  font-size: clamp(20px, 1.8vw, 32px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: var(--letter-display);
+}
+
+.playground-sphere__caption-meta {
+  margin: 8px 0 0;
+
+  font-size: clamp(12px, 0.9vw, 15px);
+  font-weight: 400;
+  line-height: 1.2;
+  opacity: 0.6;
+}
+
+@media (max-width: 1400px) {
+  .playground-sphere {
+    --caption-gap: 18px;
+  }
+
+  .playground-sphere__media {
+    --card-width: clamp(250px, 30vw, 380px);
+  }
+}
+
+@media (max-width: 500px) {
+  .playground-sphere {
+    --caption-gap: 10px;
+  }
+
+  .playground-sphere__media {
+    --card-width: clamp(115px, 33vw, 145px);
+  }
+
+  .playground-sphere__caption-title {
+    font-size: 14px;
+  }
+  .playground-sphere__caption-meta {
+    margin-top: 5px;
+    font-size: 11px;
+  }
 }

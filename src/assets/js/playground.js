@@ -9,7 +9,19 @@ gsap.registerPlugin(Observer)
 const stage = document.querySelector(".playground-sphere__stage")
 const medias = stage.querySelectorAll(".playground-sphere__media")
 const totalMedias = medias.length
+const initialMedia = stage.querySelector(".playground-sphere__media--first")
+const initialMediaIndex = initialMedia ? Array.prototype.indexOf.call(medias, initialMedia) : 0
+
+const caption = document.querySelector(".playground-sphere__caption")
+const captionTitle = caption.querySelector(".playground-sphere__caption-title")
+const captionMeta = caption.querySelector(".playground-sphere__caption-meta")
+
 let introProgress = 0
+let currentCaptionIndex = -1
+let isCaptionVisible = false
+let canShowCaption = false
+
+const videoStates = []
 
 // ----------------------
 // 2. Sphere config
@@ -110,8 +122,11 @@ function getTransformedPosition(index) {
 // 7. Render: apply current position + orientation to each card
 // ----------------------
 function renderMedias() {
+  const secondaryRevealProgress = gsap.utils.clamp(0, 1, (introProgress - 0.04) / 0.22)
+
   medias.forEach((media, index) => {
     const [x, y, z] = getTransformedPosition(index)
+    const cardProgress = z > 0 ? introProgress : 1
 
     // Final card direction when fully placed on sphere
     const finalDirX = x
@@ -119,9 +134,9 @@ function renderMedias() {
     const finalDirZ = z
 
     // Blend start direction (0,0,1) to final direction
-    const blendX = finalDirX * introProgress
-    const blendY = finalDirY * introProgress
-    const blendZ = finalDirZ * introProgress + (1 - introProgress)
+    const blendX = finalDirX * cardProgress
+    const blendY = finalDirY * cardProgress
+    const blendZ = finalDirZ * cardProgress + (1 - cardProgress)
 
     // Calculate and normalize direction
     const blendLen = Math.hypot(blendX, blendY, blendZ) || 1
@@ -133,15 +148,16 @@ function renderMedias() {
     const rot = getOrientationMatrix(dirX, dirY, dirZ)
 
     // Translation grows from 0 to full radius
-    const tx = x * radius * introProgress
-    const ty = -y * radius * introProgress
-    const tz = z * radius * introProgress
+    const tx = x * radius * cardProgress
+    const ty = -y * radius * cardProgress
+    const tz = z * radius * cardProgress
 
     // Apply transformation to CSS
     const position = `translate3d(${tx}px, ${ty}px, ${tz}px)`
     const orientation = `matrix3d(${rot[0]},${rot[3]},${rot[6]},0,${rot[1]},${rot[4]},${rot[7]},0,${rot[2]},${rot[5]},${rot[8]},0,0,0,0,1)`
 
     media.style.transform = `${position} ${orientation} scaleX(-1)`
+    media.style.opacity = index === initialMediaIndex ? "1" : String(secondaryRevealProgress)
   })
 }
 
@@ -154,6 +170,20 @@ const container = document.querySelector(".playground-sphere__container")
 
 const mm = gsap.matchMedia()
 
+function applyDesktopSphereSettings() {
+  const viewportWidth = window.innerWidth
+
+  radius = 0.6 * viewportWidth
+
+  gsap.set(stage, {
+    translateZ: `${viewportWidth * -0.22}px`,
+  })
+
+  gsap.set(container, {
+    perspective: `${viewportWidth * 2.8}px`,
+  })
+}
+
 mm.add(
   {
     isMobile: "(max-width: 500px)",
@@ -164,17 +194,15 @@ mm.add(
     const { isMobile, isTablet } = context.conditions
 
     if (isMobile) {
-      radius = 310
+      radius = 320
       gsap.set(stage, { translateZ: "250px" })
       gsap.set(container, { perspective: "1000px" })
     } else if (isTablet) {
-      radius = 980
+      radius = 850
       gsap.set(stage, { translateZ: "-310px" })
       gsap.set(container, { perspective: "3920px" })
     } else {
-      radius = 0.7 * window.innerWidth
-      gsap.set(stage, { translateZ: "-22vw" })
-      gsap.set(container, { perspective: "280vw" })
+      applyDesktopSphereSettings()
     }
 
     renderMedias()
@@ -225,6 +253,9 @@ function updateMedias() {
   }
 
   renderMedias()
+  updateCaption()
+  positionCaption()
+  updateVideoVisibility()
 }
 
 // ----------------------
@@ -379,6 +410,9 @@ function snapToIndex(index, instant) {
       }
       premultiply3x3(axisAngleMatrix(ax, ay, 0, angle * snap.t))
       renderMedias()
+      updateCaption()
+      positionCaption()
+      updateVideoVisibility()
     },
     onComplete() {
       snapTween = null
@@ -422,7 +456,7 @@ stage.addEventListener("click", onMediaClick)
 // ----------------------
 // 19. Center the closest card immediately on page load
 // ----------------------
-snapToClosest(true)
+snapToIndex(initialMediaIndex, true)
 
 // ----------------------
 // 20. Intro animation: explode cards from center to their sphere position
@@ -465,6 +499,125 @@ introTimeline.to(
         gsapObs.enable()
       }
     },
+
+    onComplete: () => {
+      updateVideoVisibility()
+    },
   },
   0,
 )
+
+introTimeline.call(
+  () => {
+    canShowCaption = true
+    updateCaption()
+  },
+  [],
+  ">-=2.5",
+)
+
+// ----------------------
+// 21. Update shared caption based on centered card
+// ----------------------
+
+function updateCaption() {
+  if (!canShowCaption) {
+    caption.classList.remove("is-visible")
+    return
+  }
+
+  const index = findClosestIndex()
+  const [, , z] = getTransformedPosition(index)
+
+  const hasCenteredCard = z > 0.98
+
+  if (!hasCenteredCard) {
+    caption.classList.remove("is-visible")
+    isCaptionVisible = false
+    return
+  }
+
+  if (index === currentCaptionIndex && isCaptionVisible) return
+
+  currentCaptionIndex = index
+
+  const media = medias[index]
+  captionTitle.textContent = media.dataset.title || ""
+  captionMeta.textContent = media.dataset.meta || ""
+
+  caption.classList.add("is-visible")
+  isCaptionVisible = true
+  positionCaption()
+}
+
+function positionCaption() {
+  if (currentCaptionIndex === -1) return
+
+  const [x, y, z] = getTransformedPosition(currentCaptionIndex)
+
+  const rot = getOrientationMatrix(x, -y, z)
+
+  // Same projection as the cards
+  const tx = x * radius * introProgress
+  const ty = -y * radius * introProgress
+  const tz = z * radius * introProgress
+
+  const centeredMedia = medias[currentCaptionIndex]
+  const cardHalfHeight = centeredMedia.offsetHeight / 2
+  const captionGap = parseFloat(getComputedStyle(container).getPropertyValue("--caption-gap")) || 20
+  const offset = cardHalfHeight + captionGap
+
+  const position = `translate3d(${tx}px, ${ty}px, ${tz}px)`
+  const orientation = `matrix3d(${rot[0]},${rot[3]},${rot[6]},0,${rot[1]},${rot[4]},${rot[7]},0,${rot[2]},${rot[5]},${rot[8]},0,0,0,0,1)`
+  const localOffset = `translateY(${offset}px)`
+
+  caption.style.transform = `${position} ${orientation} ${localOffset} scaleX(-1)`
+}
+
+// ----------------------
+// 22. Play/pause videos based on sphere visibility
+// ----------------------
+
+medias.forEach((media, index) => {
+  const video = media.querySelector("video")
+  videoStates[index] = video ? "paused" : null
+})
+
+const PLAY_THRESHOLD = 0.5
+const PAUSE_THRESHOLD = 0.2
+
+function updateVideoVisibility() {
+  for (let i = 0; i < totalMedias; i++) {
+    if (videoStates[i] === null) continue
+
+    const [, , z] = getTransformedPosition(i)
+    const video = medias[i].querySelector("video")
+
+    if (videoStates[i] === "paused" && z > PLAY_THRESHOLD) {
+      videoStates[i] = "playing"
+      video.play().catch(() => {})
+    } else if (videoStates[i] === "playing" && z < PAUSE_THRESHOLD) {
+      videoStates[i] = "paused"
+      video.pause()
+    }
+  }
+}
+
+// ----------------------
+// 23. Resize
+// ----------------------
+
+let resizeFrame = null
+
+window.addEventListener("resize", () => {
+  cancelAnimationFrame(resizeFrame)
+
+  resizeFrame = requestAnimationFrame(() => {
+    if (window.innerWidth > 1400) {
+      applyDesktopSphereSettings()
+      renderMedias()
+    }
+
+    positionCaption()
+  })
+})
