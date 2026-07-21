@@ -26,7 +26,10 @@ body {
 }
 
 .playground-sphere {
+  --card-width: clamp(340px, 20vw, 440px);
   --caption-gap: 24px;
+  --media-radius: 8px;
+  --media-hover-scale: 1.2;
 
   position: relative;
 
@@ -58,7 +61,6 @@ body {
 }
 
 .playground-sphere__media {
-  --card-width: clamp(340px, 20vw, 440px);
   --card-height: calc(var(--card-width) * 0.75);
 
   position: absolute;
@@ -75,7 +77,7 @@ body {
 
   overflow: hidden;
 
-  border-radius: 8px;
+  border-radius: var(--media-radius);
 
   user-select: none;
   transform-style: preserve-3d;
@@ -107,7 +109,7 @@ body {
   }
 
   .playground-sphere__media:hover .playground-sphere__visual {
-    transform: scale(1.2);
+    transform: scale(var(--media-hover-scale));
   }
 }
 
@@ -165,21 +167,15 @@ body {
 
 @media (max-width: 1400px) {
   .playground-sphere {
-    --caption-gap: 18px;
-  }
-
-  .playground-sphere__media {
     --card-width: clamp(250px, 30vw, 380px);
+    --caption-gap: 18px;
   }
 }
 
 @media (max-width: 500px) {
   .playground-sphere {
-    --caption-gap: 10px;
-  }
-
-  .playground-sphere__media {
     --card-width: clamp(115px, 33vw, 145px);
+    --caption-gap: 10px;
   }
 
   .playground-sphere__caption-title {
