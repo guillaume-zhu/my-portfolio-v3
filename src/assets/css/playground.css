@@ -2,8 +2,11 @@
 @import "./cabinet-grotesk.css";
 @import "./typography.css";
 @import "./variables.css";
+@import "./header.css";
 
 body {
+  --current-interface-color: var(--color-dark);
+
   min-height: 100dvh;
 
   background-color: var(--color-cream);

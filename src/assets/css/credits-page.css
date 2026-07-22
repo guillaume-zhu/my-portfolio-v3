@@ -2,6 +2,7 @@
 @import "./cabinet-grotesk.css";
 @import "./typography.css";
 @import "./variables.css";
+@import "./header.css";
 
 html {
   scroll-behavior: smooth;
@@ -9,18 +10,19 @@ html {
 
 /* -------- CREDITS PAGE -------- */
 .credits-page {
+  --current-interface-color: var(--color-dark);
+
   min-height: 100vh;
   padding: 2vw;
 
   color: var(--color-dark);
   background-color: var(--color-cream);
 }
-
 /* -------- BACK LINK -------- */
 .credits-page__back {
   position: fixed;
-  top: 2vw;
   right: 2vw;
+  bottom: 2vw;
   z-index: 10;
 
   color: inherit;
@@ -370,8 +372,8 @@ html {
   }
 
   .credits-page__back {
-    top: 1.25rem;
     right: 1.25rem;
+    bottom: 1.25rem;
   }
 
   .credits-hero {

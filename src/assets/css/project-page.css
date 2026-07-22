@@ -2,6 +2,7 @@
 @import "./cabinet-grotesk.css";
 @import "./typography.css";
 @import "./variables.css";
+@import "./header.css";
 
 html,
 body {
@@ -16,6 +17,8 @@ body::-webkit-scrollbar {
 
 /* -------- PROJECT PAGE -------- */
 .project-page {
+  --current-interface-color: var(--project-color);
+
   min-height: 100vh;
   background-color: var(--project-background);
   color: var(--project-color);

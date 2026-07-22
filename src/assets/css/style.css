@@ -2,6 +2,7 @@
 @import "./cabinet-grotesk.css";
 @import "./typography.css";
 @import "./variables.css";
+@import "./header.css";
 
 /* -------- GLOBAL -------- */
 html,
@@ -14,11 +15,15 @@ body::-webkit-scrollbar {
 }
 
 body {
+  --current-interface-color: var(--color-cream);
   background-color: var(--color-cream);
 }
 
-body.is-visual-fullscreen {
+body[data-interface-color="cream"] {
   --current-interface-color: var(--color-cream);
+}
+body[data-interface-color="dark"] {
+  --current-interface-color: var(--color-dark);
 }
 
 .tag {

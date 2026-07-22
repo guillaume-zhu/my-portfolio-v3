@@ -3,31 +3,21 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import Lenis from "lenis"
 import "lenis/dist/lenis.css"
 
+import { createSiteHeader } from "../components/createSiteHeader"
 import { createThreeHero } from "../../three/createThreeHero"
 import { createToolkitCardReveal } from "../../three/createToolkitCardReveal"
 import { createProjectLetterPhysics } from "./projects/createProjectLetterPhysics"
 import { setupProjectImageHover } from "./projects/setupProjectImageHover"
 
-gsap.registerPlugin(ScrollTrigger)
-
-// ----------------------
-// Cross-page navigation
-// ----------------------
-
-// Store the requested section before removing the hash from the URL
-const initialHash = window.location.hash
-const shouldOpenProjects = initialHash === "#projects"
-
-// Prevent the browser from scrolling to an outdated position before ScrollTrigger has created all the pin spacing
-if (shouldOpenProjects) {
-  history.scrollRestoration = "manual"
-
-  history.replaceState(null, "", window.location.pathname + window.location.search)
-}
-
 // ----------------------
 // Global setup
 // ----------------------
+gsap.registerPlugin(ScrollTrigger)
+
+createSiteHeader()
+
+const sectionNavigation = createSectionNavigation()
+
 const lenis = new Lenis({
   anchors: true,
 })
@@ -65,45 +55,345 @@ setupHeroToManifestoTransition()
 document.fonts.ready.then(() => {
   setupManifesto()
   setupTrajectory()
-  setupTrajectorySentences()
+  const trajectorySentencesTimeline = setupTrajectorySentences()
   setupTrajectoryToToolkitTransition()
   setupToolkit()
-
   const projectsTimeline = setupProjects()
+  const nextSectionTrigger = setupNextSection()
 
-  setupNextSection()
+  setupHeaderTheme()
 
   ScrollTrigger.refresh()
 
   // Update Lenis with final document height with GSAP pin spacers
   lenis.resize()
 
-  if (shouldOpenProjects) {
-    // Wait one frame before reading final ScrollTrigger positions
-    requestAnimationFrame(() => {
-      const targetScroll = projectsTimeline.scrollTrigger.labelToScroll("projects-visible")
-
-      lenis.scrollTo(targetScroll, {
-        immediate: true,
-        force: true,
-      })
-
-      ScrollTrigger.update()
-
-      history.replaceState(
-        null,
-        "",
-        `${window.location.pathname}${window.location.search}#projects`,
-      )
-
-      history.scrollRestoration = "auto"
-    })
-  }
+  sectionNavigation.init({
+    trajectorySentencesTimeline,
+    projectsTimeline,
+    nextSectionTrigger,
+  })
 })
+
+// ----------------------
+// Helpers
+// ----------------------
+// Wrap letters in span
+function wrapLettersInSpan(element) {
+  if (!element || element.dataset.splitted === "true") return
+
+  const lines = element.innerHTML.trim().split(/<br\s*\/?>/i)
+
+  element.innerHTML = lines
+    .map((line) =>
+      line
+        .trim()
+        .split("")
+        .map((char) =>
+          char === " " ? "<span>&nbsp;</span>" : `<span class="letter">${char}</span>`,
+        )
+        .join(""),
+    )
+    .join("<br />")
+
+  element.dataset.splitted = "true"
+}
+
+// Wrap project letters
+function wrapProjectLetters(element) {
+  const text = element.textContent.trim()
+
+  element.setAttribute("aria-label", text)
+
+  element.innerHTML = text
+    .split("")
+    .map((char) => {
+      const content = char === " " ? "&nbsp;" : char
+
+      return `
+    <span class="project-letter" aria-hidden="true">
+      <span class="project-letter__content">
+        ${content}
+      </span>
+    </span>
+    `
+    })
+    .join("")
+}
+
+// Convert progress into 0 -> 1 between two values
+function getPhaseProgress(progress, start, end) {
+  return gsap.utils.clamp(0, 1, (progress - start) / (end - start))
+}
+
+// Header body interface color
+function setInterfaceColor(color) {
+  if (document.body.dataset.interfaceColor === color) return
+  document.body.dataset.interfaceColor = color
+}
 
 // ----------------------
 // Functions
 // ----------------------
+// Main page section navigation
+function createSectionNavigation() {
+  // ----------------------
+  // 1. Navigation settings
+  // ----------------------
+  const supportedHashes = new Set(["#parcours", "#toolkit", "#projects", "#contact"])
+
+  const interfaceColorByHash = {
+    "#parcours": "cream",
+    "#toolkit": "cream",
+    "#projects": "dark",
+    "#contact": "cream",
+  }
+
+  // ----------------------
+  // 2. Initial hash
+  // ----------------------
+  const initialHash = supportedHashes.has(window.location.hash) ? window.location.hash : null
+
+  // Prevent native scrolling before GSAP creates its pin spacing
+  if (initialHash) {
+    history.scrollRestoration = "manual"
+
+    history.replaceState(null, "", window.location.pathname + window.location.search)
+
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "auto",
+    })
+  }
+
+  // ----------------------
+  // 3. Calculate destination
+  // ----------------------
+  function getTargetScroll(hash, references) {
+    const { trajectorySentencesTimeline, projectsTimeline, nextSectionTrigger } = references
+
+    if (hash === "#parcours") {
+      const trajectoryTrigger = trajectorySentencesTimeline?.scrollTrigger
+
+      return trajectoryTrigger ? trajectoryTrigger.start + 1 : null
+    }
+
+    if (hash === "#projects") {
+      return projectsTimeline?.scrollTrigger?.labelToScroll("projects-visible")
+    }
+
+    if (hash === "#contact") {
+      return nextSectionTrigger ? nextSectionTrigger.end - 1 : null
+    }
+
+    const targetElement = document.querySelector(hash)
+
+    if (!targetElement) return null
+
+    return targetElement.getBoundingClientRect().top + window.scrollY
+  }
+
+  // ----------------------
+  // 4. Update URL
+  // ----------------------
+  function updateUrl(hash, historyMode) {
+    const targetUrl = `${window.location.pathname}` + `${window.location.search}` + `${hash}`
+
+    if (historyMode === "replace") {
+      history.replaceState(null, "", targetUrl)
+      return
+    }
+
+    if (window.location.hash !== hash) {
+      history.pushState(null, "", targetUrl)
+    }
+  }
+
+  // ----------------------
+  // 5. Scroll to destination
+  // ----------------------
+  function scrollToSection(hash, references, { immediate = false, historyMode = "push" } = {}) {
+    const targetScroll = getTargetScroll(hash, references)
+
+    if (targetScroll == null) return false
+
+    lenis.scrollTo(targetScroll, {
+      immediate,
+      force: true,
+    })
+
+    // An immediate jump does not naturally pass through every theme trigger
+    if (immediate) {
+      ScrollTrigger.update()
+      setInterfaceColor(interfaceColorByHash[hash])
+    }
+
+    updateUrl(hash, historyMode)
+
+    return true
+  }
+
+  // Undo the scroll performed by native navigation
+  function resetNativeAnchorContainer(hash) {
+    const targetElement = document.querySelector(hash)
+    const scrollContainer = targetElement?.closest(".next-section__container")
+
+    if (!scrollContainer) return
+
+    scrollContainer.scrollTop = 0
+    scrollContainer.scrollLeft = 0
+  }
+
+  // ----------------------
+  // 6. Handle homepage links
+  // ----------------------
+  function setupInternalLinks(references) {
+    const links = document.querySelectorAll("a[href]")
+
+    links.forEach((link) => {
+      const linkUrl = new URL(link.href, window.location.href)
+      const hash = linkUrl.hash
+
+      if (!supportedHashes.has(hash)) return
+
+      link.addEventListener("click", (event) => {
+        if (
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        ) {
+          return
+        }
+
+        event.preventDefault()
+        event.stopPropagation()
+
+        scrollToSection(hash, references)
+      })
+    })
+  }
+
+  // ----------------------
+  // 7. Public initialization
+  // ----------------------
+  function init(references) {
+    setupInternalLinks(references)
+
+    window.addEventListener("hashchange", () => {
+      const hash = window.location.hash
+
+      if (!supportedHashes.has(hash)) return
+
+      resetNativeAnchorContainer(hash)
+
+      requestAnimationFrame(() => {
+        scrollToSection(hash, references, {
+          immediate: true,
+          historyMode: "replace",
+        })
+      })
+    })
+
+    if (!initialHash) return
+
+    function openInitialSection() {
+      // Recalculate every pin after all page resources are loaded
+      ScrollTrigger.refresh()
+      lenis.resize()
+
+      requestAnimationFrame(() => {
+        scrollToSection(initialHash, references, {
+          immediate: true,
+          historyMode: "replace",
+        })
+
+        history.scrollRestoration = "auto"
+      })
+    }
+
+    if (document.readyState === "complete") {
+      openInitialSection()
+    } else {
+      window.addEventListener("load", openInitialSection, {
+        once: true,
+      })
+    }
+  }
+
+  return {
+    init,
+  }
+}
+
+// Header setup theme
+function setupHeaderTheme() {
+  // Hero to manifesto
+  const manifesto = document.querySelector(".manifesto")
+
+  ScrollTrigger.create({
+    trigger: manifesto,
+    start: "top -425px",
+
+    onEnter: () => {
+      setInterfaceColor("dark")
+    },
+
+    onEnterBack: () => {
+      setInterfaceColor("dark")
+    },
+
+    onLeaveBack: () => {
+      setInterfaceColor("cream")
+    },
+
+    markers: false,
+  })
+
+  // Manifesto to trajectory
+  const trajectory = document.querySelector(".trajectory")
+
+  ScrollTrigger.create({
+    trigger: trajectory,
+    start: "top 80px",
+
+    onEnter: () => {
+      setInterfaceColor("cream")
+    },
+
+    onEnterBack: () => {
+      setInterfaceColor("cream")
+    },
+
+    onLeaveBack: () => {
+      setInterfaceColor("dark")
+    },
+
+    markers: false,
+  })
+
+  // Project to next section
+  const nextSection = document.querySelector(".next-section")
+
+  ScrollTrigger.create({
+    trigger: nextSection,
+    start: "top 80px",
+
+    onEnter: () => {
+      setInterfaceColor("cream")
+    },
+
+    onEnterBack: () => {
+      setInterfaceColor("cream")
+    },
+
+    onLeaveBack: () => {
+      setInterfaceColor("dark")
+    },
+  })
+}
 
 // Scene Hero
 function setupHeroScroll(threeHero) {
@@ -152,52 +442,6 @@ function setupHeroToManifestoTransition() {
       markers: false,
     },
   })
-}
-
-// Wrap letters in span
-function wrapLettersInSpan(element) {
-  if (!element || element.dataset.splitted === "true") return
-
-  const lines = element.innerHTML.trim().split(/<br\s*\/?>/i)
-
-  element.innerHTML = lines
-    .map((line) =>
-      line
-        .trim()
-        .split("")
-        .map((char) =>
-          char === " " ? "<span>&nbsp;</span>" : `<span class="letter">${char}</span>`,
-        )
-        .join(""),
-    )
-    .join("<br />")
-
-  element.dataset.splitted = "true"
-}
-// Wrap project letters
-function wrapProjectLetters(element) {
-  const text = element.textContent.trim()
-
-  element.setAttribute("aria-label", text)
-
-  element.innerHTML = text
-    .split("")
-    .map((char) => {
-      const content = char === " " ? "&nbsp;" : char
-
-      return `
-    <span class="project-letter" aria-hidden="true">
-      <span class="project-letter__content">
-        ${content}
-      </span>
-    </span>
-    `
-    })
-    .join("")
-}
-// Convert progress into 0 -> 1 between two values
-function getPhaseProgress(progress, start, end) {
-  return gsap.utils.clamp(0, 1, (progress - start) / (end - start))
 }
 
 // Manifesto
@@ -406,6 +650,21 @@ function setupTrajectorySentences() {
         },
         "<",
       )
+
+      tl.to(
+        {},
+        {
+          duration: 0.0001,
+
+          onStart: () => {
+            setInterfaceColor("dark")
+          },
+          onReverseComplete: () => {
+            setInterfaceColor("cream")
+          },
+        },
+        "<",
+      )
     }
 
     // Visuals enter
@@ -517,19 +776,21 @@ function setupTrajectorySentences() {
         ">+=0.2",
       )
 
-      // Change UI mode
+      // Change header color over fullscreen visuals
       tl.to(
         {},
         {
           duration: 0.001,
+
           onStart: () => {
-            document.body.classList.add("is-visual-fullscreen")
+            setInterfaceColor("cream")
           },
+
           onReverseComplete: () => {
-            document.body.classList.remove("is-visual-fullscreen")
+            setInterfaceColor("dark")
           },
         },
-        "<",
+        ">-35%",
       )
 
       // Hold final state
@@ -545,6 +806,7 @@ function setupTrajectorySentences() {
       )
     }
   })
+  return tl
 }
 
 // Trajectory to Toolkit transition
@@ -630,6 +892,7 @@ function setupToolkit() {
   const cardLiftEnd = 0.82
   const cardPlayEnd = 0.87
   const fullscreenStart = 0.97
+  const headerDarkStart = 0.9925
   const finalTransitionEnd = 1
 
   // Subtitle
@@ -794,6 +1057,9 @@ function setupToolkit() {
     markers: false,
 
     onUpdate: (self) => {
+      const isCreamCoveringHeader = self.progress >= headerDarkStart
+
+      setInterfaceColor(isCreamCoveringHeader ? "dark" : "cream")
       // ----------------------
       // 0. Decks visibility & interactive state
       // ----------------------
@@ -1459,7 +1725,7 @@ function setupNextSection() {
   // ----------------------
   // 8. Pinned scroll section
   // ----------------------
-  ScrollTrigger.create({
+  const nextSectionTrigger = ScrollTrigger.create({
     trigger: pinHeight,
     start: "top top",
     end: "bottom bottom",
@@ -1554,4 +1820,6 @@ function setupNextSection() {
       })
     },
   })
+
+  return nextSectionTrigger
 }

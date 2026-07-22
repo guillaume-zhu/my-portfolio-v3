@@ -1,7 +1,9 @@
 import { gsap } from "gsap"
 import { Observer } from "gsap/Observer"
+import { createSiteHeader } from "../components/createSiteHeader"
 
 gsap.registerPlugin(Observer)
+createSiteHeader()
 
 // ----------------------
 // 1. Dom selections

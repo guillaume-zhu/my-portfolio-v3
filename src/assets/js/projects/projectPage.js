@@ -3,8 +3,10 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { SplitText } from "gsap/SplitText"
 import Lenis from "lenis"
 import "lenis/dist/lenis.css"
+import { createSiteHeader } from "../../components/createSiteHeader"
 
 gsap.registerPlugin(ScrollTrigger, SplitText)
+createSiteHeader()
 
 // ----------------------
 // 1. Lenis
