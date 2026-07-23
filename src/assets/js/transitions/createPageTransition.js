@@ -1,4 +1,9 @@
 import gsap from "gsap"
+import { CustomEase } from "gsap/CustomEase"
+
+gsap.registerPlugin(CustomEase)
+
+CustomEase.create("heroCircleOut", "0.025, 0.99, 0.08, 1")
 
 const DEFAULT_TRANSITION_COLOR = "cream"
 
@@ -84,6 +89,34 @@ export function createPageTransition({
   async function reveal({ mode = "slide" } = {}) {
     await waitForNextPaint()
 
+    if (mode === "circle") {
+      gsap.set(transition, {
+        xPercent: 0,
+        borderRadius: 0,
+        clipPath: "circle(100vmax at 50% 50%)",
+      })
+
+      return new Promise((resolve) => {
+        gsap.to(transition, {
+          clipPath: "circle(0vmax at 50% 50%)",
+          duration: 0.8,
+          ease: "heroCircleOut",
+
+          onComplete: () => {
+            gsap.set(transition, {
+              xPercent: 100,
+              clipPath: "none",
+              borderRadius: "60vh 0 0 60vh",
+              pointerEvents: "none",
+            })
+
+            isTransitioning = false
+            resolve(true)
+          },
+        })
+      })
+    }
+
     gsap.set(transition, {
       borderRadius: "0 60vh 60vh 0",
     })
@@ -108,7 +141,7 @@ export function createPageTransition({
     })
   }
 
-  async function run(onCovered) {
+  async function run(onCovered, { mode = "slide" } = {}) {
     const didCover = await cover()
 
     if (!didCover) return false
@@ -117,7 +150,7 @@ export function createPageTransition({
       await onCovered()
     }
 
-    await reveal()
+    await reveal({ mode })
 
     return true
   }

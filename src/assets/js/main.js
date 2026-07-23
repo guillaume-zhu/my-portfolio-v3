@@ -260,6 +260,52 @@ function createSectionNavigation() {
   }
 
   // ----------------------
+  // 6. Handle hero link
+  // ----------------------
+  function setupHeroLink() {
+    const logo = document.querySelector(".site-header__logo")
+
+    if (!logo) return
+
+    logo.addEventListener("click", async (event) => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+        return
+      }
+
+      event.preventDefault()
+      event.stopPropagation()
+
+      const isAlreadyOnHero = !window.location.hash && window.scrollY <= 1
+
+      if (isAlreadyOnHero) return
+
+      pageTransition.setColor("cream")
+      lenis.stop()
+
+      try {
+        await pageTransition.run(
+          () => {
+            lenis.scrollTo(0, {
+              immediate: true,
+              force: true,
+            })
+
+            ScrollTrigger.update()
+            setInterfaceColor("cream")
+
+            history.pushState(null, "", window.location.pathname + window.location.search)
+          },
+          {
+            mode: "circle",
+          },
+        )
+      } finally {
+        lenis.start()
+      }
+    })
+  }
+
+  // ----------------------
   // 6. Handle homepage links
   // ----------------------
   function setupInternalLinks(references) {
@@ -304,6 +350,7 @@ function createSectionNavigation() {
   // 7. Public initialization
   // ----------------------
   function init(references) {
+    setupHeroLink()
     setupInternalLinks(references)
 
     window.addEventListener("hashchange", () => {
@@ -323,7 +370,9 @@ function createSectionNavigation() {
 
     if (!initialHash) {
       if (shouldRevealTransition) {
-        pageTransition.reveal()
+        pageTransition.reveal({
+          mode: "circle",
+        })
       }
 
       return

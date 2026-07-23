@@ -531,7 +531,7 @@ introTimeline.call(
 function startPlaygroundIntro() {
   if (shouldRevealTransition) {
     pageTransition.reveal()
-    gsap.delayedCall(0.5, () => {
+    gsap.delayedCall(0.2, () => {
       introTimeline.play()
     })
     return
