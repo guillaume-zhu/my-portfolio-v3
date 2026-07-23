@@ -4,6 +4,9 @@ import Lenis from "lenis"
 import "lenis/dist/lenis.css"
 
 import { createSiteHeader } from "../components/createSiteHeader"
+import { createIncomingPageTransition } from "./transitions/createPageTransition"
+import { setupCrossPageTransitions } from "./transitions/setupCrossPageTransitions"
+
 import { createThreeHero } from "../../three/createThreeHero"
 import { createToolkitCardReveal } from "../../three/createToolkitCardReveal"
 import { createProjectLetterPhysics } from "./projects/createProjectLetterPhysics"
@@ -15,8 +18,6 @@ import { setupProjectImageHover } from "./projects/setupProjectImageHover"
 gsap.registerPlugin(ScrollTrigger)
 
 createSiteHeader()
-
-const sectionNavigation = createSectionNavigation()
 
 const lenis = new Lenis({
   anchors: true,
@@ -30,14 +31,27 @@ gsap.ticker.add((time) => {
 
 gsap.ticker.lagSmoothing(0)
 
-// Clean project page transition
+const { pageTransition, shouldRevealTransition } = createIncomingPageTransition()
+
+const sectionNavigation = createSectionNavigation()
+
+setupCrossPageTransitions({
+  pageTransition,
+
+  onNavigateStart: () => {
+    lenis.stop()
+  },
+
+  onNavigateCancelled: () => {
+    lenis.start()
+  },
+})
+
 window.addEventListener("pagehide", () => {
-  document.querySelector(".page-transition")?.remove()
   lenis.start()
 })
 
 window.addEventListener("pageshow", () => {
-  document.querySelector(".page-transition")?.remove()
   lenis.start()
 })
 
@@ -257,7 +271,7 @@ function createSectionNavigation() {
 
       if (!supportedHashes.has(hash)) return
 
-      link.addEventListener("click", (event) => {
+      link.addEventListener("click", async (event) => {
         if (
           event.button !== 0 ||
           event.metaKey ||
@@ -271,7 +285,17 @@ function createSectionNavigation() {
         event.preventDefault()
         event.stopPropagation()
 
-        scrollToSection(hash, references)
+        pageTransition.setColor(interfaceColorByHash[hash])
+
+        lenis.stop()
+
+        try {
+          await pageTransition.run(() => {
+            scrollToSection(hash, references, { immediate: true })
+          })
+        } finally {
+          lenis.start()
+        }
       })
     })
   }
@@ -297,20 +321,30 @@ function createSectionNavigation() {
       })
     })
 
-    if (!initialHash) return
+    if (!initialHash) {
+      if (shouldRevealTransition) {
+        pageTransition.reveal()
+      }
+
+      return
+    }
 
     function openInitialSection() {
       // Recalculate every pin after all page resources are loaded
       ScrollTrigger.refresh()
       lenis.resize()
 
-      requestAnimationFrame(() => {
+      requestAnimationFrame(async () => {
         scrollToSection(initialHash, references, {
           immediate: true,
           historyMode: "replace",
         })
 
         history.scrollRestoration = "auto"
+
+        if (shouldRevealTransition) {
+          await pageTransition.reveal()
+        }
       })
     }
 
@@ -1348,43 +1382,6 @@ function setupToolkit() {
   })
 }
 
-// Project page transition
-function setupProjectPageTransition(links) {
-  links.forEach((link) => {
-    link.addEventListener("click", (event) => {
-      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
-
-      event.preventDefault()
-
-      const targetUrl = link.href
-      const projectTheme = link.dataset.projectTheme || "dark"
-
-      const transition = document.createElement("div")
-      transition.classList.add("page-transition", `page-transition--${projectTheme}`)
-
-      document.body.appendChild(transition)
-
-      lenis.stop()
-
-      const transitionTimeline = gsap.timeline({
-        onComplete: () => {
-          window.location.href = targetUrl
-        },
-      })
-
-      transitionTimeline.set(transition, {
-        xPercent: 100,
-      })
-
-      transitionTimeline.to(transition, {
-        xPercent: 0,
-        duration: 1.0,
-        ease: "power4.inOut",
-      })
-    })
-  })
-}
-
 // Projects
 function setupProjects() {
   // ----------------------
@@ -1396,8 +1393,6 @@ function setupProjects() {
 
   const title = root.querySelector(".projects__title")
   const links = root.querySelectorAll(".projects__link")
-
-  setupProjectPageTransition(links)
 
   // ----------------------
   // 2. Device capabilities

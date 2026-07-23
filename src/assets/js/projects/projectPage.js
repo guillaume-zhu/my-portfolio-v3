@@ -3,13 +3,17 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { SplitText } from "gsap/SplitText"
 import Lenis from "lenis"
 import "lenis/dist/lenis.css"
+
 import { createSiteHeader } from "../../components/createSiteHeader"
+import { createIncomingPageTransition } from "../transitions/createPageTransition"
+import { setupCrossPageTransitions } from "../transitions/setupCrossPageTransitions"
 
 gsap.registerPlugin(ScrollTrigger, SplitText)
+
 createSiteHeader()
 
 // ----------------------
-// 1. Lenis
+// 1. Lenis & Init
 // ----------------------
 const lenis = new Lenis({
   anchors: true,
@@ -23,10 +27,24 @@ gsap.ticker.add((time) => {
 
 gsap.ticker.lagSmoothing(0)
 
+// Transition pages
+const { pageTransition, shouldRevealTransition } = createIncomingPageTransition()
+setupCrossPageTransitions({
+  pageTransition,
+
+  onNavigateStart: () => {
+    lenis.stop()
+  },
+
+  onNavigateCancelled: () => {
+    lenis.start()
+  },
+})
+
 // ----------------------
 // 2. Init
 // ----------------------
-document.fonts.ready.then(() => {
+document.fonts.ready.then(async () => {
   setupProjectIntro()
 
   const galleryData = setupProjectGallery()
@@ -35,6 +53,10 @@ document.fonts.ready.then(() => {
   setupProjectNext()
 
   ScrollTrigger.refresh()
+
+  if (shouldRevealTransition) {
+    await pageTransition.reveal()
+  }
 })
 
 // ----------------------

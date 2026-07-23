@@ -1,0 +1,27 @@
+@import "./variables.css";
+
+/* -------- PAGE TRANSITION -------- */
+.page-transition {
+  position: fixed;
+  top: -10vh;
+  left: -20vw;
+  z-index: 9999;
+
+  display: block;
+  width: 140vw;
+  height: 120vh;
+
+  background-color: var(--color-cream);
+  border-radius: 60vh 0 0 60vh;
+
+  pointer-events: none;
+  will-change: transform, border-radius;
+}
+
+.page-transition--cream {
+  background-color: var(--color-cream);
+}
+
+.page-transition--dark {
+  background-color: var(--color-dark);
+}

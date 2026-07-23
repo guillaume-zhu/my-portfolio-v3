@@ -3,6 +3,7 @@
 @import "./typography.css";
 @import "./variables.css";
 @import "./header.css";
+@import "./page-transition.css";
 
 body {
   --current-interface-color: var(--color-dark);
@@ -32,7 +33,7 @@ body {
   --card-width: clamp(340px, 20vw, 440px);
   --caption-gap: 24px;
   --media-radius: 8px;
-  --media-hover-scale: 1.2;
+  --media-hover-scale: 1.05;
 
   position: relative;
 

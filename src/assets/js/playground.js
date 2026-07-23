@@ -1,9 +1,19 @@
 import { gsap } from "gsap"
 import { Observer } from "gsap/Observer"
+
 import { createSiteHeader } from "../components/createSiteHeader"
+import { createIncomingPageTransition } from "./transitions/createPageTransition"
+import { setupCrossPageTransitions } from "./transitions/setupCrossPageTransitions"
 
 gsap.registerPlugin(Observer)
 createSiteHeader()
+
+// Page transition
+const { pageTransition, shouldRevealTransition } = createIncomingPageTransition()
+
+setupCrossPageTransitions({
+  pageTransition,
+})
 
 // ----------------------
 // 1. Dom selections
@@ -468,7 +478,7 @@ gsapObs.disable()
 const intro = { progress: 0 }
 let isObserverEnabled = false
 const introTimeline = gsap.timeline({
-  delay: 0.2,
+  paused: true,
 })
 
 gsap.set(stage, {
@@ -517,6 +527,22 @@ introTimeline.call(
   [],
   ">-=2.5",
 )
+
+function startPlaygroundIntro() {
+  if (shouldRevealTransition) {
+    pageTransition.reveal()
+    gsap.delayedCall(0.5, () => {
+      introTimeline.play()
+    })
+    return
+  }
+
+  gsap.delayedCall(0.15, () => {
+    introTimeline.play()
+  })
+}
+
+startPlaygroundIntro()
 
 // ----------------------
 // 21. Update shared caption based on centered card

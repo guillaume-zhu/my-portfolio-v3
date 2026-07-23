@@ -3,6 +3,7 @@
 @import "./typography.css";
 @import "./variables.css";
 @import "./header.css";
+@import "./page-transition.css";
 
 /* -------- GLOBAL -------- */
 html,
@@ -529,26 +530,6 @@ body[data-interface-color="dark"] {
 }
 .project-letter__image.is-portrait {
   aspect-ratio: 4/5;
-}
-
-/* -------- PAGE TRANSITION -------- */
-.page-transition {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: auto;
-  will-change: transform;
-  display: block;
-  width: 100vw;
-  height: 100vh;
-}
-
-.page-transition--cream {
-  background-color: var(--color-cream);
-}
-
-.page-transition--dark {
-  background-color: var(--color-dark);
 }
 
 /* -------- NEXT SECTION -------- */

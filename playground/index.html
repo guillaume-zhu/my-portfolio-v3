@@ -14,9 +14,24 @@
   </head>
 
   <body>
-     <!-------- HEADER -------->
+    <!-------- TRANSITION -------->
+    <script>
+      if (sessionStorage.getItem("pageTransitionPending") === "true") {
+        const storedColor = sessionStorage.getItem("pageTransitionColor")
+        const color = storedColor === "dark" ? "dark" : "cream"
+
+        const transition = document.createElement("div")
+
+        transition.classList.add("page-transition", `page-transition--${color}`)
+
+        transition.setAttribute("aria-hidden", "true")
+        document.body.prepend(transition)
+      }
+    </script>
+
+    <!-------- HEADER -------->
     <header class="site-header"></header>
-    
+
     <main class="playground">
       <section class="playground-sphere" aria-label="Explorations créatives">
         <div class="playground-sphere__container">
@@ -504,12 +519,11 @@
               </video>
             </div>
 
-             <!-- Shared caption: content is updated from the centered card data attributes -->
+            <!-- Shared caption: content is updated from the centered card data attributes -->
             <div class="playground-sphere__caption" aria-live="polite" aria-atomic="true">
               <h2 class="playground-sphere__caption-title"></h2>
               <p class="playground-sphere__caption-meta"></p>
             </div>
-          </div>
           </div>
         </div>
       </section>

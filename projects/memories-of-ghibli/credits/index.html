@@ -16,6 +16,21 @@
   </head>
 
   <body class="credits-page">
+    <!-------- TRANSITION -------->
+    <script>
+      if (sessionStorage.getItem("pageTransitionPending") === "true") {
+        const storedColor = sessionStorage.getItem("pageTransitionColor")
+        const color = storedColor === "dark" ? "dark" : "cream"
+
+        const transition = document.createElement("div")
+
+        transition.classList.add("page-transition", `page-transition--${color}`)
+
+        transition.setAttribute("aria-hidden", "true")
+        document.body.prepend(transition)
+      }
+    </script>
+
     <!-------- HEADER -------->
     <header class="site-header"></header>
 
