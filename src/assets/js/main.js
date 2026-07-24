@@ -163,6 +163,10 @@ function createSectionNavigation() {
     "#contact": "cream",
   }
 
+  const getTransitionDistanceThreshold = () => {
+    return window.innerHeight * 3.5
+  }
+
   // ----------------------
   // 2. Initial hash
   // ----------------------
@@ -328,16 +332,33 @@ function createSectionNavigation() {
           return
         }
 
+        const targetScroll = getTargetScroll(hash, references)
+
+        if (targetScroll == null) return
+
         event.preventDefault()
         event.stopPropagation()
 
+        const scrollDistance = Math.abs(targetScroll - window.scrollY)
+
+        const shouldUseTransition = scrollDistance > getTransitionDistanceThreshold()
+
+        // Close destination : lenis scroll
+        if (!shouldUseTransition) {
+          scrollToSection(hash, references)
+          return
+        }
+
+        // Far destination : transition
         pageTransition.setColor(interfaceColorByHash[hash])
 
         lenis.stop()
 
         try {
           await pageTransition.run(() => {
-            scrollToSection(hash, references, { immediate: true })
+            scrollToSection(hash, references, {
+              immediate: true,
+            })
           })
         } finally {
           lenis.start()
