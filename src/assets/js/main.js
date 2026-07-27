@@ -1019,23 +1019,15 @@ function setupToolkit() {
   const flipEnd = 0.43
   const artDeckEnd = 0.71
   const finalCollapseEnd = 0.76
-  const cardLiftEnd = 0.82
-  const cardPlayEnd = 0.87
   const fullscreenStart = 0.97
   const headerDarkStart = 0.9925
   const finalTransitionEnd = 1
-
-  // Subtitle
-  const subtitleOffset = 75
 
   // Interactions
   const hoverZIndex = slots.length + 10
 
   // Final transition card
-  const transitionCardMaxScale = 1.5
-  const transitionCardLiftEase = gsap.parseEase("power4.inOut")
-  const transitionCardPLayEase = gsap.parseEase("power3.in")
-  const transitionCardFullscreenScale = 8
+  const transitionCardFullscreenOverscan = 1.1
   const transitionCardFullScreenEase = gsap.parseEase("power3.in")
 
   // ----------------------
@@ -1048,6 +1040,8 @@ function setupToolkit() {
   let currentArtWheelIndex = 0
 
   let isCollapsed = false
+  let transitionCardFullscreenScale = 8
+  let transitionCardFullscreenViewport = ""
 
   // ----------------------
   // 4. Helpers
@@ -1055,6 +1049,30 @@ function setupToolkit() {
   // Convert progress into 0 -> 1
   const getPhaseProgress = (progress, start, end) => {
     return gsap.utils.clamp(0, 1, (progress - start) / (end - start))
+  }
+
+  const getTransitionCardFullscreenScale = () => {
+    const viewportKey = `${window.innerWidth}x${window.innerHeight}`
+
+    if (viewportKey === transitionCardFullscreenViewport) {
+      return transitionCardFullscreenScale
+    }
+
+    const rect = artTransitionCard.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+
+    const requiredWidth = Math.max(centerX, window.innerWidth - centerX) * 2
+    const requiredHeight = Math.max(centerY, window.innerHeight - centerY) * 2
+    const cardWidth = Math.max(artTransitionCard.offsetWidth, 1)
+    const cardHeight = Math.max(artTransitionCard.offsetHeight, 1)
+
+    transitionCardFullscreenScale =
+      Math.max(requiredWidth / cardWidth, requiredHeight / cardHeight) *
+      transitionCardFullscreenOverscan
+    transitionCardFullscreenViewport = viewportKey
+
+    return transitionCardFullscreenScale
   }
 
   // ----------------------
@@ -1104,7 +1122,7 @@ function setupToolkit() {
     })
 
     gsap.set(artTransitionCard, {
-      scale: 1,
+      clearProps: "transform",
     })
     gsap.set(artTransitionReveal, {
       autoAlpha: 1,
@@ -1128,11 +1146,9 @@ function setupToolkit() {
     // Subtitle
     gsap.set(subtitleFront, {
       autoAlpha: 1,
-      y: 0,
     })
     gsap.set(subtitleArt, {
       autoAlpha: 0,
-      y: subtitleOffset,
     })
   }
 
@@ -1154,13 +1170,17 @@ function setupToolkit() {
       const card = slot.querySelector(".toolkit-card")
       if (!card) return
 
-      card.addEventListener("pointerenter", () => {
+      card.addEventListener("pointerenter", (event) => {
+        if (event.pointerType === "touch") return
+
         gsap.set(slot, {
           zIndex: hoverZIndex,
         })
       })
 
-      card.addEventListener("pointerleave", () => {
+      card.addEventListener("pointerleave", (event) => {
+        if (event.pointerType === "touch") return
+
         gsap.set(slot, {
           zIndex: index + 1,
         })
@@ -1320,13 +1340,14 @@ function setupToolkit() {
       })
 
       // Switch subtitle
+      const subtitleFadeOutProgress = getPhaseProgress(flipProgress, 0, 0.5)
+      const subtitleFadeInProgress = getPhaseProgress(flipProgress, 0.5, 1)
+
       gsap.set(subtitleFront, {
-        autoAlpha: 1 - flipProgress,
-        y: -subtitleOffset * flipProgress,
+        autoAlpha: 1 - subtitleFadeOutProgress,
       })
       gsap.set(subtitleArt, {
-        autoAlpha: flipProgress,
-        y: subtitleOffset * (1 - flipProgress),
+        autoAlpha: subtitleFadeInProgress,
       })
 
       // ----------------------
@@ -1405,51 +1426,23 @@ function setupToolkit() {
       }
 
       // ----------------------
-      // 11. Transition card lift
+      // 11. Transition card cream reveal
       // ----------------------
-      if (self.progress >= finalCollapseEnd && self.progress < cardLiftEnd) {
-        const liftProgress = getPhaseProgress(self.progress, finalCollapseEnd, cardLiftEnd)
-        const easedLiftProgress = transitionCardLiftEase(liftProgress)
-
-        const liftScale = gsap.utils.interpolate(1, transitionCardMaxScale, easedLiftProgress)
-
-        gsap.set(artTransitionCard, {
-          scale: liftScale,
-        })
-      }
-
-      // ----------------------
-      // 12. Transition card play
-      // ----------------------
-      if (self.progress >= cardLiftEnd && self.progress < cardPlayEnd) {
-        const playProgress = getPhaseProgress(self.progress, cardLiftEnd, cardPlayEnd)
-        const easedPlayProgress = transitionCardPLayEase(playProgress)
-
-        const playScale = gsap.utils.interpolate(transitionCardMaxScale, 1, easedPlayProgress)
-
-        gsap.set(artTransitionCard, {
-          scale: playScale,
-        })
-      }
-
-      // ----------------------
-      // 13. Transition card cream reveal
-      // ----------------------
-      const revealProgress = getPhaseProgress(self.progress, cardPlayEnd, fullscreenStart)
+      const revealProgress = getPhaseProgress(self.progress, finalCollapseEnd, fullscreenStart)
 
       cardReveal.setProgress(revealProgress)
 
       // ----------------------
-      // 14. Transition card hold
+      // 12. Transition card hold
       // ----------------------
-      if (self.progress >= cardPlayEnd && self.progress < fullscreenStart) {
+      if (self.progress >= finalCollapseEnd && self.progress < fullscreenStart) {
         gsap.set(artTransitionCard, {
           scale: 1,
         })
       }
 
       // ----------------------
-      // 15. Transition card fullscreen
+      // 13. Transition card fullscreen
       // ----------------------
       if (self.progress >= fullscreenStart) {
         const fullScreenProgress = getPhaseProgress(
@@ -1461,7 +1454,7 @@ function setupToolkit() {
 
         const fullscreenScale = gsap.utils.interpolate(
           1,
-          transitionCardFullscreenScale,
+          getTransitionCardFullscreenScale(),
           easedFullscreenProgress,
         )
 
