@@ -1014,13 +1014,13 @@ function setupToolkit() {
   const cardDurationPop = 0.5
 
   // Phases
-  const frontDeckEnd = 0.28
-  const collapseEnd = 0.33
-  const flipEnd = 0.43
-  const artDeckEnd = 0.71
-  const finalCollapseEnd = 0.76
-  const fullscreenStart = 0.97
-  const headerDarkStart = 0.9925
+  const frontDeckEnd = 0.3
+  const collapseEnd = 0.35
+  const flipEnd = 0.45
+  const artDeckEnd = 0.75
+  const finalCollapseEnd = 0.8
+  const fullscreenStart = 0.95
+  const headerDarkStart = 0.975
   const finalTransitionEnd = 1
 
   // Interactions
