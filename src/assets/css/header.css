@@ -64,7 +64,7 @@
   color: inherit;
 
   font-family: "Satoshi-Variable", Arial, Helvetica, sans-serif;
-  font-size: clamp(14px, 1.3vw, 20px);
+  font-size: clamp(16px, 1.3vw, 20px);
   font-weight: 500;
   line-height: 1;
 
@@ -108,4 +108,18 @@
 .site-header__link--playground:focus-visible {
   letter-spacing: 0.02em;
   font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .site-header {
+    padding: 24px;
+  }
+
+  .site-header__nav {
+    gap: 12px;
+  }
+
+  .site-header__link--secondary {
+    display: none;
+  }
 }

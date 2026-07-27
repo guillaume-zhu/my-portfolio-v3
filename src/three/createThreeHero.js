@@ -135,6 +135,8 @@ export const createThreeHero = async () => {
   const logoBox = new THREE.Box3().setFromObject(logo)
   const logoSize = logoBox.getSize(new THREE.Vector3())
   const logoCenter = logoBox.getCenter(new THREE.Vector3())
+  const logoBoundingDiameter = logoSize.length()
+  const logoViewportCoverage = 0.9
 
   const logoHitBox = new THREE.Mesh(
     new THREE.BoxGeometry(logoSize.x, logoSize.y, logoSize.z),
@@ -145,6 +147,20 @@ export const createThreeHero = async () => {
 
   logoHitBox.position.copy(logoCenter)
   logoGroup.add(logoHitBox)
+
+  const updateLogoScale = () => {
+    const cameraDistance = camera.position.distanceTo(logoGroup.position)
+    const verticalFov = THREE.MathUtils.degToRad(camera.fov)
+    const visibleHeight = 2 * cameraDistance * Math.tan(verticalFov * 0.5)
+    const visibleWidth = visibleHeight * camera.aspect
+
+    const availableSize = Math.min(visibleWidth, visibleHeight) * logoViewportCoverage
+    const responsiveScale = Math.min(1, availableSize / logoBoundingDiameter)
+
+    logoGroup.scale.setScalar(responsiveScale)
+  }
+
+  updateLogoScale()
 
   // ------------------------------------------------
   // Logo materials
@@ -255,6 +271,36 @@ export const createThreeHero = async () => {
     rotation: { x: 0, y: 0, z: 0 },
   })
 
+  const textNameVisibleRatio = {
+    width: 4488 / 8192,
+    height: 1659 / 2048,
+  }
+
+  const textNameVisibleSize = {
+    width: textName.geometry.parameters.width * textNameVisibleRatio.width,
+    height: textName.geometry.parameters.height * textNameVisibleRatio.height,
+  }
+
+  const textNameCameraDistance = camera.position.distanceTo(textName.position)
+  const textNameViewportCoverage = 0.8
+
+  const updateTextNameScale = () => {
+    const verticalFov = THREE.MathUtils.degToRad(camera.fov)
+    const visibleHeight = 2 * textNameCameraDistance * Math.tan(verticalFov * 0.5)
+    const visibleWidth = visibleHeight * camera.aspect
+
+    const horizontalScale =
+      (visibleWidth * textNameViewportCoverage) / textNameVisibleSize.width
+    const verticalScale =
+      (visibleHeight * textNameViewportCoverage) / textNameVisibleSize.height
+
+    const responsiveScale = Math.min(1, horizontalScale, verticalScale)
+
+    textName.scale.setScalar(responsiveScale)
+  }
+
+  updateTextNameScale()
+
   const textArt = await createTextPlane({
     path: "/textures/texts/text-art-director-justified.png",
     width: 5.5 * multiplyer2,
@@ -270,6 +316,22 @@ export const createThreeHero = async () => {
     position: { x: -1, y: 6.5, z: 1.25 },
     rotation: { x: 0, y: -Math.PI * 0.5, z: 0 },
   })
+
+  const roleTextsReferenceAspect = 16 / 10
+  const textArtBaseZ = textArt.position.z
+  const textCreativeBaseZ = textCreative.position.z
+
+  const updateRoleTextsLayout = () => {
+    const responsiveFactor = Math.min(1, camera.aspect / roleTextsReferenceAspect)
+
+    textArt.scale.setScalar(responsiveFactor)
+    textCreative.scale.setScalar(responsiveFactor)
+
+    textArt.position.z = textArtBaseZ * responsiveFactor
+    textCreative.position.z = textCreativeBaseZ * responsiveFactor
+  }
+
+  updateRoleTextsLayout()
 
   textName.material.opacity = 1
   textArt.material.opacity = 0
@@ -350,6 +412,9 @@ export const createThreeHero = async () => {
     // Update camera
     camera.aspect = sizes.width / sizes.height
     camera.updateProjectionMatrix()
+    updateLogoScale()
+    updateTextNameScale()
+    updateRoleTextsLayout()
 
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)

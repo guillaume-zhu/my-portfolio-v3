@@ -24,11 +24,17 @@ export function createSiteHeader() {
         playground
       </a>
 
-      <a class="site-header__link" href="/#parcours">
+      <a
+        class="site-header__link site-header__link--secondary"
+        href="/#parcours"
+      >
         parcours
       </a>
 
-      <a class="site-header__link" href="/#toolkit">
+      <a
+        class="site-header__link site-header__link--secondary"
+        href="/#toolkit"
+      >
         toolkit
       </a>
 

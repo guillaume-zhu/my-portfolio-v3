@@ -532,8 +532,14 @@ function setupHeroScroll(threeHero) {
 }
 // Hero to Manifesto transition
 function setupHeroToManifestoTransition() {
+  const getHeroFrameScaleX = () => {
+    const sideInset = Math.max(8, window.innerWidth * 0.01)
+
+    return 1 - (sideInset * 2) / window.innerWidth
+  }
+
   gsap.to(".hero-three__frame", {
-    scaleX: 0.98,
+    scaleX: getHeroFrameScaleX,
     scaleY: 0.98,
     borderRadius: "0px 0px 32px 32px",
     ease: "none",
@@ -543,6 +549,7 @@ function setupHeroToManifestoTransition() {
       start: "top bottom-=500",
       end: "top bottom-=900",
       scrub: true,
+      invalidateOnRefresh: true,
       markers: false,
     },
   })
