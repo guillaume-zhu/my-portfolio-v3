@@ -1201,7 +1201,7 @@ function setupToolkit() {
   ScrollTrigger.create({
     trigger: pinHeight,
     start: "top top",
-    end: "bottom bottom",
+    end: "bottom top",
     pin: container,
     scrub: true,
     markers: false,
@@ -1464,6 +1464,18 @@ function setupToolkit() {
       }
     },
 
+    onLeave: () => {
+      gsap.set(container, {
+        autoAlpha: 0,
+      })
+    },
+
+    onEnterBack: () => {
+      gsap.set(container, {
+        autoAlpha: 1,
+      })
+    },
+
     // Reset out of scroll
     onLeaveBack: () => {
       setInitialState()
@@ -1514,7 +1526,6 @@ function setupProjects() {
   // ----------------------
   gsap.set(title, {
     autoAlpha: 0,
-    yPercent: 40,
   })
 
   gsap.set(links, {
@@ -1579,8 +1590,7 @@ function setupProjects() {
   // Title
   tl.to(title, {
     autoAlpha: 1,
-    yPercent: 0,
-    duration: 0.4,
+    duration: 0.08,
     ease: "power3.out",
   })
 
@@ -1592,7 +1602,7 @@ function setupProjects() {
       yPercent: 0,
       duration: 0.5,
       stagger: 0.18,
-      ease: "power3.out",
+      ease: "power2.out",
     },
     ">",
   )
@@ -1601,14 +1611,18 @@ function setupProjects() {
   tl.addLabel("projects-visible")
 
   // Projects to what's next section transition
-  tl.to(container, {
-    scaleX: 0.98,
-    scaleY: 0.98,
-    borderRadius: "0px 0px 32px 32px",
-    transformOrigin: "center top",
-    duration: 0.2,
-    ease: "none",
-  })
+  tl.to(
+    container,
+    {
+      scaleX: 0.98,
+      scaleY: 0.98,
+      borderRadius: "0px 0px 32px 32px",
+      transformOrigin: "center top",
+      duration: 0.2,
+      ease: "none",
+    },
+    "-=0.1",
+  )
 
   return tl
 }

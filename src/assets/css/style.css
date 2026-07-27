@@ -293,14 +293,16 @@ body[data-interface-color="dark"] {
 
 /* Scroll distance */
 .toolkit__pin-height {
-  height: 1000vh;
+  height: 900vh;
 }
 
 /* Pinned scene */
 .toolkit__container {
   position: relative;
+  z-index: 1;
   height: 100vh;
   overflow: hidden;
+  background-color: var(--color-dark);
 }
 
 /* Section title */
