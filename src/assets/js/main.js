@@ -649,27 +649,32 @@ function setupTrajectory() {
     const title = container.querySelector(".title")
     wrapLettersInSpan(title)
 
-    const dist = container.clientHeight - title.clientHeight
+    const getDistance = () => {
+      return Math.max(container.clientHeight - title.clientHeight, 1)
+    }
 
     ScrollTrigger.create({
       trigger: container,
       pin: title,
       start: "top top",
-      end: "+=" + dist,
+      end: () => `+=${getDistance()}`,
+      invalidateOnRefresh: true,
     })
 
     const letters = container.querySelectorAll("span")
     letters.forEach((letter) => {
-      const randomDistance = Math.random() * dist
+      const randomDistanceRatio = Math.random()
+      const getRandomDistance = () => getDistance() * randomDistanceRatio
 
       gsap.from(letter, {
-        y: randomDistance,
+        y: getRandomDistance,
         ease: "none",
         scrollTrigger: {
           trigger: container,
           start: "top top",
-          end: "+=" + randomDistance,
+          end: () => `+=${getRandomDistance()}`,
           scrub: true,
+          invalidateOnRefresh: true,
         },
       })
     })
@@ -680,9 +685,10 @@ function setupTrajectory() {
       ease: "none",
       scrollTrigger: {
         trigger: container,
-        start: "top+=" + dist * 0.75 + " top",
-        end: "top+=" + dist + " top",
+        start: () => `top+=${getDistance() * 0.75} top`,
+        end: () => `top+=${getDistance()} top`,
         scrub: true,
+        invalidateOnRefresh: true,
       },
     })
 
@@ -693,9 +699,10 @@ function setupTrajectory() {
       ease: "none",
       scrollTrigger: {
         trigger: container,
-        start: "top+=" + dist + " top",
-        end: "top+=" + (dist + weightDuration) + " top",
+        start: () => `top+=${getDistance()} top`,
+        end: () => `top+=${getDistance() + weightDuration} top`,
         scrub: true,
+        invalidateOnRefresh: true,
         markers: false,
       },
     })
@@ -943,6 +950,7 @@ function setupTrajectoryToToolkitTransition() {
       start: "top bottom",
       end: "top 50%",
       scrub: true,
+      invalidateOnRefresh: true,
       markers: false,
     },
   })
@@ -950,7 +958,7 @@ function setupTrajectoryToToolkitTransition() {
   tl.to(
     trajectoryFrame,
     {
-      scaleX: 0.98,
+      scaleX: getResponsiveFrameScaleX,
       scaleY: 0.98,
       borderRadius: "0px 0px 32px 32px",
       transformOrigin: "center top",
