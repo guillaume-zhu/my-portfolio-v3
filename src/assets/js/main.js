@@ -140,6 +140,12 @@ function getPhaseProgress(progress, start, end) {
   return gsap.utils.clamp(0, 1, (progress - start) / (end - start))
 }
 
+function getResponsiveFrameScaleX() {
+  const sideInset = Math.max(8, window.innerWidth * 0.01)
+
+  return 1 - (sideInset * 2) / window.innerWidth
+}
+
 // Header body interface color
 function setInterfaceColor(color) {
   if (document.body.dataset.interfaceColor === color) return
@@ -532,14 +538,8 @@ function setupHeroScroll(threeHero) {
 }
 // Hero to Manifesto transition
 function setupHeroToManifestoTransition() {
-  const getHeroFrameScaleX = () => {
-    const sideInset = Math.max(8, window.innerWidth * 0.01)
-
-    return 1 - (sideInset * 2) / window.innerWidth
-  }
-
   gsap.to(".hero-three__frame", {
-    scaleX: getHeroFrameScaleX,
+    scaleX: getResponsiveFrameScaleX,
     scaleY: 0.98,
     borderRadius: "0px 0px 32px 32px",
     ease: "none",
@@ -563,28 +563,38 @@ function setupManifesto() {
   wrapLettersInSpan(text)
 
   const letters = document.querySelectorAll(".manifesto .letter")
-  const distance = text.clientWidth - document.body.clientWidth
-  const overlapDistance = 1175
-  const pinDistance = Math.max(distance - overlapDistance, 1)
+
+  const getScrollDistance = () => {
+    return text.clientWidth - document.body.clientWidth
+  }
+
+  const getPinDistance = () => {
+    const scrollDistance = getScrollDistance()
+    const overlapDistance = Math.min(1175, scrollDistance * 0.2)
+
+    return Math.max(scrollDistance - overlapDistance, 1)
+  }
 
   // 1. Pin only
   ScrollTrigger.create({
     trigger: ".manifesto .container",
     start: "top top",
-    end: "+=" + pinDistance,
+    end: () => `+=${getPinDistance()}`,
     pin: true,
+    invalidateOnRefresh: true,
     markers: false,
   })
 
   // 2. Text horizontal animation
   const scrollTween = gsap.to(text, {
-    x: -distance,
+    x: () => -getScrollDistance(),
     ease: "none",
     scrollTrigger: {
       trigger: ".manifesto .container",
       start: "top top",
-      end: "+=" + distance,
+      end: () => `+=${getScrollDistance()}`,
       scrub: true,
+      invalidateOnRefresh: true,
       markers: false,
     },
   })
@@ -608,7 +618,7 @@ function setupManifesto() {
   const manifesto = document.querySelector(".manifesto")
 
   gsap.to(".manifesto .container", {
-    scaleX: 0.98,
+    scaleX: getResponsiveFrameScaleX,
     scaleY: 0.98,
     borderRadius: "0px 0px 32px 32px",
     ease: "none",
@@ -618,6 +628,7 @@ function setupManifesto() {
       start: "top bottom",
       end: "top 50%",
       scrub: true,
+      invalidateOnRefresh: true,
       markers: false,
 
       onUpdate: (self) => {
