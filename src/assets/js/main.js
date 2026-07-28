@@ -1772,7 +1772,11 @@ function setupNextSection() {
     const topAreaCenterY = topAreaHeight / 2
     const containerCenterY = containerRect.height / 2
 
-    return topAreaCenterY - containerCenterY
+    const screenMatrix = svg.getScreenCTM()
+
+    if (!screenMatrix) return -200
+
+    return (topAreaCenterY - containerCenterY) / Math.abs(screenMatrix.d)
   }
 
   // ----------------------
@@ -1805,13 +1809,13 @@ function setupNextSection() {
   const orbMoveStart = 0.3
   const orbMoveEnd = 0.6
 
-  const orbStartRadius = 12
-  const orbEndRadius = 12
+  const orbStartRadius = 14
+  const orbEndRadius = 14
 
   // Text movement
   const textLiftStart = orbMoveStart
   const textLiftEnd = orbMoveEnd
-  const textLiftY = -200
+  let textLiftY = getTextLiftY()
 
   // Footer reveal when orb at center of footer
   const footerRevealStart = orbMoveEnd
@@ -1831,6 +1835,10 @@ function setupNextSection() {
     pin: container,
     scrub: true,
     markers: false,
+
+    onRefresh: () => {
+      textLiftY = getTextLiftY()
+    },
 
     onUpdate: (self) => {
       // Progress phases
@@ -1889,9 +1897,14 @@ function setupNextSection() {
         footerRevealEnd,
       )
 
+      const footerRevealMaxRadius = Math.hypot(
+        footer.offsetWidth / 2,
+        footer.offsetHeight / 2,
+      )
+
       const footerRevealRadius = gsap.utils.interpolate(
         0,
-        Math.hypot(footer.offsetWidth, footer.offsetHeight),
+        footerRevealMaxRadius,
         footerRevealProgress,
       )
 
