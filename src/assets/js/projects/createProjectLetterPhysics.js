@@ -290,9 +290,12 @@ export function createProjectLetterPhysics(links) {
   function setScrollVelocity(velocity) {
     if (isSettling) return
 
+    const responsiveStrength = gsap.utils.clamp(0.5, 1, window.innerWidth / 1200)
+
     letterBodies.forEach((letter) => {
-      // Move the anchor according to scroll velocity
-      letter.anchor.pointA.y = letter.initialY + velocity * 0.08 * letter.weight
+      // Move the anchor according to scroll velocity and available viewport width
+      letter.anchor.pointA.y =
+        letter.initialY + velocity * 0.08 * responsiveStrength * letter.weight
     })
   }
 

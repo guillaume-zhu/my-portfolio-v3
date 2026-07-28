@@ -1580,6 +1580,7 @@ function setupProjects() {
       start: "top top",
       end: "bottom bottom",
       scrub: true,
+      invalidateOnRefresh: true,
       markers: false,
     },
   })
@@ -1591,7 +1592,7 @@ function setupProjects() {
   tl.to(title, {
     autoAlpha: 1,
     duration: 0.08,
-    ease: "power3.out",
+    ease: "power1.out",
   })
 
   // Links
@@ -1614,7 +1615,7 @@ function setupProjects() {
   tl.to(
     container,
     {
-      scaleX: 0.98,
+      scaleX: getResponsiveFrameScaleX,
       scaleY: 0.98,
       borderRadius: "0px 0px 32px 32px",
       transformOrigin: "center top",
