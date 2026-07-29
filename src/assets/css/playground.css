@@ -29,6 +29,13 @@ body {
   height: 100dvh;
 }
 
+.site-header {
+  color: var(--color-cream);
+  color: color-mix(in srgb, var(--color-cream) 87%, var(--color-dark));
+
+  mix-blend-mode: difference;
+}
+
 .playground-sphere {
   --card-width: clamp(340px, 20vw, 440px);
   --caption-gap: 24px;
@@ -171,22 +178,52 @@ body {
 
 @media (max-width: 1400px) {
   .playground-sphere {
-    --card-width: clamp(250px, 30vw, 380px);
+    --card-width: clamp(260px, 30vw, 380px);
     --caption-gap: 18px;
   }
 }
 
 @media (max-width: 500px) {
   .playground-sphere {
-    --card-width: clamp(115px, 33vw, 145px);
-    --caption-gap: 10px;
+    --card-width: clamp(115px, 33vw, 140px);
+    --caption-gap: clamp(7px, 2vw, 9px);
   }
 
   .playground-sphere__caption-title {
-    font-size: 14px;
+    font-size: clamp(12px, 3.2vw, 13px);
   }
   .playground-sphere__caption-meta {
     margin-top: 5px;
-    font-size: 11px;
+    font-size: clamp(9px, 2.4vw, 10px);
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1400px) {
+  .playground-sphere {
+    --card-width: clamp(307px, calc(8.72vw + 218px), 340px);
+    --caption-gap: clamp(18px, calc(1.6vw + 1.6px), 24px);
+  }
+}
+
+@media (orientation: landscape) and (max-width: 500px) and (max-height: 420px) {
+  .playground-sphere {
+    --card-width: clamp(95px, 32svh, 140px);
+    --caption-gap: 3px;
+  }
+
+  .playground-sphere__caption-title {
+    font-size: clamp(10px, 2.2vw, 12px);
+  }
+
+  .playground-sphere__caption-meta {
+    margin-top: 3px;
+    font-size: clamp(8px, 1.5vw, 9px);
+  }
+}
+
+@media (orientation: landscape) and (min-width: 501px) and (max-width: 1400px) and (max-height: 360px) {
+  .playground-sphere {
+    --card-width: clamp(185px, 62svh, 250px);
+    --caption-gap: 8px;
   }
 }

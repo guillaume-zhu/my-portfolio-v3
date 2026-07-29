@@ -182,13 +182,22 @@ const container = document.querySelector(".playground-sphere__container")
 
 const mm = gsap.matchMedia()
 
-function applyDesktopSphereSettings() {
+function applyFluidSphereSettings() {
   const viewportWidth = window.innerWidth
+  const cardWidth = medias[0].offsetWidth
 
-  radius = 0.6 * viewportWidth
+  const widthBasedRadius = 0.6 * viewportWidth
+  const cardBasedRadius = 2.5 * cardWidth
+  const heightBasedRadiusLimit = 1.1 * window.innerHeight
+
+  const cardSpacingRadius = Math.min(cardBasedRadius, heightBasedRadiusLimit)
+
+  radius = Math.max(widthBasedRadius, cardSpacingRadius)
+
+  const frontDepth = 0.38 * viewportWidth
 
   gsap.set(stage, {
-    translateZ: `${viewportWidth * -0.22}px`,
+    translateZ: `${frontDepth - radius}px`,
   })
 
   gsap.set(container, {
@@ -201,20 +210,22 @@ mm.add(
     isMobile: "(max-width: 500px)",
     isTablet: "(min-width: 501px) and (max-width: 1400px)",
     isDesktop: "(min-width: 1401px)",
+    isCompactMobileLandscape:
+      "(orientation: landscape) and (max-width: 500px) and (max-height: 420px)",
   },
   (context) => {
-    const { isMobile, isTablet } = context.conditions
+    const { isMobile, isTablet, isCompactMobileLandscape } = context.conditions
 
     if (isMobile) {
-      radius = 320
-      gsap.set(stage, { translateZ: "250px" })
+      radius = isCompactMobileLandscape ? 200 : 320
+      gsap.set(stage, {
+        translateZ: isCompactMobileLandscape ? "370px" : "250px",
+      })
       gsap.set(container, { perspective: "1000px" })
     } else if (isTablet) {
-      radius = 850
-      gsap.set(stage, { translateZ: "-310px" })
-      gsap.set(container, { perspective: "3920px" })
+      applyFluidSphereSettings()
     } else {
-      applyDesktopSphereSettings()
+      applyFluidSphereSettings()
     }
 
     renderMedias()
@@ -641,8 +652,8 @@ window.addEventListener("resize", () => {
   cancelAnimationFrame(resizeFrame)
 
   resizeFrame = requestAnimationFrame(() => {
-    if (window.innerWidth > 1400) {
-      applyDesktopSphereSettings()
+    if (window.innerWidth > 500) {
+      applyFluidSphereSettings()
       renderMedias()
     }
 
