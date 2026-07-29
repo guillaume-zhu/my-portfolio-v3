@@ -723,12 +723,12 @@ function setupTrajectorySentences() {
 
   // Initial visuals positions
   gsap.set(visualLeft, {
-    xPercent: -100,
+    xPercent: -101,
     yPercent: -50,
   })
 
   gsap.set(visualRight, {
-    xPercent: 100,
+    xPercent: 101,
     yPercent: -50,
   })
 

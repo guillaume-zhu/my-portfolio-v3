@@ -6,14 +6,6 @@
 @import "./page-transition.css";
 
 /* -------- GLOBAL -------- */
-html,
-body {
-  scrollbar-width: none;
-}
-
-body::-webkit-scrollbar {
-  display: none;
-}
 
 body {
   --current-interface-color: var(--color-cream);
