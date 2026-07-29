@@ -7,6 +7,19 @@ CustomEase.create("heroCircleOut", "0.025, 0.99, 0.08, 1")
 
 const DEFAULT_TRANSITION_COLOR = "cream"
 
+const TRANSITION_CORNER_RADIUS =
+  "var(--page-transition-radius-x) var(--page-transition-radius-y)"
+
+function applyTransitionRadius(transition, side) {
+  const leftRadius = side === "left" ? TRANSITION_CORNER_RADIUS : "0"
+  const rightRadius = side === "right" ? TRANSITION_CORNER_RADIUS : "0"
+
+  transition.style.borderTopLeftRadius = leftRadius
+  transition.style.borderBottomLeftRadius = leftRadius
+  transition.style.borderTopRightRadius = rightRadius
+  transition.style.borderBottomRightRadius = rightRadius
+}
+
 function normalizeTransitionColor(color) {
   return color === "dark" ? "dark" : DEFAULT_TRANSITION_COLOR
 }
@@ -55,9 +68,10 @@ export function createPageTransition({
 
   let isTransitioning = initiallyCovered
 
+  applyTransitionRadius(transition, initiallyCovered ? "right" : "left")
+
   gsap.set(transition, {
     xPercent: initiallyCovered ? 0 : 100,
-    borderRadius: initiallyCovered ? "0 60vh 60vh 0" : "60vh 0 0 60vh",
     pointerEvents: initiallyCovered ? "auto" : "none",
   })
 
@@ -90,9 +104,10 @@ export function createPageTransition({
     await waitForNextPaint()
 
     if (mode === "circle") {
+      applyTransitionRadius(transition, "none")
+
       gsap.set(transition, {
         xPercent: 0,
-        borderRadius: 0,
         clipPath: "circle(100vmax at 50% 50%)",
       })
 
@@ -103,10 +118,11 @@ export function createPageTransition({
           ease: "heroCircleOut",
 
           onComplete: () => {
+            applyTransitionRadius(transition, "left")
+
             gsap.set(transition, {
               xPercent: 100,
               clipPath: "none",
-              borderRadius: "60vh 0 0 60vh",
               pointerEvents: "none",
             })
 
@@ -117,9 +133,7 @@ export function createPageTransition({
       })
     }
 
-    gsap.set(transition, {
-      borderRadius: "0 60vh 60vh 0",
-    })
+    applyTransitionRadius(transition, "right")
 
     return new Promise((resolve) => {
       gsap.to(transition, {
@@ -128,9 +142,10 @@ export function createPageTransition({
         ease: "power4.out",
 
         onComplete: () => {
+          applyTransitionRadius(transition, "left")
+
           gsap.set(transition, {
             xPercent: 100,
-            borderRadius: "60vh 0 0 60vh",
             pointerEvents: "none",
           })
 
@@ -173,9 +188,10 @@ export function createPageTransition({
   function reset() {
     gsap.killTweensOf(transition)
 
+    applyTransitionRadius(transition, "left")
+
     gsap.set(transition, {
       xPercent: 100,
-      borderRadius: "60vh 0 0 60vh",
       pointerEvents: "none",
     })
 

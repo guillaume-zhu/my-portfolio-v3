@@ -2,6 +2,9 @@
 
 /* -------- PAGE TRANSITION -------- */
 .page-transition {
+  --page-transition-radius-x: min(60vh, 42vw);
+  --page-transition-radius-y: 60vh;
+
   position: fixed;
   top: -10vh;
   left: -20vw;
@@ -12,7 +15,10 @@
   height: 120vh;
 
   background-color: var(--color-cream);
-  border-radius: 60vh 0 0 60vh;
+  border-top-left-radius: var(--page-transition-radius-x)
+    var(--page-transition-radius-y);
+  border-bottom-left-radius: var(--page-transition-radius-x)
+    var(--page-transition-radius-y);
 
   pointer-events: none;
   will-change: transform, border-radius;

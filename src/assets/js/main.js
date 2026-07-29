@@ -1622,7 +1622,7 @@ function setupProjects() {
       duration: 0.2,
       ease: "none",
     },
-    "-=0.1",
+    ">",
   )
 
   return tl
@@ -1897,10 +1897,7 @@ function setupNextSection() {
         footerRevealEnd,
       )
 
-      const footerRevealMaxRadius = Math.hypot(
-        footer.offsetWidth / 2,
-        footer.offsetHeight / 2,
-      )
+      const footerRevealMaxRadius = Math.hypot(footer.offsetWidth / 2, footer.offsetHeight / 2)
 
       const footerRevealRadius = gsap.utils.interpolate(
         0,
