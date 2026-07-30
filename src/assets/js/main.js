@@ -3,6 +3,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import Lenis from "lenis"
 import "lenis/dist/lenis.css"
 
+import { createHomeLoader } from "../components/createHomeLoader"
 import { createSiteHeader } from "../components/createSiteHeader"
 import { createIncomingPageTransition } from "./transitions/createPageTransition"
 import { setupCrossPageTransitions } from "./transitions/setupCrossPageTransitions"
@@ -15,23 +16,55 @@ import { setupProjectImageHover } from "./projects/setupProjectImageHover"
 // ----------------------
 // Global setup
 // ----------------------
+
+// GSAP and shared interface
 gsap.registerPlugin(ScrollTrigger)
 
 createSiteHeader()
 
+// Home loader session
+const shouldShowHomeLoader = document.documentElement.dataset.homeLoaderState === "pending"
+const homeLoader = createHomeLoader({
+  enabled: shouldShowHomeLoader,
+  minimumDuration: 2,
+})
+
+// Smooth scroll
 const lenis = new Lenis({
   anchors: true,
 })
 
 lenis.on("scroll", ScrollTrigger.update)
 
+// Drive Lenis from the GSAP ticker
 gsap.ticker.add((time) => {
   lenis.raf(time * 1000)
 })
 
 gsap.ticker.lagSmoothing(0)
 
+// Keep scroll locked while the home is preparing
+let isHomePreparing = shouldShowHomeLoader
+
+const syncHomeScrollState = () => {
+  if (isHomePreparing) {
+    lenis.stop()
+    return
+  }
+
+  lenis.start()
+}
+
+syncHomeScrollState()
+
+// Page and section navigation
 const { pageTransition, shouldRevealTransition } = createIncomingPageTransition()
+
+const shouldRevealIncomingTransition = shouldRevealTransition && !shouldShowHomeLoader
+
+if (shouldShowHomeLoader && shouldRevealTransition) {
+  pageTransition.reset()
+}
 
 const sectionNavigation = createSectionNavigation()
 
@@ -43,25 +76,70 @@ setupCrossPageTransitions({
   },
 
   onNavigateCancelled: () => {
-    lenis.start()
+    syncHomeScrollState()
   },
 })
 
+// Restore the correct scroll state around browser cache navigation
 window.addEventListener("pagehide", () => {
   lenis.start()
 })
 
 window.addEventListener("pageshow", () => {
-  lenis.start()
+  syncHomeScrollState()
 })
 
 // ----------------------
 // Scene scroll animation
 // ----------------------
-const threeHero = await createThreeHero()
+const homeReady = (async () => {
+  try {
+    const threeHero = await createThreeHero({
+      autoStart: false,
 
-setupHeroScroll(threeHero)
-setupHeroToManifestoTransition()
+      onProgress: (progress) => {
+        homeLoader.setProgress(progress)
+      },
+    })
+
+    threeHero.setInteractive(false)
+
+    await threeHero.ready
+
+    setupHeroScroll(threeHero)
+    setupHeroToManifestoTransition()
+
+    threeHero.setInteractive(false)
+
+    return threeHero
+  } catch (error) {
+    console.error("Unable to prepare the Three.js hero.", error)
+
+    document.querySelector(".webgl")?.remove()
+
+    return null
+  }
+})()
+
+const threeHero = await homeReady
+
+await homeLoader.complete()
+
+threeHero?.start()
+
+await homeLoader.revealLogo()
+await homeLoader.revealHero()
+
+if (shouldShowHomeLoader) {
+  document.documentElement.dataset.homeLoaderState = "ready"
+}
+
+homeLoader.dispose()
+
+isHomePreparing = false
+syncHomeScrollState()
+
+threeHero?.setInteractive(true)
 
 // ----------------------
 // Sections Animations
@@ -416,7 +494,7 @@ function createSectionNavigation() {
     })
 
     if (!initialHash) {
-      if (shouldRevealTransition) {
+      if (shouldRevealIncomingTransition) {
         pageTransition.reveal({
           mode: "circle",
         })
@@ -438,7 +516,7 @@ function createSectionNavigation() {
 
         history.scrollRestoration = "auto"
 
-        if (shouldRevealTransition) {
+        if (shouldRevealIncomingTransition) {
           await pageTransition.reveal()
         }
       })
