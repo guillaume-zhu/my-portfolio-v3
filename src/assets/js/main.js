@@ -76,6 +76,7 @@ document.fonts.ready.then(() => {
   const nextSectionTrigger = setupNextSection()
 
   setupHeaderTheme()
+  setupScrollIndicator()
 
   ScrollTrigger.refresh()
 
@@ -160,9 +161,18 @@ function createSectionNavigation() {
   // ----------------------
   // 1. Navigation settings
   // ----------------------
-  const supportedHashes = new Set(["#parcours", "#toolkit", "#projects", "#contact"])
+  const supportedHashes = new Set([
+    "#hero",
+    "#manifesto",
+    "#parcours",
+    "#toolkit",
+    "#projects",
+    "#contact",
+  ])
 
   const interfaceColorByHash = {
+    "#hero": "cream",
+    "#manifesto": "dark",
     "#parcours": "cream",
     "#toolkit": "cream",
     "#projects": "dark",
@@ -196,6 +206,10 @@ function createSectionNavigation() {
   // ----------------------
   function getTargetScroll(hash, references) {
     const { trajectorySentencesTimeline, projectsTimeline, nextSectionTrigger } = references
+
+    if (hash === "#hero") {
+      return 0
+    }
 
     if (hash === "#parcours") {
       const trajectoryTrigger = trajectorySentencesTimeline?.scrollTrigger
@@ -273,11 +287,13 @@ function createSectionNavigation() {
   // 6. Handle hero link
   // ----------------------
   function setupHeroLink() {
-    const logo = document.querySelector(".site-header__logo")
+    const heroLinks = document.querySelectorAll(
+      '.site-header__logo, .scroll-indicator__item[href="#hero"]',
+    )
 
-    if (!logo) return
+    if (!heroLinks.length) return
 
-    logo.addEventListener("click", async (event) => {
+    async function handleHeroClick(event) {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
         return
       }
@@ -285,7 +301,7 @@ function createSectionNavigation() {
       event.preventDefault()
       event.stopPropagation()
 
-      const isAlreadyOnHero = !window.location.hash && window.scrollY <= 1
+      const isAlreadyOnHero = window.scrollY <= 1
 
       if (isAlreadyOnHero) return
 
@@ -312,6 +328,10 @@ function createSectionNavigation() {
       } finally {
         lenis.start()
       }
+    }
+
+    heroLinks.forEach((link) => {
+      link.addEventListener("click", handleHeroClick)
     })
   }
 
@@ -325,7 +345,7 @@ function createSectionNavigation() {
       const linkUrl = new URL(link.href, window.location.href)
       const hash = linkUrl.hash
 
-      if (!supportedHashes.has(hash)) return
+      if (!supportedHashes.has(hash) || hash === "#hero") return
 
       link.addEventListener("click", async (event) => {
         if (
@@ -436,6 +456,116 @@ function createSectionNavigation() {
   return {
     init,
   }
+}
+
+function setupScrollIndicator() {
+  const root = document.querySelector(".scroll-indicator")
+  if (!root) return
+
+  const items = [...root.querySelectorAll(".scroll-indicator__item")]
+
+  const sections = [
+    ".hero-three",
+    ".manifesto",
+    ".trajectory",
+    ".toolkit",
+    ".projects",
+    ".next-section",
+  ].map((selector) => document.querySelector(selector))
+
+  if (!items.length || sections.some((section) => !section)) return
+
+  let currentIndex = 0
+  let hoveredIndex = null
+  let isHidden = false
+
+  function renderItems(displayedIndex) {
+    items.forEach((item, index) => {
+      const distanceFromActive = Math.abs(index - displayedIndex)
+      const isActive = distanceFromActive === 0
+
+      item.classList.toggle("is-active", isActive)
+      item.classList.toggle("is-neighbor", distanceFromActive === 1)
+    })
+  }
+
+  function setIndicatorHidden(shouldHide) {
+    if (isHidden === shouldHide) return
+
+    isHidden = shouldHide
+
+    root.classList.toggle("is-hidden", shouldHide)
+    root.toggleAttribute("inert", shouldHide)
+
+    if (shouldHide) {
+      hoveredIndex = null
+      renderItems(currentIndex)
+    }
+  }
+
+  function setActiveItem(activeIndex) {
+    currentIndex = activeIndex
+
+    items.forEach((item, index) => {
+      const isActive = index === activeIndex
+
+      if (isActive) {
+        item.setAttribute("aria-current", "location")
+      } else {
+        item.removeAttribute("aria-current")
+      }
+    })
+
+    renderItems(hoveredIndex ?? currentIndex)
+  }
+
+  sections.forEach((section, index) => {
+    const nextSection = sections[index + 1]
+
+    ScrollTrigger.create({
+      trigger: section,
+      start: "top center",
+      endTrigger: nextSection,
+      end: nextSection ? "top center" : "max",
+      invalidateOnRefresh: true,
+
+      onUpdate: (self) => {
+        items[index].style.setProperty("--scroll-indicator-progress", self.progress)
+
+        const isLastSection = index === sections.length - 1
+
+        if (isLastSection) {
+          const distanceFromPageEnd = ScrollTrigger.maxScroll(window) - window.scrollY
+
+          setIndicatorHidden(distanceFromPageEnd <= 48)
+        }
+      },
+
+      onEnter: () => {
+        setActiveItem(index)
+      },
+
+      onEnterBack: () => {
+        setActiveItem(index)
+      },
+    })
+  })
+
+  items.forEach((item, index) => {
+    item.addEventListener("pointerenter", (event) => {
+      if (event.pointerType === "touch") return
+
+      hoveredIndex = index
+      renderItems(hoveredIndex)
+    })
+  })
+
+  root.addEventListener("pointerleave", () => {
+    hoveredIndex = null
+    renderItems(currentIndex)
+  })
+
+  setActiveItem(0)
 }
 
 // Header setup theme
