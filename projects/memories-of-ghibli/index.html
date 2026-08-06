@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+
+    <link rel="stylesheet" href="/src/assets/css/reset.css" />
+
+    <link rel="stylesheet" href="/src/assets/css/project-page.css" />
+
+    <link rel="icon" type="image/svg+xml" href="/logo-guillaume-zhu-32px.png" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script type="module" src="/src/assets/js/projects/projectPage.js"></script>
+
+    <title>Memories of ghibli — Guillaume Zhu</title>
+  </head>
+
+  <body class="project-page" data-project="memories-of-ghibli" data-theme="cream">
+    <!-------- TRANSITION -------->
+    <script>
+      if (sessionStorage.getItem("pageTransitionPending") === "true") {
+        const storedColor = sessionStorage.getItem("pageTransitionColor")
+        const color = storedColor === "dark" ? "dark" : "cream"
+
+        const transition = document.createElement("div")
+
+        transition.classList.add("page-transition", `page-transition--${color}`)
+
+        transition.setAttribute("aria-hidden", "true")
+        document.body.prepend(transition)
+      }
+    </script>
+
+    <!-------- HEADER -------->
+    <header class="site-header"></header>
+
+    <a class="project-back" href="/#projects" aria-label="Retour à la liste des projets">
+      <svg
+        class="project-back__icon"
+        width="62"
+        height="15"
+        viewBox="0 0 62 15"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <path
+          class="project-back__shaft"
+          d="M60.3018 7.37256L2.30176 7.37256"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+
+        <path
+          class="project-back__arrowhead"
+          d="M7.26025 13.7279L1.07307 7.54074C0.975439 7.44311 0.975439 7.28482 1.07307 7.18718L7.26025 1"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+      </svg>
+    </a>
+
+    <main class="project-page__main">
+      <section class="project-scroll">
+        <!-- Scroll length -->
+        <div class="project-scroll__pin-height">
+          <!-- Pin -->
+          <div class="project-scroll__container">
+            <!-- Content -->
+            <div class="project-scroll__track">
+              <!-- Section Intro -->
+              <section class="project-panel project-panel--intro">
+                <div class="project-intro">
+                  <video
+                    src="/images/projects/memories-of-ghibli/ghibli-intro1.mp4"
+                    class="project-intro__visual project-intro__visual--primary"
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    preload="metadata"
+                    aria-hidden="true"
+                  ></video>
+
+                  <video
+                    src="/images/projects/memories-of-ghibli/ghibli-intro2.mp4"
+                    class="project-intro__visual project-intro__visual--secondary"
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    preload="metadata"
+                    aria-hidden="true"
+                  ></video>
+
+                  <h1 class="project-intro__title">
+                    Memories<br />
+                    of Ghibli
+                  </h1>
+                </div>
+              </section>
+
+              <!-- Section Context -->
+              <section class="project-panel project-panel--context">
+                <div class="project-context project-context--with-links">
+                  <ul class="project-context__categories">
+                    <li class="project-context__category">Creative Development</li>
+                    <li class="project-context__category">Three.js</li>
+                    <li class="project-context__category">Creative Lead</li>
+                  </ul>
+
+                  <div class="project-context__texts">
+                    <p class="project-context__text">
+                      Une promenade interactive au cœur des mondes de Miyazaki, pensée comme une
+                      chasse aux souvenirs.
+                    </p>
+
+                    <p class="project-context__text">
+                      Direction artistique, coordination créative et conception de la scène 3D : 32
+                      objets interactifs et plus de 50 assets sélectionnés puis optimisés sous
+                      Blender, avec une complexité géométrique divisée par six pour préserver
+                      richesse visuelle et performance.
+                    </p>
+
+                    <div class="project-context__links">
+                      <a
+                        class="project-context__link project-context__link--experience"
+                        href="URL_DE_LA_DEMO"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Voir l’expérience
+                        <span aria-hidden="true">↗</span>
+                      </a>
+
+                      <a
+                        class="project-context__link project-context__link--credits"
+                        href="/projects/memories-of-ghibli/credits/"
+                      >
+                        Crédits & licences
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- Section Ellipse -->
+              <section class="project-panel project-panel--ellipse">
+                <div class="project-ellipse">
+                  <img
+                    src="/images/projects/memories-of-ghibli/ghibli-ellipse1.webp"
+                    alt=""
+                    class="project-ellipse__visual"
+                  />
+                </div>
+              </section>
+
+              <!-- Section Gallery -->
+              <!-- Section Gallery -->
+              <section class="project-panel project-panel--gallery">
+                <div class="project-gallery">
+                  <div class="project-gallery__slides">
+                    <!-- Initial spacers -->
+                    <div
+                      class="project-gallery__slide project-gallery__slide--spacer"
+                      aria-hidden="true"
+                    >
+                      <div class="project-gallery__media"></div>
+                    </div>
+
+                    <div
+                      class="project-gallery__slide project-gallery__slide--spacer"
+                      aria-hidden="true"
+                    >
+                      <div class="project-gallery__media"></div>
+                    </div>
+
+                    <!-- Gallery media 1 -->
+                    <div class="project-gallery__slide">
+                      <img
+                        class="project-gallery__media"
+                        src="/images/projects/memories-of-ghibli/ghibli-gallery1.webp"
+                        alt=""
+                      />
+                    </div>
+
+                    <!-- Gallery media 2 -->
+                    <div class="project-gallery__slide">
+                      <img
+                        class="project-gallery__media"
+                        src="/images/projects/memories-of-ghibli/ghibli-gallery2.webp"
+                        alt=""
+                      />
+                    </div>
+
+                    <!-- Gallery media 3 -->
+                    <div class="project-gallery__slide">
+                      <img
+                        class="project-gallery__media"
+                        src="/images/projects/memories-of-ghibli/ghibli-gallery3.webp"
+                        alt=""
+                      />
+                    </div>
+
+                    <!-- Gallery media 4 -->
+                    <div class="project-gallery__slide">
+                      <img
+                        class="project-gallery__media"
+                        src="/images/projects/memories-of-ghibli/ghibli-gallery4.webp"
+                        alt=""
+                      />
+                    </div>
+
+                    <!-- Gallery media 5 -->
+                    <div class="project-gallery__slide">
+                      <img
+                        class="project-gallery__media"
+                        src="/images/projects/memories-of-ghibli/ghibli-gallery5.webp"
+                        alt=""
+                      />
+                    </div>
+
+                    <!-- Gallery media 6 -->
+                    <div class="project-gallery__slide">
+                      <img
+                        class="project-gallery__media"
+                        src="/images/projects/memories-of-ghibli/ghibli-gallery6.webp"
+                        alt=""
+                      />
+                    </div>
+
+                    <!-- Gallery media 7 -->
+                    <div class="project-gallery__slide">
+                      <img
+                        class="project-gallery__media"
+                        src="/images/projects/memories-of-ghibli/ghibli-gallery7.webp"
+                        alt=""
+                      />
+                    </div>
+
+                    <!-- Gallery media 8 -->
+                    <div class="project-gallery__slide">
+                      <img
+                        class="project-gallery__media"
+                        src="/images/projects/memories-of-ghibli/ghibli-gallery8.webp"
+                        alt=""
+                      />
+                    </div>
+
+                    <!-- Final spacers -->
+                    <div
+                      class="project-gallery__slide project-gallery__slide--spacer"
+                      aria-hidden="true"
+                    >
+                      <div class="project-gallery__media"></div>
+                    </div>
+
+                    <div
+                      class="project-gallery__slide project-gallery__slide--spacer"
+                      aria-hidden="true"
+                    >
+                      <div class="project-gallery__media"></div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- Section Next -->
+              <section class="project-panel project-panel--next">
+                <div class="project-next">
+                  <!-- Links words -->
+                  <a
+                    href="/projects/pulse-festival/"
+                    class="project-next__link"
+                    aria-label="Découvrir le projet Pulse Festival"
+                  >
+                    <h2 class="project-next__title">
+                      <!-- Left word -->
+                      <span class="project-next__word project-next__word--left">À</span>
+
+                      <!-- Right word group -->
+                      <span class="project-next__right">
+                        <span class="project-next__word project-next__word--right">suivre</span>
+
+                        <span class="project-next__project-name">pulse festival</span>
+                      </span>
+                    </h2>
+
+                    <!-- Medias -->
+                    <div class="project-next__medias" aria-hidden="true">
+                      <img
+                        class="project-next__media"
+                        src="/images/projects/hover/pulse/pulse-02-square.webp"
+                        alt=""
+                        loading="lazy"
+                      />
+
+                      <img
+                        class="project-next__media"
+                        src="/images/projects/hover/pulse/pulse-01-portrait.webp"
+                        alt=""
+                        loading="lazy"
+                      />
+
+                      <img
+                        class="project-next__media project-next__media--logo"
+                        src="/images/projects/hover/pulse/pulse-logo.png"
+                        alt=""
+                        loading="lazy"
+                      />
+
+                      <img
+                        class="project-next__media"
+                        src="/images/projects/hover/pulse/pulse-08-square.webp"
+                        alt=""
+                        loading="lazy"
+                      />
+
+                      <img
+                        class="project-next__media"
+                        src="/images/projects/hover/pulse/pulse-06-portrait.webp"
+                        alt=""
+                        loading="lazy"
+                      />
+                    </div>
+                  </a>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

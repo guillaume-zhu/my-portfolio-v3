@@ -10,4 +10,7 @@
 
   /* Padding */
   --padding-min: 1rem;
+
+  /* Font */
+  --letter-spacing-display: -0.025em;
 }

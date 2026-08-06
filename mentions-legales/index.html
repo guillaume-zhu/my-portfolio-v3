@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+
+    <link rel="stylesheet" href="/src/assets/css/reset.css" />
+    <link rel="stylesheet" href="/src/assets/css/credits-page.css" />
+
+    <link rel="icon" type="image/svg+xml" href="/logo-guillaume-zhu-32px.png" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script type="module" src="/src/assets/js/creditsPage.js"></script>
+
+    <title>Mentions légales — Guillaume Zhu</title>
+  </head>
+
+  <body class="credits-page">
+    <!-------- TRANSITION -------->
+    <script>
+      if (sessionStorage.getItem("pageTransitionPending") === "true") {
+        const storedColor = sessionStorage.getItem("pageTransitionColor")
+        const color = storedColor === "dark" ? "dark" : "cream"
+
+        const transition = document.createElement("div")
+
+        transition.classList.add("page-transition", `page-transition--${color}`)
+
+        transition.setAttribute("aria-hidden", "true")
+        document.body.prepend(transition)
+      }
+    </script>
+
+    <!-------- HEADER -------->
+    <header class="site-header"></header>
+
+    <a class="credits-page__back" href="/" aria-label="Retour à l’accueil"> Retour à l’accueil </a>
+
+    <main class="credits-page__main">
+      <header class="credits-hero">
+        <p class="credits-hero__eyebrow">guillaumezhu.com</p>
+
+        <h1 class="credits-hero__title">
+          Mentions<br />
+          légales
+        </h1>
+
+        <p class="credits-hero__intro">
+          Informations relatives à l’édition, l’hébergement, la propriété intellectuelle et
+          l’utilisation des données sur ce portfolio.
+        </p>
+
+        <nav class="credits-hero__nav" aria-label="Sections des mentions légales">
+          <a href="#editeur">Éditeur</a>
+          <a href="#hebergement">Hébergement</a>
+          <a href="#propriete">Propriété intellectuelle</a>
+          <a href="#donnees">Données personnelles</a>
+          <a href="#cookies">Cookies</a>
+        </nav>
+      </header>
+
+      <div class="credits-content">
+        <section class="credits-section" id="editeur">
+          <h2 class="credits-section__title">Éditeur du site</h2>
+
+          <p class="credits-section__intro">
+            Ce site est un portfolio personnel et professionnel présentant des projets de direction
+            artistique, design digital et développement front-end.
+          </p>
+
+          <div class="credits-section__body">
+            <div class="credits-resource">
+              <h3 class="credits-resource__title">Guillaume Zhu</h3>
+
+              <p class="credits-resource__meta">
+                Direction artistique · Design digital · Développement front-end
+              </p>
+
+              <p class="credits-resource__description">Site web : guillaumezhu.com</p>
+
+              <div class="credits-resource__links">
+                <a href="mailto:contact@guillaumezhu.com"> contact@guillaumezhu.com </a>
+              </div>
+
+              <p class="credits-resource__legal">Responsable de la publication : Guillaume Zhu.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="credits-section" id="hebergement">
+          <h2 class="credits-section__title">Hébergement</h2>
+
+          <p class="credits-section__intro">
+            Le site est déployé via Vercel. Le nom de domaine est conservé auprès d’OVHcloud.
+          </p>
+
+          <div class="credits-section__body">
+            <div class="credits-resource">
+              <h3 class="credits-resource__title">Vercel Inc.</h3>
+
+              <p class="credits-resource__meta">
+                440 N Barranca Ave #4133, Covina, CA 91723, United States
+              </p>
+
+              <p class="credits-resource__description">Hébergeur technique du site.</p>
+
+              <div class="credits-resource__links">
+                <a href="https://vercel.com" target="_blank" rel="noopener noreferrer">
+                  vercel.com ↗
+                </a>
+              </div>
+            </div>
+
+            <div class="credits-resource">
+              <h3 class="credits-resource__title">Nom de domaine</h3>
+
+              <p class="credits-resource__meta">guillaumezhu.com · OVHcloud</p>
+
+              <p class="credits-resource__description">
+                Le nom de domaine du site est enregistré auprès d’OVHcloud.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="credits-section" id="propriete">
+          <h2 class="credits-section__title">Propriété intellectuelle</h2>
+
+          <p class="credits-section__intro">
+            Les contenus présentés sur ce site sont protégés par le droit de la propriété
+            intellectuelle.
+          </p>
+
+          <div class="credits-section__body">
+            <div class="credits-resource">
+              <h3 class="credits-resource__title">Contenus du site</h3>
+
+              <p class="credits-resource__description">
+                Sauf mention contraire, l’ensemble des contenus présents sur ce site est la
+                propriété de Guillaume Zhu : textes, interfaces, animations, éléments graphiques,
+                choix de direction artistique, intégrations et développements front-end.
+              </p>
+
+              <p class="credits-resource__description">
+                Toute reproduction, représentation, modification, diffusion ou exploitation totale
+                ou partielle de ces contenus, sans autorisation préalable, est interdite.
+              </p>
+            </div>
+
+            <div class="credits-resource">
+              <h3 class="credits-resource__title">Projets, images et ressources externes</h3>
+
+              <p class="credits-resource__description">
+                Certains projets peuvent intégrer des ressources externes, des éléments générés,
+                composés ou retouchés, ainsi que des créations réalisées dans un cadre fictif,
+                expérimental, pédagogique ou personnel.
+              </p>
+
+              <p class="credits-resource__description">
+                Lorsque nécessaire, les crédits spécifiques sont indiqués directement dans les pages
+                projets concernées.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="credits-section" id="donnees">
+          <h2 class="credits-section__title">Données personnelles</h2>
+
+          <p class="credits-section__intro">
+            Ce portfolio ne propose pas de compte utilisateur, de formulaire d’inscription ou de
+            newsletter.
+          </p>
+
+          <div class="credits-section__body">
+            <div class="credits-resource">
+              <h3 class="credits-resource__title">Contact par email</h3>
+
+              <p class="credits-resource__description">
+                Si vous contactez l’éditeur du site par email, les informations transmises seront
+                utilisées uniquement pour répondre à votre demande.
+              </p>
+
+              <p class="credits-resource__description">
+                Vous pouvez demander l’accès, la rectification ou la suppression des informations
+                vous concernant en écrivant à l’adresse de contact indiquée sur cette page.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="credits-section" id="cookies">
+          <h2 class="credits-section__title">Cookies</h2>
+
+          <p class="credits-section__intro">
+            Le site privilégie une expérience simple, sans publicité ciblée ni suivi marketing.
+          </p>
+
+          <div class="credits-section__body">
+            <div class="credits-resource">
+              <h3 class="credits-resource__title">Cookies et mesure d’audience</h3>
+
+              <p class="credits-resource__description">
+                Ce site n’utilise pas de cookies publicitaires.
+              </p>
+
+              <p class="credits-resource__description">
+                À ce jour, aucun outil de mesure d’audience nécessitant un consentement préalable
+                n’est intégré au site.
+              </p>
+
+              <p class="credits-resource__legal">
+                Si un outil d’analyse d’audience est ajouté ultérieurement, cette page sera mise à
+                jour afin de préciser son fonctionnement.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="credits-section" id="mise-a-jour">
+          <h2 class="credits-section__title">Mise à jour</h2>
+
+          <p class="credits-section__intro">
+            Cette page pourra évoluer en fonction des outils intégrés au site.
+          </p>
+
+          <div class="credits-section__body">
+            <div class="credits-resource">
+              <h3 class="credits-resource__title">Dernière mise à jour</h3>
+
+              <p class="credits-resource__meta">Juillet 2026</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <footer class="credits-footer">
+        <p class="credits-footer__label">Fin des mentions légales</p>
+
+        <a class="credits-footer__link" href="/">
+          <span>Retour à l’accueil</span>
+          <span class="credits-footer__arrow" aria-hidden="true">↗</span>
+        </a>
+      </footer>
+    </main>
+  </body>
+</html>

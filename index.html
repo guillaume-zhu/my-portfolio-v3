@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
 
@@ -8,9 +8,8 @@
     <link rel="stylesheet" href="./src/assets/css/reset.css" />
     <link rel="stylesheet" href="./src/assets/css/style.css" />
 
-    <!-- JSS -->
+    <!-- JS -->
     <script type="module" src="/src/assets/js/main.js"></script>
-    <script type="module" src="/src/assets/js//animation.js"></script>
 
     <!-- FAV -->
     <link rel="icon" type="image/svg+xml" href="/logo-guillaume-zhu-32px.png" />
@@ -19,21 +18,366 @@
     <title>portfolio-v3</title>
   </head>
   <body>
+    <!-------- TRANSITION -------->
+    <script>
+      if (sessionStorage.getItem("pageTransitionPending") === "true") {
+        const storedColor = sessionStorage.getItem("pageTransitionColor")
+        const color = storedColor === "dark" ? "dark" : "cream"
+
+        const transition = document.createElement("div")
+
+        transition.classList.add("page-transition", `page-transition--${color}`)
+
+        transition.setAttribute("aria-hidden", "true")
+        document.body.prepend(transition)
+      }
+    </script>
+
+    <!-------- HEADER -------->
+    <header class="site-header"></header>
+
     <main>
       <!-------- HERO SECTION -------->
       <section class="hero-three">
-        <canvas class="webgl"></canvas>
+        <div class="hero-three__frame">
+          <canvas class="webgl"></canvas>
+        </div>
 
         <div class="hero-content">
-          <h1 class="hero-title">Guillaume Zhu</h1>
-          <p class="hero-title">Creative Developer - Directeur Artistique</p>
+          <!-- <h1 class="hero-title">Guillaume Zhu</h1>
+          <p class="hero-title">Creative Developer - Directeur Artistique</p> -->
         </div>
       </section>
 
       <!-------- MANIFESTO SECTION -------->
       <section class="manifesto">
-        <h2>Manifesto</h2>
-        <p>Design and code in dialogue, shaped into living digital experiences.</p>
+        <div class="container">
+          <p class="text">Je crée des expériences à la croisée du design et du code.</p>
+        </div>
+      </section>
+
+      <!-------- TRAJECTOIRY SECTION -------->
+      <section class="trajectory" id="parcours">
+        <section class="entry">
+          <div class="container">
+            <h2 class="title">Trajectoire</h2>
+          </div>
+        </section>
+
+        <section class="trajectory-sentences">
+          <div class="trajectory-sentences__pin-height">
+            <div class="trajectory-sentences__container">
+              <div class="trajectory-sentences__visuals" aria-hidden="true">
+                <div class="trajectory-sentences__visual trajectory-sentences__visual--left"></div>
+                <div class="trajectory-sentences__visual trajectory-sentences__visual--right"></div>
+              </div>
+
+              <div class="trajectory-sentences__center">
+                <div class="trajectory-sentences__sentence">D'abord</div>
+
+                <div class="trajectory-sentences__sentence is-two-lines">
+                  direction <br />
+                  artistique.
+                </div>
+
+                <div class="trajectory-sentences__sentence">Puis</div>
+
+                <div class="trajectory-sentences__sentence is-two-lines">
+                  développement <br />front.
+                </div>
+
+                <div class="trajectory-sentences__sentence is-today">Aujourd'hui</div>
+
+                <div class="trajectory-sentences__sentence is-dialogue">je fais dialoguer</div>
+
+                <div class="trajectory-sentences__sentence is-both">les deux.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-------- TOOLKIT SECTION -------->
+      <section class="toolkit" id="toolkit">
+        <div class="toolkit__pin-height">
+          <div class="toolkit__container">
+            <div class="toolkit__header">
+              <h2 class="toolkit__title">Toolkit</h2>
+
+              <div class="toolkit__subtitle-wrap">
+                <h3 class="toolkit__subtitle toolkit__subtitle--front">Creative Front-end</h3>
+                <h3 class="toolkit__subtitle toolkit__subtitle--art">Art Direction</h3>
+              </div>
+            </div>
+
+            <!-- Frontend Deck -->
+            <div class="toolkit__wheel toolkit__wheel--frontend">
+              <div class="toolkit__slot">
+                <div class="toolkit-card toolkit-card--javascript">
+                  <img src="/images/toolkit/frontend/javascript.svg" alt="JavaScript" />
+                </div>
+              </div>
+
+              <div class="toolkit__slot">
+                <div class="toolkit-card toolkit-card--threejs">
+                  <img src="/images/toolkit/frontend/threejs.svg" alt="Three.js" />
+                </div>
+              </div>
+
+              <div class="toolkit__slot">
+                <div class="toolkit-card toolkit-card--glsl">
+                  <img src="/images/toolkit/frontend/glsl.svg" alt="GLSL" />
+                </div>
+              </div>
+
+              <div class="toolkit__slot">
+                <div class="toolkit-card toolkit-card--gsap">
+                  <img src="/images/toolkit/frontend/gsap.svg" alt="GSAP" />
+                </div>
+              </div>
+
+              <div class="toolkit__slot">
+                <div class="toolkit-card toolkit-card--vuejs">
+                  <img src="/images/toolkit/frontend/vuejs.svg" alt="Vue.js" />
+                </div>
+              </div>
+
+              <div class="toolkit__slot">
+                <div class="toolkit-card toolkit-card--react">
+                  <img src="/images/toolkit/frontend/react.svg" alt="React" />
+                </div>
+              </div>
+
+              <div class="toolkit__slot">
+                <div class="toolkit-card toolkit-card--webflow">
+                  <img src="/images/toolkit/frontend/webflow.svg" alt="Webflow" />
+                </div>
+              </div>
+
+              <div class="toolkit__slot toolkit__slot--transition">
+                <div class="toolkit-card toolkit-card--flip toolkit-card--shopify">
+                  <div class="toolkit-card__flipper">
+                    <div class="toolkit-card__face toolkit-card--front">
+                      <img src="/images/toolkit/frontend/shopify.svg" alt="Shopify" />
+                    </div>
+
+                    <div class="toolkit-card__face toolkit-card__face--back">
+                      <img src="/images/toolkit/art-direction/figma.svg" alt="Figma" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Art direction deck -->
+            <div class="toolkit__wheel toolkit__wheel--art-direction">
+              <div class="toolkit__slot">
+                <div class="toolkit-card toolkit-card--figma">
+                  <img src="/images/toolkit/art-direction/figma.svg" alt="Figma" />
+                </div>
+              </div>
+
+              <div class="toolkit__slot">
+                <div class="toolkit-card toolkit-card--photoshop">
+                  <img src="/images/toolkit/art-direction/photoshop.svg" alt="Photoshop" />
+                </div>
+              </div>
+
+              <div class="toolkit__slot">
+                <div class="toolkit-card toolkit-card--illustrator">
+                  <img src="/images/toolkit/art-direction/illustrator.svg" alt="Illustrator" />
+                </div>
+              </div>
+
+              <div class="toolkit__slot">
+                <div class="toolkit-card toolkit-card--indesign">
+                  <img src="/images/toolkit/art-direction/indesign.svg" alt="InDesign" />
+                </div>
+              </div>
+
+              <div class="toolkit__slot">
+                <div class="toolkit-card toolkit-card--after-effects">
+                  <img src="/images/toolkit/art-direction/aftereffects.svg" alt="After Effects" />
+                </div>
+              </div>
+
+              <div class="toolkit__slot">
+                <div class="toolkit-card toolkit-card--capcut">
+                  <img src="/images/toolkit/art-direction/capcut.svg" alt="CapCut" />
+                </div>
+              </div>
+
+              <div class="toolkit__slot">
+                <div class="toolkit-card toolkit-card--lightroom">
+                  <img src="/images/toolkit/art-direction/lightroom.svg" alt="Lightroom" />
+                </div>
+              </div>
+
+              <div class="toolkit__slot">
+                <div class="toolkit-card toolkit-card--transition">
+                  <img src="/images/toolkit/art-direction/transition.png" alt="transition" />
+                  <canvas
+                    class="toolkit-card__cream-reveal toolkit-card__reveal-canvas"
+                    aria-hidden="true"
+                  ></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-------- PROJECTS SECTION -------->
+      <section class="projects" id="projects">
+        <div class="projects__pin-height">
+          <div class="projects__container">
+            <h2 class="projects__title">Projets</h2>
+
+            <nav class="projects__list" aria-label="Projects">
+              <a
+                class="projects__link"
+                href="/projects/memories-of-ghibli/"
+                data-project="ghibli"
+                data-project-theme="cream"
+              >
+                memories of ghibli
+              </a>
+
+              <a
+                class="projects__link"
+                href="/projects/pulse-festival/"
+                data-project="pulse"
+                data-project-theme="dark"
+              >
+                pulse festival
+              </a>
+
+              <a
+                class="projects__link"
+                href="/projects/mae-webflow/"
+                data-project="webflow"
+                data-project-theme="dark"
+              >
+                webflow
+              </a>
+
+              <a
+                class="projects__link"
+                href="/projects/ornate/"
+                data-project="ornate"
+                data-project-theme="cream"
+              >
+                ornate
+              </a>
+
+              <a
+                class="projects__link"
+                href="/projects/mirage/"
+                data-project="mirage"
+                data-project-theme="cream"
+              >
+                mirage
+              </a>
+            </nav>
+          </div>
+        </div>
+      </section>
+
+      <!-------- NEXT SECTION -------->
+      <section class="next-section">
+        <div class="next-section__pin-height">
+          <div class="next-section__container">
+            <p class="next-section__intro">La suite ?</p>
+
+            <svg
+              class="next-section__svg"
+              fill="none"
+              width="3898"
+              height="891"
+              viewBox="0 0 3898 891"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient id="nextTextGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="80%" stop-color="#f6c177" />
+                  <stop offset="85%" stop-color="#9b7cff" />
+                  <stop offset="100%" stop-color="#ff6b4a" />
+                </linearGradient>
+              </defs>
+
+              <path
+                id="nextPath"
+                d="M0.398438 611.016C175.398 377.517 857.398 -285.484 1461.4 139.638C1911.53 456.46 2114.4 805.516 2679.4 611.016C3088.4 470.219 3704.54 -33.3124 4354.9 781.516C4700.9 1215.02 5305.6 1466.52 6108.4 328.516"
+              />
+
+              <text class="next-section__text">
+                <textPath id="nextTextPath" href="#nextPath" text-anchor="start">
+                  <tspan id="nextTextCream">Si nos visions se rejoignent,</tspan>
+                  <tspan id="nextTextGradientPart" fill="url(#nextTextGradient)">
+                    traçons la suite ensemble
+                  </tspan>
+                </textPath>
+              </text>
+
+              <circle id="nextOrb" class="next-section__orb" cx="0" cy="0" r="14" fill="#ff6b4a" />
+            </svg>
+
+            <!-------- FOOTER REVEAL -------->
+            <footer id="contact" class="next-footer" aria-label="Pied de page">
+              <div class="next-footer__background" aria-hidden="true"></div>
+
+              <div class="next-footer__content">
+                <div class="next-footer__inner">
+                  <div class="next-footer__main">
+                    <p class="next-footer__headline">
+                      Disponible pour une alternance<br />
+                      en front-end créatif <br />
+                      dès octobre 2026
+                    </p>
+
+                    <div class="next-footer__meta">
+                      <a href="/mentions-legales/" class="next-footer__meta-link text-link"
+                        >Mentions légales</a
+                      >
+                      <p>© 2026 Guillaume Zhu</p>
+                    </div>
+                  </div>
+
+                  <nav class="next-footer__nav" aria-label="Navigation du pied de page">
+                    <div class="next-footer__group">
+                      <p class="next-footer__group-title">Explorer</p>
+
+                      <a href="#parcours" class="text-link">Parcours</a>
+                      <a href="#toolkit" class="text-link">Toolkit</a>
+                      <a href="#projects" class="text-link">Projets</a>
+                      <a class="playground-link" href="/playground/">Playground</a>
+                    </div>
+
+                    <div class="next-footer__group">
+                      <p class="next-footer__group-title">Contact</p>
+
+                      <a
+                        class="text-link"
+                        href="https://www.linkedin.com/in/guillaume-zhu/"
+                        target="_blank"
+                        rel="noreferrer"
+                        >LinkedIn</a
+                      >
+                      <a
+                        class="text-link"
+                        href="https://github.com/guillaume-zhu"
+                        target="_blank"
+                        rel="noreferrer"
+                        >GitHub</a
+                      >
+                      <a class="text-link" href="mailto:contact@guillaumezhu.com">Email</a>
+                    </div>
+                  </nav>
+                </div>
+              </div>
+            </footer>
+          </div>
+        </div>
       </section>
     </main>
   </body>
