@@ -3,17 +3,11 @@
 @import "./typography.css";
 @import "./variables.css";
 @import "./header.css";
+@import "./scroll-indicator.css";
 @import "./page-transition.css";
+@import "./home-loader.css";
 
 /* -------- GLOBAL -------- */
-html,
-body {
-  scrollbar-width: none;
-}
-
-body::-webkit-scrollbar {
-  display: none;
-}
 
 body {
   --current-interface-color: var(--color-cream);

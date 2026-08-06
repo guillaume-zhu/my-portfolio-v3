@@ -3,6 +3,22 @@
   <head>
     <meta charset="UTF-8" />
 
+    <!-------- SHOW LOADER --------->
+    <script>
+      {
+        const homeLoaderSessionKey = "homeLoaderShown"
+        const shouldShowHomeLoader = sessionStorage.getItem(homeLoaderSessionKey) !== "true"
+
+        document.documentElement.dataset.homeLoaderState = shouldShowHomeLoader
+          ? "pending"
+          : "skipped"
+
+        if (shouldShowHomeLoader) {
+          sessionStorage.setItem(homeLoaderSessionKey, "true")
+        }
+      }
+    </script>
+
     <!-------- LINKS --------->
     <!-- CSS -->
     <link rel="stylesheet" href="./src/assets/css/reset.css" />
@@ -12,12 +28,21 @@
     <script type="module" src="/src/assets/js/main.js"></script>
 
     <!-- FAV -->
-    <link rel="icon" type="image/svg+xml" href="/logo-guillaume-zhu-32px.png" />
+    <link rel="icon" type="image/svg+xml" href="/logo-guillaume-zhu.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Portfolio de Guillaume Zhu, Front &amp; Creative Developer et Art Director spécialisé en expériences web immersives et interfaces interactives."
+    />
 
-    <title>portfolio-v3</title>
+    <title>Guillaume Zhu — Front creative Developer &amp; Art Director</title>
   </head>
   <body>
+    <!-------- HOME LOADER -------->
+    <div class="home-loader" role="status" aria-label="Chargement de la page">
+      <canvas class="home-loader__canvas" aria-hidden="true"></canvas>
+    </div>
+
     <!-------- TRANSITION -------->
     <script>
       if (sessionStorage.getItem("pageTransitionPending") === "true") {
@@ -36,9 +61,40 @@
     <!-------- HEADER -------->
     <header class="site-header"></header>
 
+    <nav class="scroll-indicator" aria-label="Navigation entre les sections">
+      <a
+        class="scroll-indicator__item is-active"
+        href="#hero"
+        aria-label="Hero"
+        aria-current="location"
+      >
+        <span class="scroll-indicator__bar" aria-hidden="true"></span>
+      </a>
+
+      <a class="scroll-indicator__item is-neighbor" href="#manifesto" aria-label="Manifesto">
+        <span class="scroll-indicator__bar" aria-hidden="true"></span>
+      </a>
+
+      <a class="scroll-indicator__item" href="#parcours" aria-label="Trajectoire">
+        <span class="scroll-indicator__bar" aria-hidden="true"></span>
+      </a>
+
+      <a class="scroll-indicator__item" href="#toolkit" aria-label="Toolkit">
+        <span class="scroll-indicator__bar" aria-hidden="true"></span>
+      </a>
+
+      <a class="scroll-indicator__item" href="#projects" aria-label="Projets">
+        <span class="scroll-indicator__bar" aria-hidden="true"></span>
+      </a>
+
+      <a class="scroll-indicator__item" href="#contact" aria-label="Next et footer">
+        <span class="scroll-indicator__bar" aria-hidden="true"></span>
+      </a>
+    </nav>
+
     <main>
       <!-------- HERO SECTION -------->
-      <section class="hero-three">
+      <section class="hero-three" id="hero">
         <div class="hero-three__frame">
           <canvas class="webgl"></canvas>
         </div>
@@ -50,7 +106,7 @@
       </section>
 
       <!-------- MANIFESTO SECTION -------->
-      <section class="manifesto">
+      <section class="manifesto" id="manifesto">
         <div class="container">
           <p class="text">Je crée des expériences à la croisée du design et du code.</p>
         </div>

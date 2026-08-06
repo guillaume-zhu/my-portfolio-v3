@@ -4,7 +4,21 @@ import { GLTFLoader } from "three/examples/jsm/Addons.js"
 import logoGlassVertexShader from "../shaders/logoGlass/vertex.glsl"
 import logoGlassFragmentShader from "../shaders/logoGlass/fragment.glsl"
 
-export const createThreeHero = async () => {
+export const createThreeHero = async ({
+  autoStart = true,
+  onProgress = () => {},
+} = {}) => {
+  const totalLoadingSteps = 6
+  let completedLoadingSteps = 0
+
+  const completeLoadingStep = () => {
+    completedLoadingSteps += 1
+
+    onProgress(completedLoadingSteps / totalLoadingSteps)
+  }
+
+  onProgress(0)
+
   // ------------------------------------------------
   // Base setup
   // ------------------------------------------------
@@ -98,6 +112,8 @@ export const createThreeHero = async () => {
 
   pmremGenerator.dispose()
 
+  completeLoadingStep()
+
   // ------------------------------------------------
   // Light
   // ------------------------------------------------
@@ -115,6 +131,8 @@ export const createThreeHero = async () => {
 
   // Model group
   const gltf = await gltfLoader.loadAsync("/models/logo.glb")
+
+  completeLoadingStep()
 
   const logoGroup = new THREE.Group()
   scene.add(logoGroup)
@@ -264,12 +282,14 @@ export const createThreeHero = async () => {
   const multiplyer3 = 0.6
 
   const textName = await createTextPlane({
-    path: "/textures/texts/text-name.png",
+    path: "/textures/texts/text-name.webp",
     width: 5.5 * multiplyer1,
     height: 1.4 * multiplyer1,
     position: { x: 0, y: 0, z: -2.5 },
     rotation: { x: 0, y: 0, z: 0 },
   })
+
+  completeLoadingStep()
 
   const textNameVisibleRatio = {
     width: 4488 / 8192,
@@ -289,10 +309,8 @@ export const createThreeHero = async () => {
     const visibleHeight = 2 * textNameCameraDistance * Math.tan(verticalFov * 0.5)
     const visibleWidth = visibleHeight * camera.aspect
 
-    const horizontalScale =
-      (visibleWidth * textNameViewportCoverage) / textNameVisibleSize.width
-    const verticalScale =
-      (visibleHeight * textNameViewportCoverage) / textNameVisibleSize.height
+    const horizontalScale = (visibleWidth * textNameViewportCoverage) / textNameVisibleSize.width
+    const verticalScale = (visibleHeight * textNameViewportCoverage) / textNameVisibleSize.height
 
     const responsiveScale = Math.min(1, horizontalScale, verticalScale)
 
@@ -302,20 +320,24 @@ export const createThreeHero = async () => {
   updateTextNameScale()
 
   const textArt = await createTextPlane({
-    path: "/textures/texts/text-art-director-justified.png",
+    path: "/textures/texts/text-art-director-justified.webp",
     width: 5.5 * multiplyer2,
     height: 1.4 * multiplyer2,
     position: { x: 1, y: 5.25, z: -1.75 },
     rotation: { x: 0, y: -Math.PI * 0.5, z: 0 },
   })
 
+  completeLoadingStep()
+
   const textCreative = await createTextPlane({
-    path: "/textures/texts/text-creative-developer-justified.png",
+    path: "/textures/texts/text-creative-developer-justified.webp",
     width: 5.5 * multiplyer3,
     height: 1.4 * multiplyer3,
     position: { x: -1, y: 6.5, z: 1.25 },
     rotation: { x: 0, y: -Math.PI * 0.5, z: 0 },
   })
+
+  completeLoadingStep()
 
   const roleTextsReferenceAspect = 16 / 10
   const textArtBaseZ = textArt.position.z
@@ -449,7 +471,24 @@ export const createThreeHero = async () => {
   // ------------------------------------------------
   // Animation loop
   // ------------------------------------------------
-  let previousTime = performance.now()
+  let previousTime = 0
+  let isReady = false
+  let isRunning = false
+  let startRequested = autoStart
+
+  const renderFrame = () => {
+    logo.visible = false
+    glassLogo.visible = false
+
+    renderer.setRenderTarget(sceneRenderTarget)
+    renderer.render(scene, camera)
+
+    logo.visible = true
+    glassLogo.visible = true
+
+    renderer.setRenderTarget(null)
+    renderer.render(scene, camera)
+  }
 
   const tick = (currentTime) => {
     // Time
@@ -490,28 +529,55 @@ export const createThreeHero = async () => {
     logoGroup.rotateOnAxis(logoRotationAxis, delta * logoRotationSpeed)
 
     // Render
-    logo.visible = false
-    glassLogo.visible = false
-
-    renderer.setRenderTarget(sceneRenderTarget)
-    renderer.render(scene, camera)
-
-    logo.visible = true
-    glassLogo.visible = true
-
-    renderer.setRenderTarget(null)
-    renderer.render(scene, camera)
+    renderFrame()
 
     window.requestAnimationFrame(tick)
   }
 
-  window.requestAnimationFrame(tick)
+  // ------------------------------------------------
+  // Loader preparation
+  // ------------------------------------------------
+
+  const start = () => {
+    startRequested = true
+
+    if (!isReady || isRunning) return
+
+    isRunning = true
+    previousTime = performance.now()
+
+    window.requestAnimationFrame(tick)
+  }
+
+  const ready = (async () => {
+    await renderer.compileAsync(scene, camera)
+
+    await new Promise((resolve) => {
+      window.requestAnimationFrame((currentTime) => {
+        glassMaterial.uniforms.uTime.value = currentTime * 0.001
+        updateSceneFromScroll()
+        renderFrame()
+
+        window.requestAnimationFrame(resolve)
+      })
+    })
+
+    completeLoadingStep()
+
+    isReady = true
+
+    if (startRequested) {
+      start()
+    }
+  })()
 
   return {
     scene,
     camera,
     renderer,
     logoGroup,
+    ready,
+    start,
     setScrollProgress,
     setInteractive,
   }
