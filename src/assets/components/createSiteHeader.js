@@ -19,12 +19,6 @@ export function createSiteHeader() {
     >
 
       <a
-        class="site-header__link site-header__link--playground"
-        href="/playground/">
-        playground
-      </a>
-
-      <a
         class="site-header__link site-header__link--secondary"
         href="/#parcours"
       >
@@ -40,6 +34,12 @@ export function createSiteHeader() {
 
       <a class="site-header__link" href="/#projects">
         projets
+      </a>
+
+      <a
+        class="site-header__link site-header__link--playground"
+        href="/playground/">
+        playground
       </a>
 
       <a class="site-header__link" href="/#contact">
