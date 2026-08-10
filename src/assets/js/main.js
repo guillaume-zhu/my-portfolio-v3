@@ -2094,12 +2094,25 @@ function setupNextSection() {
     y: 0,
   }
 
+  const footerCenterOffset = {
+    x: 0,
+    y: 0,
+  }
+
+  const footerCenterPoint = {
+    x: 0,
+    y: 0,
+  }
+
   gsap.set(orb, {
     autoAlpha: 0,
   })
   gsap.set(footer, {
     clipPath: "circle(0px at 50% 50%)",
   })
+
+  const setFooterClipPath = gsap.quickSetter(footer, "clipPath")
+  const setFooterWebkitClipPath = gsap.quickSetter(footer, "webkitClipPath")
 
   function updateViewBox() {
     svg.setAttribute("viewBox", `${position.x} ${position.y} ${viewBoxWidth} ${viewBoxHeight}`)
@@ -2111,11 +2124,13 @@ function setupNextSection() {
   const tweenOptions = {
     duration: 0.2,
     ease: "power1",
-    onUpdate: updateViewBox,
   }
 
-  const xTo = gsap.quickTo(position, "x", tweenOptions)
   const yTo = gsap.quickTo(position, "y", tweenOptions)
+  const xTo = gsap.quickTo(position, "x", {
+    ...tweenOptions,
+    onUpdate: updateViewBox,
+  })
 
   // ----------------------
   // 5. Text preparation
@@ -2129,6 +2144,7 @@ function setupNextSection() {
   const gradientCharacters = gradientFullText.split("")
 
   const totalCharacters = creamCharacters.length + gradientCharacters.length
+  let previousVisibleCharacters = -1
 
   creamTextPart.textContent = creamFullText
   gradientTextPart.textContent = gradientMeasureText
@@ -2171,18 +2187,10 @@ function setupNextSection() {
 
   // Get footer center SVG -> XY point
   function getFooterCenterAsSvgPoint() {
-    const footerRect = footer.getBoundingClientRect()
+    footerCenterPoint.x = position.x + footerCenterOffset.x
+    footerCenterPoint.y = position.y + footerCenterOffset.y
 
-    const svgPoint = svg.createSVGPoint()
-
-    svgPoint.x = footerRect.left + footerRect.width / 2
-    svgPoint.y = footerRect.top + footerRect.height / 2
-
-    const screenMatrix = svg.getScreenCTM()
-
-    if (!screenMatrix) return orbPoint
-
-    return svgPoint.matrixTransform(screenMatrix.inverse())
+    return footerCenterPoint
   }
 
   // Get middle free space above footer
@@ -2242,11 +2250,35 @@ function setupNextSection() {
   // Text movement
   const textLiftStart = orbMoveStart
   const textLiftEnd = orbMoveEnd
-  let textLiftY = getTextLiftY()
+  let textLiftY = 0
+  let footerRevealMaxRadius = 0
+  let previousFooterRevealProgress = 0
+  let previousFooterIsInteractive = false
+  let previousOrbOpacity = 0
+  let previousTextY = null
 
   // Footer reveal when orb at center of footer
   const footerRevealStart = orbMoveEnd
   const footerRevealEnd = 1
+
+  function refreshNextMeasurements() {
+    textLiftY = getTextLiftY()
+    footerRevealMaxRadius = Math.hypot(footer.offsetWidth / 2, footer.offsetHeight / 2)
+
+    const footerRect = footer.getBoundingClientRect()
+    const svgRect = svg.getBoundingClientRect()
+
+    const footerCenterX = footerRect.left + footerRect.width / 2
+    const footerCenterY = footerRect.top + footerRect.height / 2
+
+    footerCenterOffset.x =
+      (footerCenterX - svgRect.left) * (viewBoxWidth / svgRect.width)
+
+    footerCenterOffset.y =
+      (footerCenterY - svgRect.top) * (viewBoxHeight / svgRect.height)
+  }
+
+  refreshNextMeasurements()
 
   // Orb fade when footer reveal reach orb same radius
   const orbFadeRadiusStart = orbEndRadius * 0.85
@@ -2263,9 +2295,7 @@ function setupNextSection() {
     scrub: true,
     markers: false,
 
-    onRefresh: () => {
-      textLiftY = getTextLiftY()
-    },
+    onRefresh: refreshNextMeasurements,
 
     onUpdate: (self) => {
       // Progress phases
@@ -2280,24 +2310,25 @@ function setupNextSection() {
       const pointIndex = Math.floor(pathProgress * (points.length - 1))
       const point = points[pointIndex]
 
-      xTo(point.x - (viewBoxWidth * scaleFactor) / 2 - textOffsetX)
       yTo(point.y - viewBoxHeight / 2 - 30)
+      xTo(point.x - (viewBoxWidth * scaleFactor) / 2 - textOffsetX)
 
       // Text reveal
       const visibleCharacters = Math.floor(pathProgress * totalCharacters)
 
-      const visibleCreamCharacters = Math.min(visibleCharacters, creamCharacters.length)
-      const visibleGradientCharacters = Math.max(0, visibleCharacters - creamCharacters.length)
+      if (visibleCharacters !== previousVisibleCharacters) {
+        const visibleCreamCharacters = Math.min(visibleCharacters, creamCharacters.length)
+        const visibleGradientCharacters = Math.max(
+          0,
+          visibleCharacters - creamCharacters.length,
+        )
 
-      const nextCreamText = creamCharacters.slice(0, visibleCreamCharacters).join("")
-      const nextGradientText = gradientCharacters.slice(0, visibleGradientCharacters).join("")
+        creamTextPart.textContent = creamCharacters.slice(0, visibleCreamCharacters).join("")
+        gradientTextPart.textContent = gradientCharacters
+          .slice(0, visibleGradientCharacters)
+          .join("")
 
-      if (creamTextPart.textContent !== nextCreamText) {
-        creamTextPart.textContent = nextCreamText
-      }
-
-      if (gradientTextPart.textContent !== nextGradientText) {
-        gradientTextPart.textContent = nextGradientText
+        previousVisibleCharacters = visibleCharacters
       }
 
       // Orb visibility
@@ -2306,15 +2337,21 @@ function setupNextSection() {
       // Text natural scroll movement
       const textLiftProgress = getPhaseProgress(finalProgress, textLiftStart, textLiftEnd)
 
-      gsap.set(text, {
-        autoAlpha: 1,
-        y: textLiftY * textLiftProgress,
-      })
+      const textY = textLiftY * textLiftProgress
+
+      if (textY !== previousTextY) {
+        gsap.set(text, {
+          y: textY,
+        })
+
+        previousTextY = textY
+      }
 
       // Orb movement
       const orbMoveProgress = getPhaseProgress(finalProgress, orbMoveStart, orbMoveEnd)
 
-      const footerCenterPoint = getFooterCenterAsSvgPoint()
+      const footerCenterPoint =
+        orbMoveProgress > 0 ? getFooterCenterAsSvgPoint() : orbPoint
 
       const orbX = gsap.utils.interpolate(orbPoint.x, footerCenterPoint.x, orbMoveProgress)
       const orbY = gsap.utils.interpolate(orbPoint.y, footerCenterPoint.y, orbMoveProgress)
@@ -2328,19 +2365,33 @@ function setupNextSection() {
         footerRevealEnd,
       )
 
-      const footerRevealMaxRadius = Math.hypot(footer.offsetWidth / 2, footer.offsetHeight / 2)
-
       const footerRevealRadius = gsap.utils.interpolate(
         0,
         footerRevealMaxRadius,
         footerRevealProgress,
       )
 
-      gsap.set(footer, {
-        clipPath: `circle(${footerRevealRadius}px at 50% 50%)`,
-        webkitClipPath: `circle(${footerRevealRadius}px at 50% 50%)`,
-        pointerEvents: footerRevealProgress > 0.4 ? "auto" : "none",
-      })
+      const shouldUpdateFooterReveal =
+        footerRevealProgress > 0 || previousFooterRevealProgress > 0
+
+      if (shouldUpdateFooterReveal) {
+        const footerClipPath = `circle(${footerRevealRadius}px at 50% 50%)`
+
+        setFooterClipPath(footerClipPath)
+        setFooterWebkitClipPath(footerClipPath)
+      }
+
+      previousFooterRevealProgress = footerRevealProgress
+
+      const footerIsInteractive = footerRevealProgress > 0.4
+
+      if (footerIsInteractive !== previousFooterIsInteractive) {
+        gsap.set(footer, {
+          pointerEvents: footerIsInteractive ? "auto" : "none",
+        })
+
+        previousFooterIsInteractive = footerIsInteractive
+      }
 
       // Orb fades only when footer circle reaches orb radius
       const orbFadeProgress = getPhaseProgress(
@@ -2349,15 +2400,23 @@ function setupNextSection() {
         orbFadeRadiusEnd,
       )
 
-      gsap.set(orb, {
-        autoAlpha: isOrbVisible ? 1 - orbFadeProgress : 0,
-        attr: {
-          cx: orbX,
-          cy: orbY,
-          r: orbRadius,
-          fill: orbColor,
-        },
-      })
+      const orbOpacity = isOrbVisible ? 1 - orbFadeProgress : 0
+
+      const shouldUpdateOrb = orbOpacity > 0 || previousOrbOpacity > 0
+
+      if (shouldUpdateOrb) {
+        gsap.set(orb, {
+          autoAlpha: orbOpacity,
+          attr: {
+            cx: orbX,
+            cy: orbY,
+            r: orbRadius,
+            fill: orbColor,
+          },
+        })
+      }
+
+      previousOrbOpacity = orbOpacity
     },
   })
 

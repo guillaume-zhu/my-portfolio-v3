@@ -690,6 +690,7 @@ body[data-interface-color="dark"] {
   border-radius: 32px;
 
   clip-path: circle(0px at 50% 50%);
+  will-change: clip-path;
   pointer-events: none;
 }
 
