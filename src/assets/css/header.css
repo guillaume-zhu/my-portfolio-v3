@@ -26,8 +26,8 @@
 
 .site-header__logo {
   display: block;
-  width: 48px;
-  height: 48px;
+  width: clamp(36px, 4vw, 48px);
+  height: clamp(36px, 4vw, 48px);
 
   color: inherit;
 }
