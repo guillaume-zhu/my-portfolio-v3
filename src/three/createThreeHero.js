@@ -479,6 +479,7 @@ export const createThreeHero = async ({
   let isReady = false
   let isRunning = false
   let startRequested = autoStart
+  let animationFrameId = null
 
   const renderFrame = () => {
     logo.visible = false
@@ -495,6 +496,8 @@ export const createThreeHero = async ({
   }
 
   const tick = (currentTime) => {
+    if (!isRunning) return
+
     // Time
     const delta = (currentTime - previousTime) / 1000
     previousTime = currentTime
@@ -536,7 +539,7 @@ export const createThreeHero = async ({
     // Render
     renderFrame()
 
-    window.requestAnimationFrame(tick)
+    animationFrameId = window.requestAnimationFrame(tick)
   }
 
   // ------------------------------------------------
@@ -551,7 +554,17 @@ export const createThreeHero = async ({
     isRunning = true
     previousTime = performance.now()
 
-    window.requestAnimationFrame(tick)
+    animationFrameId = window.requestAnimationFrame(tick)
+  }
+
+  const pause = () => {
+    startRequested = false
+    isRunning = false
+
+    if (animationFrameId === null) return
+
+    window.cancelAnimationFrame(animationFrameId)
+    animationFrameId = null
   }
 
   const ready = (async () => {
@@ -583,6 +596,7 @@ export const createThreeHero = async ({
     logoGroup,
     ready,
     start,
+    pause,
     setScrollProgress,
     setInteractive,
   }

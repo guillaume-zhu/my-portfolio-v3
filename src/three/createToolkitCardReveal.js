@@ -83,17 +83,37 @@ export function createToolkitCardReveal(canvas) {
   // 6. Render
   // --------------
   const clock = new THREE.Clock()
+  let isRunning = false
+  let animationFrameId = null
 
   function render() {
     renderer.render(scene, camera)
   }
 
   function tick() {
+    if (!isRunning) return
+
     uniforms.uTime.value = clock.getElapsedTime()
 
     render()
 
-    requestAnimationFrame(tick)
+    animationFrameId = requestAnimationFrame(tick)
+  }
+
+  function start() {
+    if (isRunning) return
+
+    isRunning = true
+    animationFrameId = requestAnimationFrame(tick)
+  }
+
+  function pause() {
+    isRunning = false
+
+    if (animationFrameId === null) return
+
+    cancelAnimationFrame(animationFrameId)
+    animationFrameId = null
   }
 
   // --------------
@@ -112,14 +132,25 @@ export function createToolkitCardReveal(canvas) {
   window.addEventListener("resize", resize)
 
   resize()
-  tick()
 
   // --------------
   // 8. Controls
   // --------------
   function setProgress(progress) {
-    uniforms.uProgress.value = THREE.MathUtils.clamp(progress, 0, 1)
+    const nextProgress = THREE.MathUtils.clamp(progress, 0, 1)
 
+    if (uniforms.uProgress.value === nextProgress) return
+
+    uniforms.uProgress.value = nextProgress
+
+    const shouldAnimate = nextProgress > 0 && nextProgress < 1
+
+    if (shouldAnimate) {
+      start()
+      return
+    }
+
+    pause()
     render()
   }
 

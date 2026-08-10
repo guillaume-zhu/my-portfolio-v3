@@ -125,7 +125,7 @@ const threeHero = await homeReady
 
 await homeLoader.complete()
 
-threeHero?.start()
+setupHeroRenderVisibility(threeHero)
 
 await homeLoader.revealLogo()
 await homeLoader.revealHero()
@@ -704,6 +704,39 @@ function setupHeaderTheme() {
       setInterfaceColor("dark")
     },
   })
+}
+
+// Hero render visibility
+function setupHeroRenderVisibility(threeHero) {
+  if (!threeHero) return
+
+  const frame = document.querySelector(".hero-three__frame")
+
+  if (!frame) {
+    threeHero.start()
+    return
+  }
+
+  const updateRendering = (isVisible) => {
+    if (isVisible) {
+      threeHero.start()
+      return
+    }
+
+    threeHero.pause()
+  }
+
+  const observer = new IntersectionObserver(([entry]) => {
+    updateRendering(entry.isIntersecting)
+  })
+
+  observer.observe(frame)
+
+  // Sync immediately before the observer's first callback.
+  const frameRect = frame.getBoundingClientRect()
+  const isInitiallyVisible = frameRect.bottom > 0 && frameRect.top < window.innerHeight
+
+  updateRendering(isInitiallyVisible)
 }
 
 // Scene Hero
