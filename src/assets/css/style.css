@@ -373,7 +373,7 @@ body[data-interface-color="dark"] {
   margin: 0 auto;
   transform: translateY(-50%);
   will-change: transform;
-  cursor: pointer;
+  cursor: default;
   transition: transform 0.2s ease-out;
   pointer-events: none;
 }
@@ -382,10 +382,15 @@ body[data-interface-color="dark"] {
   cursor: pointer;
 }
 @media (any-hover: hover) and (any-pointer: fine) {
-  .toolkit-card:hover {
+  .toolkit__wheel.is-interactive .toolkit-card:hover {
     transform: translateY(-54%) scale(1.04);
   }
 }
+
+.toolkit-card__motion {
+  will-change: transform;
+}
+
 .toolkit-card img {
   position: absolute;
   inset: 0;

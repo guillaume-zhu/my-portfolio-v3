@@ -1261,6 +1261,20 @@ function setupToolkit() {
   // Interactions
   const hoverZIndex = slots.length + 10
 
+  // Click wave
+  const waveStepDelay = 0.045
+  const waveAttenuation = 0.18
+  const waveMinimumStrength = 0.25
+
+  const wavePressY = 6
+  const wavePressScale = 0.97
+  const wavePressDuration = 0.08
+
+  const waveLiftY = -24
+  const waveLiftScale = 1.07
+  const waveLiftDuration = 0.18
+  const waveSettleDuration = 0.42
+
   // Final transition card
   const transitionCardFullscreenOverscan = 1.1
   const transitionCardFullScreenEase = gsap.parseEase("power3.in")
@@ -1278,12 +1292,20 @@ function setupToolkit() {
   let transitionCardFullscreenScale = 8
   let transitionCardFullscreenViewport = ""
 
+  let activeWaveTimeline = null
+  let activeWaveSlot = null
+  let activeWaveBaseZIndex = 0
+
   // ----------------------
   // 4. Helpers
   // ----------------------
   // Convert progress into 0 -> 1
   const getPhaseProgress = (progress, start, end) => {
     return gsap.utils.clamp(0, 1, (progress - start) / (end - start))
+  }
+
+  const getWaveStrength = (distance) => {
+    return Math.max(waveMinimumStrength, 1 - distance * waveAttenuation)
   }
 
   const getTransitionCardFullscreenScale = () => {
@@ -1399,6 +1421,7 @@ function setupToolkit() {
   // ----------------------
   // 6. Interctions
   // ----------------------
+
   // Hover cards
   function setupCardHover(deckSlots) {
     deckSlots.forEach((slot, index) => {
@@ -1415,10 +1438,139 @@ function setupToolkit() {
 
       card.addEventListener("pointerleave", (event) => {
         if (event.pointerType === "touch") return
+        if (slot === activeWaveSlot) return
 
         gsap.set(slot, {
           zIndex: index + 1,
         })
+      })
+    })
+  }
+
+  // Click animation for one card
+  function createCardWave(motionTargets, strength) {
+    const pressScale = 1 - (1 - wavePressScale) * strength
+    const liftScale = 1 + (waveLiftScale - 1) * strength
+
+    const timeline = gsap.timeline()
+
+    timeline.to(motionTargets, {
+      y: wavePressY * strength,
+      scale: pressScale,
+      duration: wavePressDuration,
+      ease: "power2.in",
+    })
+
+    timeline.to(motionTargets, {
+      y: waveLiftY * strength,
+      scale: liftScale,
+      duration: waveLiftDuration,
+      ease: "power3.out",
+    })
+
+    timeline.to(motionTargets, {
+      y: 0,
+      scale: 1,
+      duration: waveSettleDuration,
+      ease: "elastic.out(0.8, 0.35)",
+    })
+
+    return timeline
+  }
+
+  // Propagate the wave through the visible cards
+  function createDeckWave(deckSlots, sourceIndex) {
+    const deckSlotList = [...deckSlots]
+    const sourceSlot = deckSlotList[sourceIndex]
+
+    if (!sourceSlot?.classList.contains("is-visible")) return null
+
+    const timeline = gsap.timeline({
+      paused: true,
+    })
+
+    deckSlotList.forEach((slot, slotIndex) => {
+      if (!slot.classList.contains("is-visible")) return
+
+      const distance = Math.abs(slotIndex - sourceIndex)
+      const strength = getWaveStrength(distance)
+      const delay = distance * waveStepDelay
+      const motionTargets = slot.querySelectorAll(".toolkit-card__motion")
+      const cardWave = createCardWave(motionTargets, strength)
+
+      timeline.add(cardWave, delay)
+    })
+
+    return timeline
+  }
+
+  // Restore the selected card to its natural depth after the wave.
+  function restoreActiveWaveSlot() {
+    if (!activeWaveSlot) return
+
+    const canHover = window.matchMedia(
+      "(any-hover: hover) and (any-pointer: fine)",
+    ).matches
+
+    const shouldKeepHoverDepth =
+      canHover && activeWaveSlot.matches(":hover")
+
+    gsap.set(activeWaveSlot, {
+      zIndex: shouldKeepHoverDepth
+        ? hoverZIndex
+        : activeWaveBaseZIndex,
+    })
+
+    activeWaveSlot = null
+    activeWaveBaseZIndex = 0
+  }
+
+  // Stop the current wave and restore its animated properties.
+  function stopToolkitWave() {
+    activeWaveTimeline?.kill()
+    restoreActiveWaveSlot()
+
+    const motionTargets = root.querySelectorAll(".toolkit-card__motion")
+
+    gsap.killTweensOf(motionTargets, "y,scale")
+    gsap.set(motionTargets, {
+      y: 0,
+      scale: 1,
+    })
+
+    activeWaveTimeline = null
+  }
+
+  // Play the wave when a card is clicked
+  function setupCardWave(deckSlots) {
+    deckSlots.forEach((slot, index) => {
+      const card = slot.querySelector(".toolkit-card")
+
+      if (!card) return
+
+      card.addEventListener("click", () => {
+        stopToolkitWave()
+
+        const timeline = createDeckWave(deckSlots, index)
+
+        if (!timeline) return
+
+        activeWaveTimeline = timeline
+        activeWaveSlot = slot
+        activeWaveBaseZIndex = index + 1
+
+        gsap.set(slot, {
+          zIndex: hoverZIndex,
+        })
+
+        timeline.eventCallback("onComplete", () => {
+          if (activeWaveTimeline === timeline) {
+            restoreActiveWaveSlot()
+            activeWaveTimeline = null
+          }
+        })
+
+        timeline.play()
       })
     })
   }
@@ -1429,6 +1581,8 @@ function setupToolkit() {
   setInitialState()
   setupCardHover(slots)
   setupCardHover(artSlots)
+  setupCardWave(slots)
+  setupCardWave(artSlots)
 
   // ----------------------
   // 8. Scroll animation
@@ -1442,6 +1596,10 @@ function setupToolkit() {
     markers: false,
 
     onUpdate: (self) => {
+      if (activeWaveTimeline) {
+        stopToolkitWave()
+      }
+
       const isCreamCoveringHeader = self.progress >= headerDarkStart
 
       setInterfaceColor(isCreamCoveringHeader ? "dark" : "cream")
@@ -1449,10 +1607,12 @@ function setupToolkit() {
       // 0. Decks visibility & interactive state
       // ----------------------
       const isArtDeckActive = self.progress >= flipEnd
+      const isArtDeckInteractive =
+        isArtDeckActive && self.progress < finalCollapseEnd
 
       gsap.set(artWheel, {
         autoAlpha: isArtDeckActive ? 1 : 0,
-        pointerEvents: isArtDeckActive ? "auto" : "none",
+        pointerEvents: isArtDeckInteractive ? "auto" : "none",
       })
 
       gsap.set(wheel, {
@@ -1460,7 +1620,7 @@ function setupToolkit() {
         pointerEvents: isArtDeckActive ? "none" : "auto",
       })
 
-      artWheel.classList.toggle("is-interactive", isArtDeckActive)
+      artWheel.classList.toggle("is-interactive", isArtDeckInteractive)
       wheel.classList.toggle("is-interactive", !isArtDeckActive)
 
       // ----------------------
