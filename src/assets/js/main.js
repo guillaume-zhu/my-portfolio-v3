@@ -147,7 +147,7 @@ threeHero?.setInteractive(true)
 document.fonts.ready.then(() => {
   setupManifesto()
   setupTrajectory()
-  const trajectorySentencesTimeline = setupTrajectorySentences()
+  setupTrajectorySentences()
   setupTrajectoryToToolkitTransition()
   setupToolkit()
   const projectsTimeline = setupProjects()
@@ -162,7 +162,6 @@ document.fonts.ready.then(() => {
   lenis.resize()
 
   sectionNavigation.init({
-    trajectorySentencesTimeline,
     projectsTimeline,
     nextSectionTrigger,
   })
@@ -283,16 +282,10 @@ function createSectionNavigation() {
   // 3. Calculate destination
   // ----------------------
   function getTargetScroll(hash, references) {
-    const { trajectorySentencesTimeline, projectsTimeline, nextSectionTrigger } = references
+    const { projectsTimeline, nextSectionTrigger } = references
 
     if (hash === "#hero") {
       return 0
-    }
-
-    if (hash === "#parcours") {
-      const trajectoryTrigger = trajectorySentencesTimeline?.scrollTrigger
-
-      return trajectoryTrigger ? trajectoryTrigger.start + 1 : null
     }
 
     if (hash === "#projects") {
@@ -944,6 +937,20 @@ function setupTrajectorySentences() {
     wrapLettersInSpan(sentence)
   })
 
+  const firstSentence = sentences[0]
+  const firstSentenceLetters = firstSentence.querySelectorAll("span")
+
+  // Keep "D'abord" outside the frame until its dedicated entrance.
+  gsap.set(firstSentence, {
+    yPercent: 50,
+    y: "50vh",
+  })
+
+  gsap.set(firstSentenceLetters, {
+    yPercent: 50,
+    y: "50vh",
+  })
+
   // Pin full sequence
   ScrollTrigger.create({
     trigger: pinHeight,
@@ -963,6 +970,26 @@ function setupTrajectorySentences() {
       markers: false,
     },
   })
+
+  // Give the trajectory title time to leave before revealing "D'abord".
+  tl.to({}, { duration: 0.3 })
+
+  tl.to(firstSentence, {
+    yPercent: 0,
+    y: 0,
+    ease: "power3.out",
+  })
+
+  tl.to(
+    firstSentenceLetters,
+    {
+      yPercent: 0,
+      y: 0,
+      ease: "power3.out",
+      stagger: 0.02,
+    },
+    "<",
+  )
 
   sentences.forEach((sentence, index) => {
     const nextSentence = sentences[index + 1]
