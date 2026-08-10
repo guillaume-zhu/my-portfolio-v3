@@ -1508,17 +1508,12 @@ function setupToolkit() {
   function restoreActiveWaveSlot() {
     if (!activeWaveSlot) return
 
-    const canHover = window.matchMedia(
-      "(any-hover: hover) and (any-pointer: fine)",
-    ).matches
+    const canHover = window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches
 
-    const shouldKeepHoverDepth =
-      canHover && activeWaveSlot.matches(":hover")
+    const shouldKeepHoverDepth = canHover && activeWaveSlot.matches(":hover")
 
     gsap.set(activeWaveSlot, {
-      zIndex: shouldKeepHoverDepth
-        ? hoverZIndex
-        : activeWaveBaseZIndex,
+      zIndex: shouldKeepHoverDepth ? hoverZIndex : activeWaveBaseZIndex,
     })
 
     activeWaveSlot = null
@@ -1607,8 +1602,7 @@ function setupToolkit() {
       // 0. Decks visibility & interactive state
       // ----------------------
       const isArtDeckActive = self.progress >= flipEnd
-      const isArtDeckInteractive =
-        isArtDeckActive && self.progress < finalCollapseEnd
+      const isArtDeckInteractive = isArtDeckActive && self.progress < finalCollapseEnd
 
       gsap.set(artWheel, {
         autoAlpha: isArtDeckActive ? 1 : 0,
@@ -2198,6 +2192,11 @@ function setupNextSection() {
   const pathStart = 0.28
   const pathEnd = 0.82
 
+  // Keep the writing edge toward the right, then center it before the orb transition.
+  const textReadingOffsetRatio = 0.1
+  const textCenteringStart = 0.8
+  const textReadingOffset = viewBoxWidth * scaleFactor * textReadingOffsetRatio
+
   // Orb transition
   const orbRevealStart = 0.06
 
@@ -2240,11 +2239,15 @@ function setupNextSection() {
       const pathProgress = getPhaseProgress(self.progress, pathStart, pathEnd)
       const finalProgress = getPhaseProgress(self.progress, pathEnd, 1)
 
+      const textCenteringProgress = getPhaseProgress(pathProgress, textCenteringStart, 1)
+
+      const textOffsetX = gsap.utils.interpolate(textReadingOffset, 0, textCenteringProgress)
+
       // Camera follows path
       const pointIndex = Math.floor(pathProgress * (points.length - 1))
       const point = points[pointIndex]
 
-      xTo(point.x - (viewBoxWidth * scaleFactor) / 2)
+      xTo(point.x - (viewBoxWidth * scaleFactor) / 2 - textOffsetX)
       yTo(point.y - viewBoxHeight / 2 - 30)
 
       // Text reveal
