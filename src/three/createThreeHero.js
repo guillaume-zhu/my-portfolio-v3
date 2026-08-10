@@ -85,6 +85,7 @@ export const createThreeHero = async ({
   // Rayscaster
   const raycaster = new THREE.Raycaster()
   const mouse = new THREE.Vector2()
+  let hasPointerPosition = false
 
   let hoverTarget = 0
   let hoverProgress = 0
@@ -447,12 +448,15 @@ export const createThreeHero = async ({
 
   // Mouse
   window.addEventListener("mousemove", (event) => {
+    hasPointerPosition = true
+
     mouse.x = (event.clientX / sizes.width) * 2 - 1
     mouse.y = -(event.clientY / sizes.height) * 2 + 1
   })
 
   window.addEventListener("click", () => {
     if (!isInteractive) return
+    if (!hasPointerPosition) return
     if (!hoverTarget) return
     if (hoverProgress < 0.75) return
 
@@ -502,7 +506,7 @@ export const createThreeHero = async ({
     updateSceneFromScroll()
 
     // Hover interaction
-    if (isInteractive) {
+    if (isInteractive && hasPointerPosition) {
       raycaster.setFromCamera(mouse, camera)
       const intersects = raycaster.intersectObject(logoHitBox)
 
@@ -510,6 +514,7 @@ export const createThreeHero = async ({
       document.body.style.cursor = hoverTarget ? "pointer" : "default"
     } else {
       hoverTarget = 0
+      document.body.style.cursor = "default"
     }
 
     hoverProgress = THREE.MathUtils.damp(hoverProgress, hoverTarget, 4.5, delta)
