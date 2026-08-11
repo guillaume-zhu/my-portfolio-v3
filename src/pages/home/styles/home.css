@@ -103,6 +103,61 @@ body[data-interface-color="dark"] {
   position: relative;
   z-index: 2;
   height: 100%;
+  pointer-events: none;
+}
+
+.hero-content__identity {
+  position: absolute;
+  right: clamp(24px, 3vw, 48px);
+  bottom: clamp(24px, 3vw, 48px);
+
+  color: var(--color-cream);
+  text-align: right;
+}
+
+.hero-content__title,
+.hero-content__role {
+  margin: 0;
+}
+
+.hero-content__title {
+  font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
+  font-size: clamp(28px, 3.25vw, 64px);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+}
+
+.hero-content__role {
+  margin-top: 20px;
+  font-family: "CabinetGrotesk-Variable", Arial, Helvetica, sans-serif;
+  font-size: clamp(14px, 1.25vw, 22px);
+  font-weight: 300;
+  line-height: 1;
+  /* letter-spacing: -0.02em; */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hero-content__role span {
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .hero-content__identity {
+    right: 24px;
+    bottom: 88px;
+  }
+
+  .hero-content__title {
+    font-size: clamp(38px, 11vw, 52px);
+  }
+
+  .hero-content__role {
+    margin-top: 20px;
+    font-size: clamp(14px, 4vw, 18px);
+  }
 }
 
 /* -------- MANIFESTO -------- */
