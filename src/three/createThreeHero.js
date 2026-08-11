@@ -39,10 +39,18 @@ export const createThreeHero = async ({
   // Sizes
   // ------------------------------------------------
 
+  const useMobileQuality = window.matchMedia("(hover: none) and (pointer: coarse)").matches
+
+  const qualityProfile = {
+    maxPixelRatio: useMobileQuality ? 1.5 : 2,
+    renderTargetSamples: useMobileQuality ? 0 : 4,
+    textureRoot: useMobileQuality ? "/textures/mobile" : "/textures",
+  }
+
   const sizes = {
     width: window.innerWidth,
     height: window.innerHeight,
-    pixelRatio: Math.min(window.devicePixelRatio, 2),
+    pixelRatio: Math.min(window.devicePixelRatio, qualityProfile.maxPixelRatio),
   }
 
   // ------------------------------------------------
@@ -74,7 +82,7 @@ export const createThreeHero = async ({
     sizes.width * sizes.pixelRatio,
     sizes.height * sizes.pixelRatio,
     {
-      samples: 4,
+      samples: qualityProfile.renderTargetSamples,
     },
   )
 
@@ -98,7 +106,9 @@ export const createThreeHero = async ({
   // Environment
   // ------------------------------------------------
 
-  const environmentTexture = await textureLoader.loadAsync("/textures/scene-gradient.webp")
+  const environmentTexture = await textureLoader.loadAsync(
+    `${qualityProfile.textureRoot}/scene-gradient.webp`,
+  )
 
   environmentTexture.mapping = THREE.EquirectangularReflectionMapping
   environmentTexture.colorSpace = THREE.SRGBColorSpace
@@ -283,7 +293,7 @@ export const createThreeHero = async ({
   const multiplyer3 = 0.6
 
   const textName = await createTextPlane({
-    path: "/textures/texts/text-name.webp",
+    path: `${qualityProfile.textureRoot}/texts/text-name.webp`,
     width: 5.5 * multiplyer1,
     height: 1.4 * multiplyer1,
     position: { x: 0, y: 0, z: -2.5 },
@@ -321,7 +331,7 @@ export const createThreeHero = async ({
   updateTextNameScale()
 
   const textArt = await createTextPlane({
-    path: "/textures/texts/text-art-director-justified.webp",
+    path: `${qualityProfile.textureRoot}/texts/text-art-director-justified.webp`,
     width: 5.5 * multiplyer2,
     height: 1.4 * multiplyer2,
     position: { x: 1, y: 5.25, z: -1.75 },
@@ -331,7 +341,7 @@ export const createThreeHero = async ({
   completeLoadingStep()
 
   const textCreative = await createTextPlane({
-    path: "/textures/texts/text-creative-developer-justified.webp",
+    path: `${qualityProfile.textureRoot}/texts/text-creative-developer-justified.webp`,
     width: 5.5 * multiplyer3,
     height: 1.4 * multiplyer3,
     position: { x: -1, y: 6.5, z: 1.25 },
@@ -430,7 +440,7 @@ export const createThreeHero = async ({
     // Update sizes
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
-    sizes.pixelRatio = Math.min(window.devicePixelRatio, 2)
+    sizes.pixelRatio = Math.min(window.devicePixelRatio, qualityProfile.maxPixelRatio)
 
     // Update camera
     camera.aspect = sizes.width / sizes.height
