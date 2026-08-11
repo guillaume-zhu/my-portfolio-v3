@@ -82,7 +82,7 @@ export function createToolkitCardReveal(canvas) {
   // --------------
   // 6. Render
   // --------------
-  const clock = new THREE.Clock()
+  const timer = new THREE.Timer()
   let isRunning = false
   let animationFrameId = null
 
@@ -90,10 +90,11 @@ export function createToolkitCardReveal(canvas) {
     renderer.render(scene, camera)
   }
 
-  function tick() {
+  function tick(timestamp) {
     if (!isRunning) return
 
-    uniforms.uTime.value = clock.getElapsedTime()
+    timer.update(timestamp)
+    uniforms.uTime.value = timer.getElapsed()
 
     render()
 
