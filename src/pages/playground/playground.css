@@ -40,7 +40,7 @@ body {
   --card-width: clamp(340px, 20vw, 440px);
   --caption-gap: 24px;
   --media-radius: 8px;
-  --media-hover-scale: 1.05;
+  --media-hover-scale: 1.1;
 
   position: relative;
 
@@ -73,6 +73,7 @@ body {
 
 .playground-sphere__media {
   --card-height: calc(var(--card-width) * 0.75);
+  --click-scale: 1;
 
   position: absolute;
 

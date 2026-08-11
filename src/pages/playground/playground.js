@@ -168,7 +168,7 @@ function renderMedias() {
     const position = `translate3d(${tx}px, ${ty}px, ${tz}px)`
     const orientation = `matrix3d(${rot[0]},${rot[3]},${rot[6]},0,${rot[1]},${rot[4]},${rot[7]},0,${rot[2]},${rot[5]},${rot[8]},0,0,0,0,1)`
 
-    media.style.transform = `${position} ${orientation} scaleX(-1)`
+    media.style.transform = `${position} ${orientation} scaleX(-1) scale(var(--click-scale))`
     media.style.opacity = index === initialMediaIndex ? "1" : String(secondaryRevealProgress)
   })
 }
@@ -461,6 +461,66 @@ function settle() {
 // ----------------------
 let dragDist = 0
 
+function getMediaWaveTargets(clickedIndex) {
+  const clickedPosition = basePositions[clickedIndex]
+
+  return basePositions
+    .map((position, index) => {
+      const dotProduct =
+        clickedPosition.x * position.x +
+        clickedPosition.y * position.y +
+        clickedPosition.z * position.z
+
+      const angularDistance = Math.acos(gsap.utils.clamp(-1, 1, dotProduct))
+
+      return {
+        index,
+        angularDistance,
+      }
+    })
+    .sort((a, b) => a.angularDistance - b.angularDistance)
+    .slice(0, 9)
+}
+
+function playMediaClickWave(clickedIndex) {
+  const waveTargets = getMediaWaveTargets(clickedIndex)
+
+  waveTargets.forEach(({ index }, rank) => {
+    const media = medias[index]
+    const isClickedMedia = rank === 0
+
+    const neighborProgress = Math.max(0, rank - 1) / Math.max(1, waveTargets.length - 2)
+
+    const pressScale = isClickedMedia ? 0.85 : gsap.utils.interpolate(0.95, 0.978, neighborProgress)
+
+    const reboundScale = isClickedMedia
+      ? 1.02
+      : gsap.utils.interpolate(1.02, 1.008, neighborProgress)
+
+    gsap.to(media, {
+      keyframes: [
+        {
+          "--click-scale": pressScale,
+          duration: 0.1,
+          ease: "power2.in",
+        },
+        {
+          "--click-scale": reboundScale,
+          duration: 0.4,
+          ease: "back.out(2)",
+        },
+        {
+          "--click-scale": 1,
+          duration: 0.2,
+          ease: "power2.out",
+        },
+      ],
+      delay: rank * 0.025,
+      overwrite: true,
+    })
+  })
+}
+
 function onMediaClick(e) {
   if (dragDist > 3) return
 
@@ -471,6 +531,7 @@ function onMediaClick(e) {
   if (index === -1) return
 
   moving = false
+  playMediaClickWave(index)
   snapToIndex(index)
 }
 
