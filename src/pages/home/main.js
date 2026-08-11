@@ -741,12 +741,21 @@ function setupHeroRenderVisibility(threeHero) {
 
 // Scene Hero
 function setupHeroScroll(threeHero) {
+  const getScrollDistance = () => {
+    const isTouchDevice = window.matchMedia(
+      "(hover: none) and (pointer: coarse)",
+    ).matches
+
+    return isTouchDevice ? 2800 : 4000
+  }
+
   ScrollTrigger.create({
     trigger: ".hero-three",
     start: "top top",
-    end: "+=4000",
+    end: () => `+=${getScrollDistance()}`,
     scrub: true,
     pin: true,
+    invalidateOnRefresh: true,
     markers: false,
 
     onEnter: () => {
