@@ -175,4 +175,7 @@ void main() {
     );
 
     #include <colorspace_fragment>
+
+    // Match the premultiplied-alpha format expected by the canvas compositor.
+    gl_FragColor.rgb *= gl_FragColor.a;
 }

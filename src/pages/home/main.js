@@ -1950,7 +1950,9 @@ function setupProjects() {
   // ----------------------
   // 5. Project physics
   // ----------------------
-  const projectPhysics = createProjectLetterPhysics(links)
+  const projectPhysics = createProjectLetterPhysics(links, {
+    monitorPerformance: !canHover,
+  })
 
   // ----------------------
   // 6. Initial state
@@ -2144,6 +2146,25 @@ function setupNextSection() {
   // ----------------------
   // 5. Text preparation
   // ----------------------
+  function getPathLengthAtX(targetX) {
+    let start = 0
+    let end = path.getTotalLength()
+
+    // The path moves continuously from left to right.
+    for (let i = 0; i < 20; i++) {
+      const middle = (start + end) / 2
+      const point = path.getPointAtLength(middle)
+
+      if (point.x < targetX) {
+        start = middle
+      } else {
+        end = middle
+      }
+    }
+
+    return (start + end) / 2
+  }
+
   const creamFullText = creamTextPart.textContent.trim() + " "
   const gradientFullText = gradientTextPart.textContent.trim().replace(/\.$/, "")
 
@@ -2162,7 +2183,16 @@ function setupNextSection() {
   gradientTextPart.textContent = gradientFullText
   const textLength = textPath.getComputedTextLength()
 
-  const orbLength = textLength + (textLengthWithDot - textLength) / 2
+  const lastCharacterIndex = text.getNumberOfChars() - 1
+  const textEndPoint = text.getEndPositionOfChar(lastCharacterIndex)
+  const textEndLength = getPathLengthAtX(textEndPoint.x)
+
+  const orbGap = Math.max(
+    0,
+    (textLengthWithDot - textLength) / 2,
+  )
+
+  const orbLength = textEndLength + orbGap
 
   creamTextPart.textContent = ""
   gradientTextPart.textContent = ""
@@ -2320,7 +2350,7 @@ function setupNextSection() {
       const point = points[pointIndex]
 
       yTo(point.y - viewBoxHeight / 2 - 30)
-      xTo(point.x - (viewBoxWidth * scaleFactor) / 2 - textOffsetX)
+      xTo(point.x - footerCenterOffset.x - textOffsetX)
 
       // Text reveal
       const visibleCharacters = Math.floor(pathProgress * totalCharacters)

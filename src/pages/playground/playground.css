@@ -195,7 +195,7 @@ body {
   }
   .playground-sphere__caption-meta {
     margin-top: 5px;
-    font-size: clamp(9px, 2.4vw, 10px);
+    font-size: clamp(8px, 2.2vw, 9px);
   }
 }
 

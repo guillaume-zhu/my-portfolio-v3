@@ -89,7 +89,7 @@ export const createHomeLoader = ({ enabled = true, minimumDuration = 1.2 } = {})
         canvas,
         antialias: true,
         alpha: true,
-        premultipliedAlpha: false,
+        premultipliedAlpha: true,
       })
 
       renderer.outputColorSpace = THREE.SRGBColorSpace

@@ -676,6 +676,16 @@ body[data-interface-color="dark"] {
   pointer-events: none;
 }
 
+@media (hover: none) and (pointer: coarse) {
+  .next-section__text {
+    font-size: 240px;
+  }
+
+  #nextTextGradientPart {
+    fill: inherit;
+  }
+}
+
 /* -------- FOOTER -------- */
 .next-footer {
   position: absolute;

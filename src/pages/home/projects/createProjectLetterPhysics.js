@@ -2,7 +2,10 @@ import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import Matter from "matter-js"
 
-export function createProjectLetterPhysics(links) {
+export function createProjectLetterPhysics(
+  links,
+  { monitorPerformance = false } = {},
+) {
   // ----------------------------------
   // 1. MATTER.JS SETUP
   // ----------------------------------
@@ -18,8 +21,37 @@ export function createProjectLetterPhysics(links) {
   const letterBodies = []
 
   let isSettling = false
+  let isPhysicsDisabled = false
 
   let resizeTimeout
+
+  // ----------------------------------
+  // 2. PERFORMANCE MONITORING
+  // ----------------------------------
+
+  let performanceCheckComplete = !monitorPerformance
+  let measuredFrameCount = 0
+  let slowFrameCount = 0
+  let hasLowPerformance = false
+
+  function updatePerformanceCheck(deltaTime) {
+    if (performanceCheckComplete || !Number.isFinite(deltaTime)) return
+
+    measuredFrameCount += 1
+
+    if (deltaTime > 24) {
+      slowFrameCount += 1
+    }
+
+    if (measuredFrameCount < 30) return
+
+    hasLowPerformance = slowFrameCount / measuredFrameCount >= 0.7
+    performanceCheckComplete = true
+
+    if (hasLowPerformance) {
+      disableProjectPhysics()
+    }
+  }
 
   // ----------------------------------
   // 2. CREATE AND REBUILD PHYSICS
@@ -183,11 +215,22 @@ export function createProjectLetterPhysics(links) {
     })
   }
 
+  function disableProjectPhysics() {
+    settleAndStopProjectPhysics()
+
+    isPhysicsDisabled = true
+
+    clearTimeout(resizeTimeout)
+    window.removeEventListener("resize", handleResize)
+  }
+
   // ----------------------------------
   // 4. UPDATE PHYSICS ON EACH FRAME
   // ----------------------------------
 
-  function updateProjectPhysics() {
+  function updateProjectPhysics(_time, deltaTime) {
+    updatePerformanceCheck(deltaTime)
+
     // Advance the Matter.js simulation
     Engine.update(engine, 1000 / 60)
 
@@ -252,6 +295,8 @@ export function createProjectLetterPhysics(links) {
 
   // Restart if come back
   function startProjectPhysics() {
+    if (isPhysicsDisabled) return
+
     isSettling = false
 
     // Restore gravity
@@ -270,6 +315,8 @@ export function createProjectLetterPhysics(links) {
 
   // Progressive stop
   function settleAndStopProjectPhysics() {
+    if (isPhysicsDisabled) return
+
     isSettling = true
 
     // Remove gravity while letters return
@@ -288,7 +335,7 @@ export function createProjectLetterPhysics(links) {
 
   // Scroll velocity transfert
   function setScrollVelocity(velocity) {
-    if (isSettling) return
+    if (isPhysicsDisabled || isSettling) return
 
     const responsiveStrength = gsap.utils.clamp(0.5, 1, window.innerWidth / 1200)
 
