@@ -164,6 +164,8 @@ document.fonts.ready.then(() => {
   // Update Lenis with final document height with GSAP pin spacers
   lenis.resize()
 
+  setupDeferredHomeBackgrounds()
+
   sectionNavigation.init({
     projectsTimeline,
     nextSectionTrigger,
@@ -267,6 +269,14 @@ function createSectionNavigation() {
   // 2. Initial hash
   // ----------------------
   const initialHash = supportedHashes.has(window.location.hash) ? window.location.hash : null
+
+  function loadSectionBackground(hash) {
+    if (hash === "#parcours") {
+      loadTrajectoryBackground()
+    } else if (hash === "#contact") {
+      loadFooterBackground()
+    }
+  }
 
   // Prevent native scrolling before GSAP creates its pin spacing
   if (initialHash) {
@@ -436,6 +446,8 @@ function createSectionNavigation() {
 
         if (targetScroll == null) return
 
+        loadSectionBackground(hash)
+
         if (hash === "#projects") {
           preloadProjectImages()
         }
@@ -483,6 +495,8 @@ function createSectionNavigation() {
 
       if (!supportedHashes.has(hash)) return
 
+      loadSectionBackground(hash)
+
       if (hash === "#projects") {
         preloadProjectImages()
       }
@@ -511,6 +525,8 @@ function createSectionNavigation() {
       // Recalculate every pin after all page resources are loaded
       ScrollTrigger.refresh()
       lenis.resize()
+
+      loadSectionBackground(initialHash)
 
       if (initialHash === "#projects") {
         preloadProjectImages()
@@ -542,6 +558,49 @@ function createSectionNavigation() {
   return {
     init,
   }
+}
+
+function loadTrajectoryBackground() {
+  document.querySelector(".trajectory-sentences")?.classList.add("is-background-ready")
+}
+
+function loadFooterBackground() {
+  document.querySelector(".next-section")?.classList.add("is-background-ready")
+}
+
+function setupDeferredHomeBackgrounds() {
+  const targets = [
+    {
+      element: document.querySelector(".trajectory-sentences"),
+      load: loadTrajectoryBackground,
+    },
+    {
+      element: document.querySelector(".next-section"),
+      load: loadFooterBackground,
+    },
+  ].filter(({ element }) => element)
+
+  if (!targets.length) return
+
+  const loaders = new Map(targets.map(({ element, load }) => [element, load]))
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return
+
+        loaders.get(entry.target)?.()
+        observer.unobserve(entry.target)
+      })
+    },
+    {
+      rootMargin: "2000px 0px",
+    },
+  )
+
+  targets.forEach(({ element }) => {
+    observer.observe(element)
+  })
 }
 
 function setupScrollIndicator() {
