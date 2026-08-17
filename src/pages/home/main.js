@@ -11,7 +11,10 @@ import { setupCrossPageTransitions } from "../../shared/page-transition/setupCro
 import { createThreeHero } from "./webgl/createThreeHero"
 import { createToolkitCardReveal } from "./webgl/createToolkitCardReveal"
 import { createProjectLetterPhysics } from "./projects/createProjectLetterPhysics"
-import { setupProjectImageHover } from "./projects/setupProjectImageHover"
+import {
+  preloadProjectImages,
+  setupProjectImageHover,
+} from "./projects/setupProjectImageHover"
 
 // ----------------------
 // Global setup
@@ -433,6 +436,10 @@ function createSectionNavigation() {
 
         if (targetScroll == null) return
 
+        if (hash === "#projects") {
+          preloadProjectImages()
+        }
+
         event.preventDefault()
         event.stopPropagation()
 
@@ -476,6 +483,10 @@ function createSectionNavigation() {
 
       if (!supportedHashes.has(hash)) return
 
+      if (hash === "#projects") {
+        preloadProjectImages()
+      }
+
       resetNativeAnchorContainer(hash)
 
       requestAnimationFrame(() => {
@@ -500,6 +511,10 @@ function createSectionNavigation() {
       // Recalculate every pin after all page resources are loaded
       ScrollTrigger.refresh()
       lenis.resize()
+
+      if (initialHash === "#projects") {
+        preloadProjectImages()
+      }
 
       requestAnimationFrame(async () => {
         scrollToSection(initialHash, references, {
@@ -1945,6 +1960,14 @@ function setupProjects() {
 
   if (canHover) {
     setupProjectImageHover(links)
+
+    ScrollTrigger.create({
+      trigger: root,
+      start: () => `top bottom+=${window.innerHeight * 5}`,
+      once: true,
+      invalidateOnRefresh: true,
+      onEnter: preloadProjectImages,
+    })
   }
 
   // ----------------------

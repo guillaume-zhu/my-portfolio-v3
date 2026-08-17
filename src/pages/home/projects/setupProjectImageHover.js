@@ -50,19 +50,27 @@ const PROJECT_IMAGES = {
   ],
 }
 
-export function setupProjectImageHover(links) {
-  // ----------------------
-  // 1. Preload images
-  // ----------------------
+let projectImagesPreloadStarted = false
+
+export function preloadProjectImages() {
+  const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches
+
+  if (!canHover) return
+  if (projectImagesPreloadStarted) return
+
+  projectImagesPreloadStarted = true
+
   Object.values(PROJECT_IMAGES).forEach((images) => {
     images.forEach((imageSource) => {
       const image = new Image()
       image.src = imageSource
     })
   })
+}
 
+export function setupProjectImageHover(links) {
   // ----------------------
-  // 2. Setup project hovers
+  // Setup project hovers
   // ----------------------
   links.forEach((link) => {
     // Project data
