@@ -2,6 +2,7 @@ import { gsap } from "gsap"
 import { Observer } from "gsap/Observer"
 
 import { createSiteHeader } from "../../shared/site-header/createSiteHeader"
+import { prefersReducedMotion } from "../../shared/motion/preference"
 import { createIncomingPageTransition } from "../../shared/page-transition/createPageTransition"
 import { setupCrossPageTransitions } from "../../shared/page-transition/setupCrossPageTransitions"
 
@@ -443,8 +444,8 @@ function snapToIndex(index, instant) {
 
   const tween = gsap.to(snap, {
     t: 1,
-    duration: 1,
-    ease: "expo.inOut",
+    duration: prefersReducedMotion ? 0.25 : 1,
+    ease: prefersReducedMotion ? "power2.out" : "expo.inOut",
     onUpdate() {
       for (let k = 0; k < 9; k++) {
         m[k] = mStart[k]
@@ -639,6 +640,15 @@ introTimeline.call(
 )
 
 function startPlaygroundIntro() {
+  if (prefersReducedMotion) {
+    if (shouldRevealTransition) {
+      pageTransition.reveal()
+    }
+
+    introTimeline.progress(1)
+    return
+  }
+
   if (shouldRevealTransition) {
     pageTransition.reveal()
     gsap.delayedCall(0.2, () => {
@@ -721,8 +731,8 @@ medias.forEach((media, index) => {
   videoStates[index] = video ? "paused" : null
 })
 
-const PLAY_THRESHOLD = 0.9
-const PAUSE_THRESHOLD = 0.85
+const PLAY_THRESHOLD = prefersReducedMotion ? 0.96 : 0.9
+const PAUSE_THRESHOLD = prefersReducedMotion ? 0.92 : 0.85
 
 function updateVideoVisibility() {
   for (let i = 0; i < totalMedias; i++) {

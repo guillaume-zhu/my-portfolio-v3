@@ -7,6 +7,7 @@ import logoGlassFragmentShader from "./shaders/logo-glass/fragment.glsl"
 export const createThreeHero = async ({
   autoStart = true,
   onProgress = () => {},
+  reducedMotion = false,
 } = {}) => {
   const totalLoadingSteps = 6
   let completedLoadingSteps = 0
@@ -158,7 +159,7 @@ export const createThreeHero = async ({
 
   // Rotation
   const logoRotationAxis = new THREE.Vector3(0.2, 1, 0.1).normalize()
-  const logoBaseRotationSpeed = 0.2
+  const logoBaseRotationSpeed = reducedMotion ? 0 : 0.2
 
   // ------------------------------------------------
   // Logo Hitbox
@@ -400,7 +401,7 @@ export const createThreeHero = async ({
       1,
     )
 
-    const boost = normalizedVelocity * maxScrollRotationBoost
+    const boost = reducedMotion ? 0 : normalizedVelocity * maxScrollRotationBoost
     scrollRotationBoost = Math.max(scrollRotationBoost, boost)
   }
 

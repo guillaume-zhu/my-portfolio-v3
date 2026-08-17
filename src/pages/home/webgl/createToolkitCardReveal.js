@@ -3,7 +3,7 @@ import * as THREE from "three"
 import vertexShader from "./shaders/toolkit-card-reveal/vertex.glsl"
 import fragmentShader from "./shaders/toolkit-card-reveal/fragment.glsl"
 
-export function createToolkitCardReveal(canvas) {
+export function createToolkitCardReveal(canvas, { reducedMotion = false } = {}) {
   if (!(canvas instanceof HTMLCanvasElement)) return null
 
   // --------------
@@ -143,7 +143,7 @@ export function createToolkitCardReveal(canvas) {
 
     uniforms.uProgress.value = nextProgress
 
-    const shouldAnimate = nextProgress > 0 && nextProgress < 1
+    const shouldAnimate = !reducedMotion && nextProgress > 0 && nextProgress < 1
 
     if (shouldAnimate) {
       start()

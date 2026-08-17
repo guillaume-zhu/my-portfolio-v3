@@ -53,8 +53,17 @@ function measureProjectLetterLayout(links, { neutralizeLinks = false } = {}) {
 
 export function createProjectLetterPhysics(
   links,
-  { monitorPerformance = false } = {},
+  { monitorPerformance = false, disabled = false } = {},
 ) {
+  if (disabled) {
+    return {
+      ensure: () => Promise.resolve(null),
+      start: () => {},
+      settleAndStop: () => {},
+      setScrollVelocity: () => {},
+    }
+  }
+
   let initialLetterLayout = measureProjectLetterLayout(links)
   let measuredViewportWidth = window.innerWidth
   let measuredViewportHeight = window.innerHeight

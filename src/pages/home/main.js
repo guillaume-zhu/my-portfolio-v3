@@ -5,6 +5,7 @@ import "lenis/dist/lenis.css"
 
 import { createHomeLoader } from "./loader/createHomeLoader"
 import { createSiteHeader } from "../../shared/site-header/createSiteHeader"
+import { prefersReducedMotion } from "../../shared/motion/preference"
 import { createIncomingPageTransition } from "../../shared/page-transition/createPageTransition"
 import { setupCrossPageTransitions } from "../../shared/page-transition/setupCrossPageTransitions"
 
@@ -102,6 +103,7 @@ const homeReady = (async () => {
   try {
     const threeHero = await createThreeHero({
       autoStart: false,
+      reducedMotion: prefersReducedMotion,
 
       onProgress: (progress) => {
         homeLoader.setProgress(progress)
@@ -274,7 +276,7 @@ function createSectionNavigation() {
   // ----------------------
   const initialHash = supportedHashes.has(window.location.hash) ? window.location.hash : null
 
-  if (initialHash === "#projects") {
+  if (initialHash === "#projects" && !prefersReducedMotion) {
     void preloadProjectPhysicsModule().catch(() => {})
   }
 
@@ -1364,7 +1366,9 @@ function setupToolkit() {
   const artTransitionSlot = artTransitionCard?.closest(".toolkit__slot")
   const artTransitionReveal = artTransitionCard?.querySelector(".toolkit-card__cream-reveal")
 
-  const cardReveal = createToolkitCardReveal(artTransitionReveal)
+  const cardReveal = createToolkitCardReveal(artTransitionReveal, {
+    reducedMotion: prefersReducedMotion,
+  })
 
   // ----------------------
   // 2. Settings
@@ -2045,6 +2049,7 @@ function setupProjects() {
   // ----------------------
   const projectPhysics = createProjectLetterPhysics(links, {
     monitorPerformance: !canHover,
+    disabled: prefersReducedMotion,
   })
 
   ScrollTrigger.create({
