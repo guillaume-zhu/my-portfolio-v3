@@ -315,6 +315,11 @@ body::-webkit-scrollbar {
   cursor: pointer;
 }
 
+.project-next__link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
 .project-next__link::before {
   content: "";
   position: absolute;
@@ -421,6 +426,11 @@ body::-webkit-scrollbar {
     width 0.55s cubic-bezier(0.77, 0, 0.18, 1),
     background-color 0.3s ease,
     color 0.3s ease;
+}
+
+.project-back:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
 }
 
 .project-back__icon {

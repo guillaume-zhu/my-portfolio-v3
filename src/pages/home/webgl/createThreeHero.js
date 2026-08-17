@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { GLTFLoader } from "three/examples/jsm/Addons.js"
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 
 import logoGlassVertexShader from "./shaders/logo-glass/vertex.glsl"
 import logoGlassFragmentShader from "./shaders/logo-glass/fragment.glsl"

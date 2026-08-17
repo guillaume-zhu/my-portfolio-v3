@@ -310,6 +310,8 @@ function rebase() {
 // 13. Track gesture start/end
 // ----------------------
 function onInput() {
+  cancelSnap()
+
   if (!moving) {
     moving = true
     rebase()
@@ -397,7 +399,20 @@ function axisAngleMatrix(ax, ay, az, angle) {
 
 let snapTween = null
 
+function cancelSnap() {
+  const tween = snapTween
+  if (!tween) return
+
+  tween.kill()
+
+  if (snapTween === tween) {
+    snapTween = null
+  }
+}
+
 function snapToIndex(index, instant) {
+  cancelSnap()
+
   // Initial position
   const [vx, vy, vz] = getTransformedPosition(index)
 
@@ -423,7 +438,7 @@ function snapToIndex(index, instant) {
   const mStart = m.slice()
   const snap = { t: 0 }
 
-  snapTween = gsap.to(snap, {
+  const tween = gsap.to(snap, {
     t: 1,
     duration: 1,
     ease: "expo.inOut",
@@ -438,9 +453,13 @@ function snapToIndex(index, instant) {
       updateVideoVisibility()
     },
     onComplete() {
-      snapTween = null
+      if (snapTween === tween) {
+        snapTween = null
+      }
     },
   })
+
+  snapTween = tween
 }
 
 // ----------------------
