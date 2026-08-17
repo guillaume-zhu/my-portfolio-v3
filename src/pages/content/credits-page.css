@@ -66,7 +66,7 @@ html {
   text-transform: uppercase;
   letter-spacing: 0.08em;
 
-  opacity: 0.6;
+  opacity: 0.65;
 }
 
 .credits-hero__title {
@@ -215,7 +215,7 @@ html {
 .credits-list__creator,
 .credits-list__license {
   font-size: 0.875rem;
-  opacity: 0.6;
+  opacity: 0.65;
 }
 
 .credits-list__license {
@@ -230,7 +230,7 @@ html {
   font-size: 0.875rem;
   line-height: 1.5;
 
-  opacity: 0.6;
+  opacity: 0.65;
 }
 
 /* -------- CREDIT RESOURCE -------- */
@@ -253,7 +253,7 @@ html {
 .credits-resource__meta {
   margin-top: 0.5rem;
   font-size: 0.875rem;
-  opacity: 0.6;
+  opacity: 0.65;
 }
 
 .credits-resource__description {
@@ -281,7 +281,7 @@ html {
   font-size: 0.75rem;
   line-height: 1.5;
 
-  opacity: 0.55;
+  opacity: 0.65;
 }
 
 /* -------- CREDITS TEAM -------- */
@@ -335,7 +335,7 @@ html {
   text-transform: uppercase;
   letter-spacing: 0.08em;
 
-  opacity: 0.5;
+  opacity: 0.65;
 }
 
 .credits-footer__link {
