@@ -1,10 +1,138 @@
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import Matter from "matter-js"
+
+let matterModulePromise = null
+
+export function preloadProjectPhysicsModule() {
+  matterModulePromise ??= import("matter-js").then(({ default: Matter }) => Matter)
+
+  return matterModulePromise
+}
+
+function measureProjectLetterLayout(links, { neutralizeLinks = false } = {}) {
+  const savedTransforms = neutralizeLinks
+    ? [...links].map((link) => link.style.transform)
+    : null
+
+  if (neutralizeLinks) {
+    links.forEach((link) => {
+      link.style.transform = "none"
+    })
+  }
+
+  try {
+    const currentScrollY = window.scrollY
+
+    return [...links].map((link) => {
+      const projectLetters = [...link.querySelectorAll(".project-letter")]
+      const middleIndex = (projectLetters.length - 1) / 2
+
+      return projectLetters.flatMap((letter, index) => {
+        const rect = letter.getBoundingClientRect()
+
+        if (rect.width === 0 || rect.height === 0) return []
+
+        return {
+          element: letter,
+          centerX: rect.left + rect.width / 2,
+          centerY: rect.top + currentScrollY + rect.height / 2,
+          width: rect.width,
+          height: rect.height,
+          weight: middleIndex === 0 ? 0 : Math.abs(index - middleIndex) / middleIndex,
+        }
+      })
+    })
+  } finally {
+    if (neutralizeLinks) {
+      links.forEach((link, index) => {
+        link.style.transform = savedTransforms[index]
+      })
+    }
+  }
+}
 
 export function createProjectLetterPhysics(
   links,
   { monitorPerformance = false } = {},
+) {
+  let initialLetterLayout = measureProjectLetterLayout(links)
+  let measuredViewportWidth = window.innerWidth
+  let measuredViewportHeight = window.innerHeight
+
+  let physicsPromise = null
+  let physicsController = null
+  let shouldRun = false
+  let latestScrollVelocity = 0
+
+  function ensure() {
+    physicsPromise ??= preloadProjectPhysicsModule()
+      .then((Matter) => {
+        const hasViewportChanged =
+          window.innerWidth !== measuredViewportWidth ||
+          window.innerHeight !== measuredViewportHeight
+
+        if (hasViewportChanged) {
+          initialLetterLayout = measureProjectLetterLayout(links, {
+            neutralizeLinks: true,
+          })
+
+          measuredViewportWidth = window.innerWidth
+          measuredViewportHeight = window.innerHeight
+        }
+
+        physicsController = createMatterProjectLetterPhysics(
+          Matter,
+          links,
+          { monitorPerformance },
+          initialLetterLayout,
+        )
+
+        if (shouldRun) {
+          physicsController.start()
+          physicsController.setScrollVelocity(latestScrollVelocity)
+        }
+
+        return physicsController
+      })
+      .catch((error) => {
+        console.error("Unable to initialize Projects physics.", error)
+        return null
+      })
+
+    return physicsPromise
+  }
+
+  return {
+    ensure,
+
+    start() {
+      shouldRun = true
+
+      if (physicsController) {
+        physicsController.start()
+        return
+      }
+
+      ensure()
+    },
+
+    settleAndStop() {
+      shouldRun = false
+      physicsController?.settleAndStop()
+    },
+
+    setScrollVelocity(velocity) {
+      latestScrollVelocity = velocity
+      physicsController?.setScrollVelocity(velocity)
+    },
+  }
+}
+
+function createMatterProjectLetterPhysics(
+  Matter,
+  links,
+  { monitorPerformance = false } = {},
+  initialLetterLayout,
 ) {
   // ----------------------------------
   // 1. MATTER.JS SETUP
@@ -57,7 +185,7 @@ export function createProjectLetterPhysics(
   // 2. CREATE AND REBUILD PHYSICS
   // ----------------------------------
 
-  function createProjectPhysics() {
+  function createProjectPhysics(layout = null) {
     // ----------------------------------
     // Reset previous DOM transformations
     // ----------------------------------
@@ -79,37 +207,26 @@ export function createProjectLetterPhysics(
 
     letterBodies.length = 0
 
-    const currentScrollY = window.scrollY
+    const projectLayouts =
+      layout ?? measureProjectLetterLayout(links, { neutralizeLinks: true })
 
     // ----------------------------------
     // Build each project line separately
     // ----------------------------------
     // Prevents last letter of one project being connected to the next project
 
-    links.forEach((link) => {
-      const projectLetters = link.querySelectorAll(".project-letter")
-
+    projectLayouts.forEach((projectLetters) => {
       const projectLetterBodies = []
-
-      const middleIndex = (projectLetters.length - 1) / 2
 
       // --------------------------------
       // Create one body for each letter
       // --------------------------------
 
-      projectLetters.forEach((letter, index) => {
-        const rect = letter.getBoundingClientRect()
-
-        if (rect.width === 0 || rect.height === 0) {
-          return
-        }
-
-        // Initial center position of the letter
-        const centerX = rect.left + rect.width / 2
-        const centerY = rect.top + currentScrollY + rect.height / 2
+      projectLetters.forEach((letterLayout) => {
+        const { element, centerX, centerY, width, height, weight } = letterLayout
 
         // Invisible physical body
-        const body = Bodies.rectangle(centerX, centerY, rect.width, rect.height, {
+        const body = Bodies.rectangle(centerX, centerY, width, height, {
           frictionAir: 0.05,
           density: 0.001,
 
@@ -132,20 +249,16 @@ export function createProjectLetterPhysics(
           length: 0,
         })
 
-        // Center letters move less Edge letters react more strongly
-        const normalizedDistance =
-          middleIndex === 0 ? 0 : Math.abs(index - middleIndex) / middleIndex
-
         const letterData = {
-          element: letter,
+          element,
           body,
           anchor,
 
           initialX: centerX,
           initialY: centerY,
 
-          width: rect.width,
-          weight: normalizedDistance,
+          width,
+          weight,
         }
 
         projectLetterBodies.push(letterData)
@@ -366,7 +479,7 @@ export function createProjectLetterPhysics(
   // 7. INITIALISATION
   // ----------------------------------
 
-  createProjectPhysics()
+  createProjectPhysics(initialLetterLayout)
 
   // ----------------------------------
   // 8. RETURN

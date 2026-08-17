@@ -10,7 +10,10 @@ import { setupCrossPageTransitions } from "../../shared/page-transition/setupCro
 
 import { createThreeHero } from "./webgl/createThreeHero"
 import { createToolkitCardReveal } from "./webgl/createToolkitCardReveal"
-import { createProjectLetterPhysics } from "./projects/createProjectLetterPhysics"
+import {
+  createProjectLetterPhysics,
+  preloadProjectPhysicsModule,
+} from "./projects/createProjectLetterPhysics"
 import {
   preloadProjectImages,
   setupProjectImageHover,
@@ -153,7 +156,7 @@ document.fonts.ready.then(() => {
   setupTrajectorySentences()
   setupTrajectoryToToolkitTransition()
   setupToolkit()
-  const projectsTimeline = setupProjects()
+  const { projectsTimeline, ensureProjectPhysics } = setupProjects()
   const nextSectionTrigger = setupNextSection()
 
   setupHeaderTheme()
@@ -168,6 +171,7 @@ document.fonts.ready.then(() => {
 
   sectionNavigation.init({
     projectsTimeline,
+    ensureProjectPhysics,
     nextSectionTrigger,
   })
 })
@@ -269,6 +273,10 @@ function createSectionNavigation() {
   // 2. Initial hash
   // ----------------------
   const initialHash = supportedHashes.has(window.location.hash) ? window.location.hash : null
+
+  if (initialHash === "#projects") {
+    void preloadProjectPhysicsModule().catch(() => {})
+  }
 
   function loadSectionBackground(hash) {
     if (hash === "#parcours") {
@@ -450,6 +458,7 @@ function createSectionNavigation() {
 
         if (hash === "#projects") {
           preloadProjectImages()
+          references.ensureProjectPhysics()
         }
 
         event.preventDefault()
@@ -499,6 +508,7 @@ function createSectionNavigation() {
 
       if (hash === "#projects") {
         preloadProjectImages()
+        references.ensureProjectPhysics()
       }
 
       resetNativeAnchorContainer(hash)
@@ -530,6 +540,7 @@ function createSectionNavigation() {
 
       if (initialHash === "#projects") {
         preloadProjectImages()
+        references.ensureProjectPhysics()
       }
 
       requestAnimationFrame(async () => {
@@ -2036,6 +2047,14 @@ function setupProjects() {
     monitorPerformance: !canHover,
   })
 
+  ScrollTrigger.create({
+    trigger: root,
+    start: () => `top bottom+=${window.innerHeight * 5}`,
+    once: true,
+    invalidateOnRefresh: true,
+    onEnter: projectPhysics.ensure,
+  })
+
   // ----------------------
   // 6. Initial state
   // ----------------------
@@ -2140,7 +2159,10 @@ function setupProjects() {
     ">",
   )
 
-  return tl
+  return {
+    projectsTimeline: tl,
+    ensureProjectPhysics: projectPhysics.ensure,
+  }
 }
 
 // What's next section
