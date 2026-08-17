@@ -2,13 +2,13 @@ import gsap from "gsap"
 
 const PROJECT_IMAGES = {
   ghibli: [
-    "/projects/memories-of-ghibli/previews/ghibli-01-square.png",
+    "/projects/memories-of-ghibli/previews/ghibli-01-square.webp",
     "/projects/memories-of-ghibli/previews/ghibli-02-square.webp",
-    "/projects/memories-of-ghibli/previews/ghibli-03-portrait.png",
-    "/projects/memories-of-ghibli/previews/ghibli-04-carre.png",
-    "/projects/memories-of-ghibli/previews/ghibli-05-portrait.png",
-    "/projects/memories-of-ghibli/previews/ghibli-06-carre.png",
-    "/projects/memories-of-ghibli/previews/ghibli-07-carre.png",
+    "/projects/memories-of-ghibli/previews/ghibli-03-portrait.webp",
+    "/projects/memories-of-ghibli/previews/ghibli-04-carre.webp",
+    "/projects/memories-of-ghibli/previews/ghibli-05-portrait.webp",
+    "/projects/memories-of-ghibli/previews/ghibli-06-carre.webp",
+    "/projects/memories-of-ghibli/previews/ghibli-07-carre.webp",
     "/projects/memories-of-ghibli/previews/ghibli-08-portrait.webp",
   ],
   pulse: [
