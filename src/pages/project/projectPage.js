@@ -46,6 +46,7 @@ setupCrossPageTransitions({
 // ----------------------
 document.fonts.ready.then(async () => {
   setupProjectIntro()
+  setupProjectGalleryVideoPlayback()
 
   const projectMedia = gsap.matchMedia()
 
@@ -82,6 +83,54 @@ document.fonts.ready.then(async () => {
 // ============================================================
 // 3. Shared behaviors — desktop and mobile
 // ============================================================
+
+// Gallery video playback
+function setupProjectGalleryVideoPlayback() {
+  const galleryPanel = document.querySelector(".project-panel--gallery")
+
+  if (!galleryPanel) return
+
+  const videos = galleryPanel.querySelectorAll("video")
+
+  if (!videos.length) return
+
+  const ellipsePanel = document.querySelector(".project-panel--ellipse")
+  const activationPanels = [ellipsePanel, galleryPanel].filter(Boolean)
+  const intersectingPanels = new Set()
+
+  const syncPlayback = () => {
+    const shouldPlay = intersectingPanels.size > 0
+
+    videos.forEach((video) => {
+      if (shouldPlay) {
+        video.play().catch(() => {})
+      } else {
+        video.pause()
+      }
+    })
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          intersectingPanels.add(entry.target)
+        } else {
+          intersectingPanels.delete(entry.target)
+        }
+      })
+
+      syncPlayback()
+    },
+    {
+      rootMargin: "1000px",
+    },
+  )
+
+  activationPanels.forEach((panel) => {
+    observer.observe(panel)
+  })
+}
 
 // Intro
 function setupProjectIntro() {
