@@ -171,7 +171,7 @@ body {
 .playground-sphere__caption-meta {
   margin: 8px 0 0;
 
-  font-size: clamp(12px, 0.9vw, 15px);
+  font-size: clamp(16px, 1.5vw, 15px);
   font-weight: 400;
   line-height: 1.2;
   opacity: 0.6;

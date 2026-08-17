@@ -182,13 +182,13 @@ const container = document.querySelector(".playground-sphere__container")
 
 const mm = gsap.matchMedia()
 
-function applyFluidSphereSettings() {
+function applyFluidSphereSettings(radiusScale = 1) {
   const viewportWidth = window.innerWidth
   const cardWidth = medias[0].offsetWidth
 
-  const widthBasedRadius = 0.6 * viewportWidth
-  const cardBasedRadius = 2.5 * cardWidth
-  const heightBasedRadiusLimit = 1.1 * window.innerHeight
+  const widthBasedRadius = 0.6 * viewportWidth * radiusScale
+  const cardBasedRadius = 2.5 * cardWidth * radiusScale
+  const heightBasedRadiusLimit = 1.1 * window.innerHeight * radiusScale
 
   const cardSpacingRadius = Math.min(cardBasedRadius, heightBasedRadiusLimit)
 
@@ -217,13 +217,13 @@ mm.add(
     const { isMobile, isTablet, isCompactMobileLandscape } = context.conditions
 
     if (isMobile) {
-      radius = isCompactMobileLandscape ? 200 : 320
+      radius = isCompactMobileLandscape ? 215 : 340
       gsap.set(stage, {
-        translateZ: isCompactMobileLandscape ? "370px" : "250px",
+        translateZ: isCompactMobileLandscape ? "355px" : "230px",
       })
       gsap.set(container, { perspective: "1000px" })
     } else if (isTablet) {
-      applyFluidSphereSettings()
+      applyFluidSphereSettings(1.06)
     } else {
       applyFluidSphereSettings()
     }
@@ -702,8 +702,8 @@ medias.forEach((media, index) => {
   videoStates[index] = video ? "paused" : null
 })
 
-const PLAY_THRESHOLD = 0.5
-const PAUSE_THRESHOLD = 0.2
+const PLAY_THRESHOLD = 0.9
+const PAUSE_THRESHOLD = 0.85
 
 function updateVideoVisibility() {
   for (let i = 0; i < totalMedias; i++) {
