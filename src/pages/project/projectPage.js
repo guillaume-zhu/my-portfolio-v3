@@ -132,6 +132,52 @@ function setupProjectGalleryVideoPlayback() {
   })
 }
 
+function bindContextLinkTabbability(timeline, links, revealCompleteTime) {
+  if (!links.length) return
+
+  let areLinksTabbable = null
+
+  const sync = () => {
+    const shouldBeTabbable = timeline.time() >= revealCompleteTime
+
+    if (shouldBeTabbable === areLinksTabbable) return
+
+    links.forEach((link) => {
+      if (shouldBeTabbable) {
+        link.removeAttribute("tabindex")
+      } else {
+        link.setAttribute("tabindex", "-1")
+      }
+    })
+
+    areLinksTabbable = shouldBeTabbable
+  }
+
+  timeline.eventCallback("onUpdate", sync)
+  sync()
+}
+
+function bindNextLinkTabbability(timeline, link) {
+  let isLinkTabbable = null
+
+  const sync = () => {
+    const shouldBeTabbable = timeline.progress() === 1
+
+    if (shouldBeTabbable === isLinkTabbable) return
+
+    if (shouldBeTabbable) {
+      link.removeAttribute("tabindex")
+    } else {
+      link.setAttribute("tabindex", "-1")
+    }
+
+    isLinkTabbable = shouldBeTabbable
+  }
+
+  timeline.eventCallback("onUpdate", sync)
+  sync()
+}
+
 // Intro
 function setupProjectIntro() {
   const title = document.querySelector(".project-intro__title")
@@ -166,6 +212,9 @@ function setupProjectIntro() {
     {
       opacity: 1,
       duration: 2,
+      onComplete: () => {
+        backLink.removeAttribute("tabindex")
+      },
     },
     "<+=0.25",
   )
@@ -317,6 +366,7 @@ function setupProjectScroll(galleryData) {
   const container = root.querySelector(".project-scroll__container")
   const track = root.querySelector(".project-scroll__track")
   const galleryPanel = root.querySelector(".project-panel--gallery")
+  const nextLink = root.querySelector(".project-next__link")
 
   // ----------------------
   // 2. Settings
@@ -377,6 +427,8 @@ function setupProjectScroll(galleryData) {
     ease: "none",
   })
 
+  bindNextLinkTabbability(pageTimeline, nextLink)
+
   // Context text reveal
   const cleanupContentReveals = addProjectContentRevals(pageTimeline, root, container)
 
@@ -394,6 +446,7 @@ function addProjectContentRevals(pageTimeline, root, container) {
   const contextPanel = context.closest(".project-panel--context")
   const textsContainer = context.querySelector(".project-context__texts")
   const revealElements = context.querySelectorAll(".project-context__text, .project-context__link")
+  const contextLinks = context.querySelectorAll(".project-context__link")
   const categories = context.querySelectorAll(".project-context__category")
   const ellipse = root.querySelector(".project-ellipse")
 
@@ -497,6 +550,8 @@ function addProjectContentRevals(pageTimeline, root, container) {
         },
         contextRevealDuration,
       )
+
+      bindContextLinkTabbability(contentTimeline, contextLinks, contextRevealDuration)
 
       pageTimeline.add(contentTimeline, contextRevealStart)
 
@@ -684,6 +739,7 @@ function setupMobileProjectContentReveals() {
   const context = document.querySelector(".project-context")
   const textsContainer = context.querySelector(".project-context__texts")
   const revealElements = context.querySelectorAll(".project-context__text, .project-context__link")
+  const contextLinks = context.querySelectorAll(".project-context__link")
   const categories = context.querySelectorAll(".project-context__category")
 
   gsap.set(textsContainer, {
@@ -731,6 +787,14 @@ function setupMobileProjectContentReveals() {
           stagger: 0.5,
         },
         0.1,
+      )
+
+      const contextRevealCompleteTime = contextTimeline.duration()
+
+      bindContextLinkTabbability(
+        contextTimeline,
+        contextLinks,
+        contextRevealCompleteTime,
       )
 
       return contextTimeline
@@ -796,6 +860,7 @@ function setupMobileProjectGallery(galleryData) {
 // Project next
 function setupMobileProjectNext() {
   const root = document.querySelector(".project-next")
+  const link = root.querySelector(".project-next__link")
   const medias = root.querySelectorAll(".project-next__media")
 
   gsap.fromTo(
@@ -819,6 +884,12 @@ function setupMobileProjectNext() {
         trigger: root,
         start: "top 55%",
         toggleActions: "play none none reverse",
+        onEnter: () => {
+          link.removeAttribute("tabindex")
+        },
+        onLeaveBack: () => {
+          link.setAttribute("tabindex", "-1")
+        },
       },
     },
   )
