@@ -18,6 +18,7 @@ setupCrossPageTransitions({
 // ----------------------
 // 1. Dom selections
 // ----------------------
+const sphere = document.querySelector(".playground-sphere")
 const stage = document.querySelector(".playground-sphere__stage")
 const medias = stage.querySelectorAll(".playground-sphere__media")
 const totalMedias = medias.length
@@ -397,6 +398,7 @@ function axisAngleMatrix(ax, ay, az, angle) {
   ]
 }
 
+let selectedMediaIndex = initialMediaIndex
 let snapTween = null
 
 function cancelSnap() {
@@ -411,6 +413,7 @@ function cancelSnap() {
 }
 
 function snapToIndex(index, instant) {
+  selectedMediaIndex = index
   cancelSnap()
 
   // Initial position
@@ -540,6 +543,12 @@ function playMediaClickWave(clickedIndex) {
   })
 }
 
+function selectMedia(index) {
+  moving = false
+  playMediaClickWave(index)
+  snapToIndex(index)
+}
+
 function onMediaClick(e) {
   if (dragDist > 3) return
 
@@ -549,12 +558,22 @@ function onMediaClick(e) {
   const index = Array.prototype.indexOf.call(medias, media)
   if (index === -1) return
 
-  moving = false
-  playMediaClickWave(index)
-  snapToIndex(index)
+  selectMedia(index)
+}
+
+function onSphereKeydown(event) {
+  if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return
+
+  event.preventDefault()
+
+  const direction = event.key === "ArrowRight" ? 1 : -1
+  const nextIndex = (selectedMediaIndex + direction + totalMedias) % totalMedias
+
+  selectMedia(nextIndex)
 }
 
 stage.addEventListener("click", onMediaClick)
+sphere.addEventListener("keydown", onSphereKeydown)
 
 // ----------------------
 // 19. Center the closest card immediately on page load

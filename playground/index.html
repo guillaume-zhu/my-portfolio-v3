@@ -49,7 +49,16 @@
     <main class="playground">
       <h1 class="visually-hidden">Playground — Explorations créatives</h1>
 
-      <section class="playground-sphere" aria-label="Explorations créatives">
+      <section
+        class="playground-sphere"
+        aria-label="Explorations créatives"
+        aria-describedby="playground-keyboard-help"
+        tabindex="0"
+      >
+        <p id="playground-keyboard-help" class="visually-hidden">
+          Utilisez les flèches gauche et droite pour parcourir les explorations.
+        </p>
+
         <div class="playground-sphere__container">
           <div class="playground-sphere__stage">
             <!-- 01 — Solvea Commerce -->
