@@ -132,13 +132,25 @@ function setupProjectGalleryVideoPlayback() {
   })
 }
 
-function bindContextLinkTabbability(timeline, links, revealCompleteTime) {
+function bindContextLinkTabbability(
+  timeline,
+  links,
+  revealCompleteTime,
+  exitTime = Infinity,
+) {
   if (!links.length) return
 
   let areLinksTabbable = null
 
+  const resolveTime = (value) => {
+    return typeof value === "function" ? value() : value
+  }
+
   const sync = () => {
-    const shouldBeTabbable = timeline.time() >= revealCompleteTime
+    const currentTime = timeline.time()
+    const shouldBeTabbable =
+      currentTime >= resolveTime(revealCompleteTime) &&
+      currentTime < resolveTime(exitTime)
 
     if (shouldBeTabbable === areLinksTabbable) return
 
@@ -153,7 +165,13 @@ function bindContextLinkTabbability(timeline, links, revealCompleteTime) {
     areLinksTabbable = shouldBeTabbable
   }
 
-  timeline.eventCallback("onUpdate", sync)
+  const previousOnUpdate = timeline.eventCallback("onUpdate")
+
+  timeline.eventCallback("onUpdate", () => {
+    previousOnUpdate?.()
+    sync()
+  })
+
   sync()
 }
 
@@ -494,6 +512,24 @@ function addProjectContentRevals(pageTimeline, root, container) {
     )
   }
 
+  let contextRevealCompleteTime = Infinity
+  let contextExitTime = Infinity
+
+  const getContextLinksExitTime = () => {
+    if (!contextLinks.length) return Infinity
+
+    const linkRightEdges = [...contextLinks].map((link) => {
+      return (
+        getContextLeft() +
+        textsContainer.offsetLeft +
+        link.offsetLeft +
+        link.offsetWidth
+      )
+    })
+
+    return Math.min(...linkRightEdges)
+  }
+
   // ----------------------
   // 4. Split text and content reveal
   // ----------------------
@@ -504,6 +540,9 @@ function addProjectContentRevals(pageTimeline, root, container) {
       const contextRevealStart = getContextRevealStart()
       const contextRevealEnd = getContextRevealEnd()
       const contextRevealDuration = contextRevealEnd - contextRevealStart
+
+      contextRevealCompleteTime = contextRevealEnd
+      contextExitTime = getContextLinksExitTime()
 
       const lineDuration = contextRevealDuration / split.lines.length
       const categoryDuration = contextRevealDuration * 0.2
@@ -551,13 +590,18 @@ function addProjectContentRevals(pageTimeline, root, container) {
         contextRevealDuration,
       )
 
-      bindContextLinkTabbability(contentTimeline, contextLinks, contextRevealDuration)
-
       pageTimeline.add(contentTimeline, contextRevealStart)
 
       return contentTimeline
     },
   })
+
+  bindContextLinkTabbability(
+    pageTimeline,
+    contextLinks,
+    () => contextRevealCompleteTime,
+    () => contextExitTime,
+  )
 
   // ----------------------
   // 5. Resize refresh
