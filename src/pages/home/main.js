@@ -833,7 +833,7 @@ function setupHeroScroll(threeHero) {
       "(hover: none) and (pointer: coarse)",
     ).matches
 
-    return isTouchDevice ? 2800 : 4000
+    return isTouchDevice ? 2800 : 3500
   }
 
   ScrollTrigger.create({

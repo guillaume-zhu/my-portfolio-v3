@@ -709,6 +709,22 @@ body[data-interface-color="dark"] {
   will-change: opacity, transform;
 }
 
+.next-section__playground-link {
+  position: absolute;
+  top: calc(115% + clamp(12px, 1.5vw, 24px));
+  left: 50%;
+
+  width: max-content;
+
+  color: var(--color-cream);
+  font-family: "Satoshi-Variable", Arial, Helvetica, sans-serif;
+  font-size: clamp(16px, 1.5vw, 24px);
+  line-height: 1.2;
+  text-decoration: none;
+
+  transform: translateX(-50%);
+}
+
 .next-section__svg {
   position: absolute;
   left: 0;
