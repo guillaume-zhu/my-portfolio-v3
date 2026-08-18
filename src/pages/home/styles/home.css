@@ -464,6 +464,16 @@ body[data-interface-color="dark"] {
   }
 }
 
+@media (min-width: 601px) and (max-height: 1000px) {
+  .toolkit__wheel {
+    top: 67svh;
+  }
+
+  .toolkit-card {
+    width: min(clamp(180px, 18vw, 295px), 29svh);
+  }
+}
+
 @media (max-height: 500px) and (orientation: landscape) {
   .toolkit__header {
     top: 4svh;
