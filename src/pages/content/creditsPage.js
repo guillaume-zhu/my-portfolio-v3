@@ -1,8 +1,13 @@
+import { createI18n } from "../../shared/i18n"
 import { createSiteHeader } from "../../shared/site-header/createSiteHeader"
 import { createIncomingPageTransition } from "../../shared/page-transition/createPageTransition"
 import { setupCrossPageTransitions } from "../../shared/page-transition/setupCrossPageTransitions"
 
-createSiteHeader()
+const supportsI18n = document.body.dataset.i18nPage === "ghibli-credits"
+const i18n = supportsI18n ? createI18n() : null
+
+i18n?.applyTranslations()
+createSiteHeader(i18n)
 
 const { pageTransition, shouldRevealTransition } = createIncomingPageTransition()
 

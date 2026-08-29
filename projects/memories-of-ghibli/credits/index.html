@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
 
@@ -14,21 +14,36 @@
 
     <meta
       name="description"
-      content="Crédits, licences et ressources de Memories of Ghibli, projet étudiant expérimental et non commercial inspiré des films de Hayao Miyazaki."
+      content="Credits, licenses and resources for Memories of Ghibli, an experimental, non-commercial student project inspired by the films of Hayao Miyazaki."
+      data-i18n-attr="content:credits.ghibli.description"
     />
-    <title>Crédits &amp; licences — Memories of Ghibli | Guillaume Zhu</title>
+    <title data-i18n="credits.ghibli.title">
+      Credits &amp; licenses — Memories of Ghibli | Guillaume Zhu
+    </title>
     <link rel="canonical" href="https://guillaumezhu.com/projects/memories-of-ghibli/credits/" />
-    <meta property="og:title" content="Crédits &amp; licences — Memories of Ghibli | Guillaume Zhu" />
-    <meta property="og:description" content="Crédits, licences et ressources de Memories of Ghibli, projet étudiant expérimental et non commercial inspiré des films de Hayao Miyazaki." />
+    <meta
+      property="og:title"
+      content="Credits &amp; licenses — Memories of Ghibli | Guillaume Zhu"
+      data-i18n-attr="content:credits.ghibli.title"
+    />
+    <meta
+      property="og:description"
+      content="Credits, licenses and resources for Memories of Ghibli, an experimental, non-commercial student project inspired by the films of Hayao Miyazaki."
+      data-i18n-attr="content:credits.ghibli.description"
+    />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://guillaumezhu.com/projects/memories-of-ghibli/credits/" />
     <meta property="og:image" content="https://guillaumezhu.com/og/memories-of-ghibli.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Aperçu du projet Memories of Ghibli, expérience 3D interactive" />
+    <meta
+      property="og:image:alt"
+      content="Preview of Memories of Ghibli, an interactive 3D experience"
+      data-i18n-attr="content:credits.ghibli.imageAlt"
+    />
   </head>
 
-  <body class="credits-page">
+  <body class="credits-page" data-i18n-page="ghibli-credits">
     <!-------- TRANSITION -------->
     <script>
       if (sessionStorage.getItem("pageTransitionPending") === "true") {
@@ -50,9 +65,10 @@
     <a
       class="credits-page__back"
       href="/projects/memories-of-ghibli/"
-      aria-label="Retour au projet Memories of Ghibli"
+      aria-label="Back to Memories of Ghibli"
+      data-i18n-attr="aria-label:credits.ghibli.backLabel"
     >
-      Retour au projet
+      <span data-i18n="credits.ghibli.backText">Back to project</span>
     </a>
 
     <main class="credits-page__main">
@@ -60,19 +76,23 @@
         <p class="credits-hero__eyebrow">Memories of Ghibli</p>
 
         <h1 class="credits-hero__title">
-          Crédits<br />
-          & licences
+          <span data-i18n="credits.ghibli.heroTitleLine1">Credits</span><br />
+          <span data-i18n="credits.ghibli.heroTitleLine2">&amp; licenses</span>
         </h1>
 
-        <p class="credits-hero__intro">
-          Projet étudiant expérimental et non commercial, inspiré des films de Hayao Miyazaki. Cette
-          création non officielle n’est ni affiliée à, ni approuvée par Studio Ghibli.
+        <p class="credits-hero__intro" data-i18n="credits.ghibli.heroIntro">
+          Experimental, non-commercial student project inspired by the films of Hayao Miyazaki. This
+          unofficial creation is neither affiliated with nor endorsed by Studio Ghibli.
         </p>
 
-        <nav class="credits-hero__nav" aria-label="Sections des crédits">
-          <a href="#models">Modèles 3D</a>
-          <a href="#audio">Musique & son</a>
-          <a href="#typography">Typographie</a>
+        <nav
+          class="credits-hero__nav"
+          aria-label="Credits sections"
+          data-i18n-attr="aria-label:credits.ghibli.navigationLabel"
+        >
+          <a href="#models" data-i18n="credits.ghibli.navigationModels">3D Models</a>
+          <a href="#audio" data-i18n="credits.ghibli.navigationMusic">Music &amp; Sound</a>
+          <a href="#typography" data-i18n="credits.ghibli.navigationTypography">Typography</a>
           <a href="#data">TMDB</a>
           <a href="#production">Production</a>
         </nav>
@@ -80,11 +100,11 @@
 
       <div class="credits-content">
         <section class="credits-section" id="models">
-          <h2 class="credits-section__title">Modèles 3D</h2>
+          <h2 class="credits-section__title" data-i18n="credits.ghibli.modelsTitle">3D Models</h2>
 
-          <p class="credits-section__intro">
-            Les modèles 3D externes ont été sélectionnés, adaptés et optimisés sous Blender pour
-            leur intégration dans une expérience WebGL.
+          <p class="credits-section__intro" data-i18n="credits.ghibli.modelsIntro">
+            External 3D models were curated, adapted and optimized in Blender for integration into a
+            WebGL experience.
           </p>
 
           <div class="credits-section__body">
@@ -687,15 +707,17 @@
               </li>
             </ul>
 
-            <p class="credits-section__note">
-              Certains modèles complémentaires ont été générés avec Tripo, puis adaptés, optimisés
-              et intégrés par l’équipe du projet.
+            <p class="credits-section__note" data-i18n="credits.ghibli.modelsNote">
+              Additional models were generated with Tripo, then adapted, optimized and integrated by
+              the project team.
             </p>
           </div>
         </section>
 
         <section class="credits-section" id="audio">
-          <h2 class="credits-section__title">Musique & ambiance sonore</h2>
+          <h2 class="credits-section__title" data-i18n="credits.ghibli.musicTitle">
+            Music &amp; Sound
+          </h2>
 
           <div class="credits-section__body">
             <div class="credits-resource">
@@ -703,8 +725,11 @@
 
               <p class="credits-resource__meta">Kevin MacLeod · Incompetech</p>
 
-              <p class="credits-resource__description">
-                Musique d’ambiance intégrée à l’expérience.
+              <p
+                class="credits-resource__description"
+                data-i18n="credits.ghibli.etherealDescription"
+              >
+                Ambient music featured in the experience.
               </p>
 
               <div class="credits-resource__links">
@@ -758,15 +783,17 @@
                 </a>
               </div>
 
-              <p class="credits-resource__legal">
-                Utilisé dans le cadre d’un projet étudiant expérimental, gratuit et non commercial.
+              <p class="credits-resource__legal" data-i18n="credits.ghibli.seaCliffLegal">
+                Used as part of an experimental, free and non-commercial student project.
               </p>
             </div>
           </div>
         </section>
 
         <section class="credits-section" id="typography">
-          <h2 class="credits-section__title">Typographie</h2>
+          <h2 class="credits-section__title" data-i18n="credits.ghibli.typographyTitle">
+            Typography
+          </h2>
 
           <div class="credits-section__body">
             <div class="credits-resource">
@@ -774,8 +801,11 @@
 
               <p class="credits-resource__meta">GUST e-foundry</p>
 
-              <p class="credits-resource__description">
-                Typographie principale utilisée dans l’interface de l’expérience.
+              <p
+                class="credits-resource__description"
+                data-i18n="credits.ghibli.typographyDescription"
+              >
+                Primary typeface used throughout the experience interface.
               </p>
 
               <div class="credits-resource__links">
@@ -800,7 +830,9 @@
         </section>
 
         <section class="credits-section" id="data">
-          <h2 class="credits-section__title">Données cinématographiques</h2>
+          <h2 class="credits-section__title" data-i18n="credits.ghibli.filmDataTitle">
+            Film Data
+          </h2>
 
           <div class="credits-section__body">
             <div class="credits-resource">
@@ -808,14 +840,17 @@
 
               <p class="credits-resource__meta">TMDB API</p>
 
-              <p class="credits-resource__description">
-                Les affiches, notes, synopsis et bandes-annonces présentés dans l’expérience sont
-                fournis par The Movie Database.
+              <p
+                class="credits-resource__description"
+                data-i18n="credits.ghibli.filmDataDescription"
+              >
+                Posters, ratings, synopses and trailers featured in the experience are provided by
+                The Movie Database.
               </p>
 
               <div class="credits-resource__links">
                 <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">
-                  Visiter TMDB ↗
+                  <span data-i18n="credits.ghibli.filmDataCta">Visit TMDB ↗</span>
                 </a>
               </div>
 
@@ -831,45 +866,47 @@
 
           <div class="credits-section__body">
             <div class="credits-resource">
-              <h3 class="credits-resource__title">Équipe du projet</h3>
+              <h3 class="credits-resource__title" data-i18n="credits.ghibli.teamTitle">
+                Project Team
+              </h3>
 
-              <p class="credits-resource__description">
-                Memories of Ghibli a été conçu et développé dans le cadre d’un projet étudiant
-                collectif.
+              <p class="credits-resource__description" data-i18n="credits.ghibli.teamIntro">
+                Memories of Ghibli was designed and developed as a collaborative student project.
               </p>
 
               <ul class="credits-team">
                 <li class="credits-team__member">
                   <span class="credits-team__name">Guillaume</span>
-                  <span class="credits-team__role">
-                    Direction artistique, pilotage d’équipe, scène 3D, environnements et
-                    optimisation des assets
+                  <span class="credits-team__role" data-i18n="credits.ghibli.guillaumeRole">
+                    Art direction, team leadership, 3D scene, environments and asset optimization
                   </span>
                 </li>
 
                 <li class="credits-team__member">
                   <span class="credits-team__name">Karen</span>
-                  <span class="credits-team__role"> Optimisation GPU, instancing et BVH </span>
+                  <span class="credits-team__role" data-i18n="credits.ghibli.karenRole">
+                    GPU optimization, instancing and BVH
+                  </span>
                 </li>
 
                 <li class="credits-team__member">
                   <span class="credits-team__name">Ramy</span>
-                  <span class="credits-team__role">
-                    Interface, HUD, système de progression et intégration de l’API
+                  <span class="credits-team__role" data-i18n="credits.ghibli.ramyRole">
+                    Interface, HUD, progression system and API integration
                   </span>
                 </li>
 
                 <li class="credits-team__member">
                   <span class="credits-team__name">Nassim</span>
-                  <span class="credits-team__role">
-                    Expérience de jeu, interactions et gestion des données
+                  <span class="credits-team__role" data-i18n="credits.ghibli.nassimRole">
+                    Gameplay experience, interactions and data management
                   </span>
                 </li>
               </ul>
 
-              <p class="credits-resource__legal">
-                Les interfaces, éléments graphiques et ressources non mentionnés sur cette page ont
-                été réalisés, générés ou adaptés par l’équipe du projet.
+              <p class="credits-resource__legal" data-i18n="credits.ghibli.teamLegal">
+                Interfaces, graphic elements and resources not listed on this page were created,
+                generated or adapted by the project team.
               </p>
             </div>
           </div>
@@ -877,10 +914,12 @@
       </div>
 
       <footer class="credits-footer">
-        <p class="credits-footer__label">Fin des crédits</p>
+        <p class="credits-footer__label" data-i18n="credits.ghibli.footerLabel">
+          End of credits
+        </p>
 
         <a class="credits-footer__link" href="/projects/memories-of-ghibli/">
-          <span>Retour au projet</span>
+          <span data-i18n="credits.ghibli.footerBack">Back to project</span>
           <span class="credits-footer__arrow" aria-hidden="true">↗</span>
         </a>
       </footer>

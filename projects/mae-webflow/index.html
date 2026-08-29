@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
 
@@ -15,18 +15,31 @@
 
     <meta
       name="description"
-      content="Conception et développement du portfolio de Maë : direction visuelle, interactions, animations GSAP et base Webflow autonome."
+      content="Design and development of Maë’s portfolio: visual direction, interactions, GSAP animations and an autonomous Webflow foundation."
+      data-i18n-attr="content:projects.mae.description"
     />
-    <title>Maë — Portfolio Webflow | Guillaume Zhu</title>
+    <title data-i18n="projects.mae.title">Maë — Webflow Portfolio | Guillaume Zhu</title>
     <link rel="canonical" href="https://guillaumezhu.com/projects/mae-webflow/" />
-    <meta property="og:title" content="Maë — Portfolio Webflow | Guillaume Zhu" />
-    <meta property="og:description" content="Conception et développement du portfolio de Maë : direction visuelle, interactions, animations GSAP et base Webflow autonome." />
+    <meta
+      property="og:title"
+      content="Maë — Webflow Portfolio | Guillaume Zhu"
+      data-i18n-attr="content:projects.mae.title"
+    />
+    <meta
+      property="og:description"
+      content="Design and development of Maë’s portfolio: visual direction, interactions, GSAP animations and an autonomous Webflow foundation."
+      data-i18n-attr="content:projects.mae.description"
+    />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://guillaumezhu.com/projects/mae-webflow/" />
     <meta property="og:image" content="https://guillaumezhu.com/og/mae.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Aperçu du projet Maë, portfolio Webflow" />
+    <meta
+      property="og:image:alt"
+      content="Preview of Maë, a Webflow portfolio project"
+      data-i18n-attr="content:projects.mae.imageAlt"
+    />
   </head>
 
   <body class="project-page" data-project="webflow" data-theme="dark">
@@ -52,7 +65,8 @@
       class="project-back"
       href="/#projects"
       tabindex="-1"
-      aria-label="Retour à la liste des projets"
+      aria-label="Back to project list"
+      data-i18n-attr="aria-label:projects.mae.backLabel"
     >
       <svg
         class="project-back__icon"
@@ -116,10 +130,10 @@
 
                   <h1 class="project-intro__title">Maë<br />webflow</h1>
 
-                  <p class="visually-hidden">
-                    Aperçu du portfolio de Maë : une navigation animée présentant ses projets,
-                    associée à une identité visuelle fondée sur des dégradés colorés et un logotype
-                    dédié.
+                  <p class="visually-hidden" data-i18n="projects.mae.introDescription">
+                    Preview of Maë’s portfolio: an animated navigation showcasing her projects,
+                    paired with a visual identity built around colorful gradients and a dedicated
+                    logotype.
                   </p>
                 </div>
               </section>
@@ -134,15 +148,14 @@
                   </ul>
 
                   <div class="project-context__texts">
-                    <p class="project-context__text">
-                      Conception et développement du portfolio de Maë, de la direction visuelle aux
+                    <p class="project-context__text" data-i18n="projects.mae.context1">
+                      Design and development of Maë’s portfolio, from visual direction to
                       interactions.
                     </p>
-                    <p class="project-context__text">
-                      Porté par une série d’animations GSAP, le site transforme la navigation en
-                      parcours narratif mettant en valeur sa personnalité, ses compétences et ses
-                      projets, tout en lui offrant une base Webflow autonome et facile à faire
-                      évoluer.
+                    <p class="project-context__text" data-i18n="projects.mae.context2">
+                      Driven by a series of GSAP animations, the site turns navigation into a
+                      narrative journey highlighting her personality, skills and projects, while
+                      providing an autonomous Webflow foundation that is easy to maintain and evolve.
                     </p>
 
                     <div class="project-context__links">
@@ -153,7 +166,7 @@
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        Voir le portfolio
+                        <span data-i18n="projects.mae.viewPortfolio">View the portfolio</span>
                         <span aria-hidden="true">↗</span>
                       </a>
                     </div>
@@ -166,7 +179,8 @@
                 <div class="project-ellipse">
                   <img
                     src="/projects/mae-webflow/media/webflow-ellipse1.webp"
-                    alt="Cartes en effet de verre présentant le positionnement et les compétences de Maë sur le dégradé caractéristique de son identité visuelle."
+                    alt="Glass-effect cards presenting Maë’s positioning and skills over the signature gradient of her visual identity."
+                    data-i18n-attr="alt:projects.mae.ellipseAlt"
                     class="project-ellipse__visual"
                   loading="lazy"
                   decoding="async"
@@ -198,7 +212,8 @@
                       <img
                         class="project-gallery__media"
                         src="/projects/mae-webflow/media/webflow-gallery1.webp"
-                        alt="Interface du portfolio présentant la sélection et la mise en avant d’un projet."
+                        alt="Portfolio interface showcasing the selection and presentation of a project."
+                        data-i18n-attr="alt:projects.mae.gallery1Alt"
                       loading="lazy"
                       decoding="async"
                       />
@@ -209,7 +224,8 @@
                       <img
                         class="project-gallery__media"
                         src="/projects/mae-webflow/media/webflow-gallery2.webp"
-                        alt="Dégradé coloré caractéristique de l’identité visuelle du portfolio de Maë."
+                        alt="Color gradient characteristic of Maë’s portfolio visual identity."
+                        data-i18n-attr="alt:projects.mae.gallery2Alt"
                       loading="lazy"
                       decoding="async"
                       />
@@ -226,9 +242,9 @@
                         preload="metadata"
                         aria-hidden="true"
                       ></video>
-                      <p class="visually-hidden">
-                        Section animée du portfolio présentant la vision globale de Maë et ses
-                        différents domaines d’expertise.
+                      <p class="visually-hidden" data-i18n="projects.mae.gallery3Description">
+                        Animated portfolio section presenting Maë’s overall vision and areas of
+                        expertise.
                       </p>
                     </div>
 
@@ -243,9 +259,9 @@
                         preload="metadata"
                         aria-hidden="true"
                       ></video>
-                      <p class="visually-hidden">
-                        Section du portfolio présentant son approche à travers un texte animé par
-                        des effets de révélation GSAP.
+                      <p class="visually-hidden" data-i18n="projects.mae.gallery4Description">
+                        Portfolio section presenting her approach through text animated with GSAP
+                        reveal effects.
                       </p>
                     </div>
 
@@ -254,7 +270,8 @@
                       <img
                         class="project-gallery__media"
                         src="/projects/mae-webflow/media/webflow-gallery5.webp"
-                        alt="Page projet du portfolio présentant le contexte et la démarche du projet Vkard."
+                        alt="Project page presenting the context and approach behind the Vkard project."
+                        data-i18n-attr="alt:projects.mae.gallery5Alt"
                       loading="lazy"
                       decoding="async"
                       />
@@ -265,7 +282,8 @@
                       <img
                         class="project-gallery__media"
                         src="/projects/mae-webflow/media/webflow-gallery6.webp"
-                        alt="Variante de l’identité visuelle du portfolio de Maë, associant son logotype à un dégradé coloré."
+                        alt="Variation of Maë’s portfolio visual identity, combining her logotype with a colorful gradient."
+                        data-i18n-attr="alt:projects.mae.gallery6Alt"
                       loading="lazy"
                       decoding="async"
                       />
@@ -297,15 +315,22 @@
                     href="/projects/ornate/"
                     class="project-next__link"
                     tabindex="-1"
-                    aria-label="Découvrir le projet Ornate"
+                    aria-label="Discover Ornate"
+                    data-i18n-attr="aria-label:projects.mae.nextLabel"
                   >
                     <h2 class="project-next__title">
                       <!-- Left word -->
-                      <span class="project-next__word project-next__word--left">À</span>
+                      <span
+                        class="project-next__word project-next__word--left"
+                        data-i18n="projects.mae.nextLeft"
+                      >Up</span>
 
                       <!-- Right word group -->
                       <span class="project-next__right">
-                        <span class="project-next__word project-next__word--right">suivre</span>
+                        <span
+                          class="project-next__word project-next__word--right"
+                          data-i18n="projects.mae.nextRight"
+                        >next</span>
 
                         <span class="project-next__project-name">ornate</span>
                       </span>

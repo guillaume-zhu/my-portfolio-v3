@@ -9,7 +9,9 @@ import { createSiteHeader } from "../../shared/site-header/createSiteHeader"
 import { createIncomingPageTransition } from "../../shared/page-transition/createPageTransition"
 import { setupCrossPageTransitions } from "../../shared/page-transition/setupCrossPageTransitions"
 
-const supportsI18n = document.body.dataset.project === "memories-of-ghibli"
+const supportsI18n = ["memories-of-ghibli", "pulse", "webflow", "mirage", "ornate"].includes(
+  document.body.dataset.project,
+)
 const i18n = supportsI18n ? createI18n() : null
 
 i18n?.applyTranslations()
