@@ -120,6 +120,80 @@
   font-weight: 700;
 }
 
+.site-header__language-switch {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.3em;
+
+  padding: 0;
+  border: 0;
+
+  color: inherit;
+  background: none;
+
+  font-family: "Satoshi-Variable", Arial, Helvetica, sans-serif;
+  font-size: clamp(16px, 1.3vw, 20px);
+  font-weight: 500;
+  line-height: 1;
+
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.site-header__language-switch span {
+  opacity: 0.45;
+  transition: opacity 0.25s ease;
+}
+
+.site-header__language-switch span.is-active {
+  opacity: 1;
+}
+
+.site-header__language-switch span:first-child,
+.site-header__language-switch span:last-child {
+  position: relative;
+}
+
+.site-header__language-switch span:first-child::after,
+.site-header__language-switch span:last-child::after {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  bottom: -0.3em;
+
+  width: 100%;
+  height: 1px;
+
+  background-color: currentColor;
+
+  transform: scaleX(0);
+  transform-origin: left center;
+
+  transition: transform 0.35s ease;
+}
+
+.site-header__language-switch:hover span:first-child:not(.is-active),
+.site-header__language-switch:hover span:last-child:not(.is-active),
+.site-header__language-switch:focus-visible span:first-child:not(.is-active),
+.site-header__language-switch:focus-visible span:last-child:not(.is-active) {
+  opacity: 1;
+}
+
+.site-header__language-switch:hover span:first-child:not(.is-active)::after,
+.site-header__language-switch:hover span:last-child:not(.is-active)::after,
+.site-header__language-switch:focus-visible span:first-child:not(.is-active)::after,
+.site-header__language-switch:focus-visible span:last-child:not(.is-active)::after {
+  transform: scaleX(1);
+}
+
+.site-header__language-switch:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
 @media (max-width: 600px) {
   .site-header {
     padding: 24px;
@@ -131,5 +205,16 @@
 
   .site-header__link--secondary {
     display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .site-header__nav {
+    gap: 8px;
+  }
+
+  .site-header__link,
+  .site-header__language-switch {
+    font-size: clamp(13px, 3.9vw, 14px);
   }
 }

@@ -4,13 +4,18 @@ import { SplitText } from "gsap/SplitText"
 import Lenis from "lenis"
 import "lenis/dist/lenis.css"
 
+import { createI18n } from "../../shared/i18n"
 import { createSiteHeader } from "../../shared/site-header/createSiteHeader"
 import { createIncomingPageTransition } from "../../shared/page-transition/createPageTransition"
 import { setupCrossPageTransitions } from "../../shared/page-transition/setupCrossPageTransitions"
 
-gsap.registerPlugin(ScrollTrigger, SplitText)
+const supportsI18n = document.body.dataset.project === "memories-of-ghibli"
+const i18n = supportsI18n ? createI18n() : null
 
-createSiteHeader()
+i18n?.applyTranslations()
+createSiteHeader(i18n)
+
+gsap.registerPlugin(ScrollTrigger, SplitText)
 
 // ----------------------
 // 1. Global setup — Lenis and page transitions
