@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
 
@@ -14,21 +14,34 @@
 
     <meta
       name="description"
-      content="Mentions légales du portfolio de Guillaume Zhu : édition, hébergement, propriété intellectuelle et données personnelles."
+      content="Legal notice for Guillaume Zhu’s portfolio: publisher, hosting, intellectual property and personal data."
+      data-i18n-attr="content:legal.description"
     />
-    <title>Mentions légales | Guillaume Zhu</title>
+    <title data-i18n="legal.title">Legal Notice | Guillaume Zhu</title>
     <link rel="canonical" href="https://guillaumezhu.com/mentions-legales/" />
-    <meta property="og:title" content="Mentions légales | Guillaume Zhu" />
-    <meta property="og:description" content="Mentions légales du portfolio de Guillaume Zhu : édition, hébergement, propriété intellectuelle et données personnelles." />
+    <meta
+      property="og:title"
+      content="Legal Notice | Guillaume Zhu"
+      data-i18n-attr="content:legal.title"
+    />
+    <meta
+      property="og:description"
+      content="Legal notice for Guillaume Zhu’s portfolio: publisher, hosting, intellectual property and personal data."
+      data-i18n-attr="content:legal.description"
+    />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://guillaumezhu.com/mentions-legales/" />
     <meta property="og:image" content="https://guillaumezhu.com/og/home.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Logo 3D de Guillaume Zhu avec les mentions Front Creative Developer et Art Director" />
+    <meta
+      property="og:image:alt"
+      content="Guillaume Zhu’s 3D logo featuring the titles Front Creative Developer and Art Director"
+      data-i18n-attr="content:legal.imageAlt"
+    />
   </head>
 
-  <body class="credits-page">
+  <body class="credits-page" data-i18n-page="legal-notice">
     <!-------- TRANSITION -------->
     <script>
       if (sessionStorage.getItem("pageTransitionPending") === "true") {
@@ -47,64 +60,80 @@
     <!-------- HEADER -------->
     <header class="site-header"></header>
 
-    <a class="credits-page__back" href="/" aria-label="Retour à l’accueil"> Retour à l’accueil </a>
+    <a
+      class="credits-page__back"
+      href="/"
+      aria-label="Back to home"
+      data-i18n="legal.backHome"
+      data-i18n-attr="aria-label:legal.backHome"
+    >Back to home</a>
 
     <main class="credits-page__main">
       <header class="credits-hero">
         <p class="credits-hero__eyebrow">guillaumezhu.com</p>
 
         <h1 class="credits-hero__title">
-          Mentions<br />
-          légales
+          <span data-i18n="legal.heroTitleLine1">Legal</span><br />
+          <span data-i18n="legal.heroTitleLine2">Notice</span>
         </h1>
 
-        <p class="credits-hero__intro">
-          Informations relatives à l’édition, l’hébergement, la propriété intellectuelle et
-          l’utilisation des données sur ce portfolio.
+        <p class="credits-hero__intro" data-i18n="legal.heroIntro">
+          Information regarding the publication, hosting, intellectual property and use of data on
+          this portfolio.
         </p>
 
-        <nav class="credits-hero__nav" aria-label="Sections des mentions légales">
-          <a href="#editeur">Éditeur</a>
-          <a href="#hebergement">Hébergement</a>
-          <a href="#propriete">Propriété intellectuelle</a>
-          <a href="#donnees">Données personnelles</a>
+        <nav
+          class="credits-hero__nav"
+          aria-label="Legal notice sections"
+          data-i18n-attr="aria-label:legal.navigationLabel"
+        >
+          <a href="#editeur" data-i18n="legal.navigationPublisher">Publisher</a>
+          <a href="#hebergement" data-i18n="legal.navigationHosting">Hosting</a>
+          <a href="#propriete" data-i18n="legal.navigationProperty">Intellectual Property</a>
+          <a href="#donnees" data-i18n="legal.navigationData">Personal Data</a>
           <a href="#cookies">Cookies</a>
         </nav>
       </header>
 
       <div class="credits-content">
         <section class="credits-section" id="editeur">
-          <h2 class="credits-section__title">Éditeur du site</h2>
+          <h2 class="credits-section__title" data-i18n="legal.publisherTitle">
+            Website Publisher
+          </h2>
 
-          <p class="credits-section__intro">
-            Ce site est un portfolio personnel et professionnel présentant des projets de direction
-            artistique, design digital et développement front-end.
+          <p class="credits-section__intro" data-i18n="legal.publisherIntro">
+            This website is a personal and professional portfolio showcasing projects in art
+            direction, digital design and front-end development.
           </p>
 
           <div class="credits-section__body">
             <div class="credits-resource">
               <h3 class="credits-resource__title">Guillaume Zhu</h3>
 
-              <p class="credits-resource__meta">
-                Direction artistique · Design digital · Développement front-end
+              <p class="credits-resource__meta" data-i18n="legal.publisherMeta">
+                Art Direction · Digital Design · Front-end Development
               </p>
 
-              <p class="credits-resource__description">Site web : guillaumezhu.com</p>
+              <p class="credits-resource__description" data-i18n="legal.publisherWebsite">
+                Website: guillaumezhu.com
+              </p>
 
               <div class="credits-resource__links">
                 <a href="mailto:contact@guillaumezhu.com"> contact@guillaumezhu.com </a>
               </div>
 
-              <p class="credits-resource__legal">Responsable de la publication : Guillaume Zhu.</p>
+              <p class="credits-resource__legal" data-i18n="legal.publisherLegal">
+                Publication manager: Guillaume Zhu.
+              </p>
             </div>
           </div>
         </section>
 
         <section class="credits-section" id="hebergement">
-          <h2 class="credits-section__title">Hébergement</h2>
+          <h2 class="credits-section__title" data-i18n="legal.hostingTitle">Hosting</h2>
 
-          <p class="credits-section__intro">
-            Le site est déployé via Vercel. Le nom de domaine est conservé auprès d’OVHcloud.
+          <p class="credits-section__intro" data-i18n="legal.hostingIntro">
+            The website is deployed through Vercel. The domain name is registered with OVHcloud.
           </p>
 
           <div class="credits-section__body">
@@ -115,7 +144,9 @@
                 440 N Barranca Ave #4133, Covina, CA 91723, United States
               </p>
 
-              <p class="credits-resource__description">Hébergeur technique du site.</p>
+              <p class="credits-resource__description" data-i18n="legal.hostingDescription">
+                Technical hosting provider for the website.
+              </p>
 
               <div class="credits-resource__links">
                 <a href="https://vercel.com" target="_blank" rel="noopener noreferrer">
@@ -125,78 +156,92 @@
             </div>
 
             <div class="credits-resource">
-              <h3 class="credits-resource__title">Nom de domaine</h3>
+              <h3 class="credits-resource__title" data-i18n="legal.domainTitle">Domain Name</h3>
 
               <p class="credits-resource__meta">guillaumezhu.com · OVHcloud</p>
 
-              <p class="credits-resource__description">
-                Le nom de domaine du site est enregistré auprès d’OVHcloud.
+              <p class="credits-resource__description" data-i18n="legal.domainDescription">
+                The website’s domain name is registered with OVHcloud.
               </p>
             </div>
           </div>
         </section>
 
         <section class="credits-section" id="propriete">
-          <h2 class="credits-section__title">Propriété intellectuelle</h2>
+          <h2 class="credits-section__title" data-i18n="legal.propertyTitle">
+            Intellectual Property
+          </h2>
 
-          <p class="credits-section__intro">
-            Les contenus présentés sur ce site sont protégés par le droit de la propriété
-            intellectuelle.
+          <p class="credits-section__intro" data-i18n="legal.propertyIntro">
+            The content presented on this website is protected by intellectual property law.
           </p>
 
           <div class="credits-section__body">
             <div class="credits-resource">
-              <h3 class="credits-resource__title">Contenus du site</h3>
+              <h3 class="credits-resource__title" data-i18n="legal.websiteContentTitle">
+                Website Content
+              </h3>
 
-              <p class="credits-resource__description">
-                Sauf mention contraire, l’ensemble des contenus présents sur ce site est la
-                propriété de Guillaume Zhu : textes, interfaces, animations, éléments graphiques,
-                choix de direction artistique, intégrations et développements front-end.
+              <p class="credits-resource__description" data-i18n="legal.websiteContentParagraph1">
+                Unless otherwise stated, all content featured on this website is the property of
+                Guillaume Zhu, including texts, interfaces, animations, graphic elements, art
+                direction, integrations and front-end development.
               </p>
 
-              <p class="credits-resource__description">
-                Toute reproduction, représentation, modification, diffusion ou exploitation totale
-                ou partielle de ces contenus, sans autorisation préalable, est interdite.
+              <p class="credits-resource__description" data-i18n="legal.websiteContentParagraph2">
+                Any reproduction, representation, modification, distribution or full or partial use
+                of this content without prior authorization is prohibited.
               </p>
             </div>
 
             <div class="credits-resource">
-              <h3 class="credits-resource__title">Projets, images et ressources externes</h3>
+              <h3 class="credits-resource__title" data-i18n="legal.externalResourcesTitle">
+                Projects, Images &amp; External Resources
+              </h3>
 
-              <p class="credits-resource__description">
-                Certains projets peuvent intégrer des ressources externes, des éléments générés,
-                composés ou retouchés, ainsi que des créations réalisées dans un cadre fictif,
-                expérimental, pédagogique ou personnel.
+              <p
+                class="credits-resource__description"
+                data-i18n="legal.externalResourcesParagraph1"
+              >
+                Some projects may incorporate external resources, generated, composited or retouched
+                elements, as well as creations produced within fictional, experimental, educational
+                or personal contexts.
               </p>
 
-              <p class="credits-resource__description">
-                Lorsque nécessaire, les crédits spécifiques sont indiqués directement dans les pages
-                projets concernées.
+              <p
+                class="credits-resource__description"
+                data-i18n="legal.externalResourcesParagraph2"
+              >
+                Where necessary, specific credits are provided directly on the relevant project
+                pages.
               </p>
             </div>
           </div>
         </section>
 
         <section class="credits-section" id="donnees">
-          <h2 class="credits-section__title">Données personnelles</h2>
+          <h2 class="credits-section__title" data-i18n="legal.personalDataTitle">
+            Personal Data
+          </h2>
 
-          <p class="credits-section__intro">
-            Ce portfolio ne propose pas de compte utilisateur, de formulaire d’inscription ou de
-            newsletter.
+          <p class="credits-section__intro" data-i18n="legal.personalDataIntro">
+            This portfolio does not provide user accounts, registration forms or newsletters.
           </p>
 
           <div class="credits-section__body">
             <div class="credits-resource">
-              <h3 class="credits-resource__title">Contact par email</h3>
+              <h3 class="credits-resource__title" data-i18n="legal.emailTitle">
+                Contact by Email
+              </h3>
 
-              <p class="credits-resource__description">
-                Si vous contactez l’éditeur du site par email, les informations transmises seront
-                utilisées uniquement pour répondre à votre demande.
+              <p class="credits-resource__description" data-i18n="legal.emailParagraph1">
+                If you contact the website publisher by email, the information you provide will be
+                used solely to respond to your request.
               </p>
 
-              <p class="credits-resource__description">
-                Vous pouvez demander l’accès, la rectification ou la suppression des informations
-                vous concernant en écrivant à l’adresse de contact indiquée sur cette page.
+              <p class="credits-resource__description" data-i18n="legal.emailParagraph2">
+                You may request access to, correction or deletion of information concerning you by
+                writing to the contact address provided on this page.
               </p>
             </div>
           </div>
@@ -205,53 +250,63 @@
         <section class="credits-section" id="cookies">
           <h2 class="credits-section__title">Cookies</h2>
 
-          <p class="credits-section__intro">
-            Le site privilégie une expérience simple, sans publicité ciblée ni suivi marketing.
+          <p class="credits-section__intro" data-i18n="legal.cookiesIntro">
+            The website prioritizes a simple experience without targeted advertising or marketing
+            tracking.
           </p>
 
           <div class="credits-section__body">
             <div class="credits-resource">
-              <h3 class="credits-resource__title">Cookies et mesure d’audience</h3>
+              <h3 class="credits-resource__title" data-i18n="legal.cookiesAnalyticsTitle">
+                Cookies &amp; Analytics
+              </h3>
 
-              <p class="credits-resource__description">
-                Ce site n’utilise pas de cookies publicitaires.
+              <p class="credits-resource__description" data-i18n="legal.cookiesParagraph1">
+                This website does not use advertising cookies.
               </p>
 
-              <p class="credits-resource__description">
-                À ce jour, aucun outil de mesure d’audience nécessitant un consentement préalable
-                n’est intégré au site.
+              <p class="credits-resource__description" data-i18n="legal.cookiesParagraph2">
+                At present, no audience measurement tool requiring prior consent is integrated into
+                the website.
               </p>
 
-              <p class="credits-resource__legal">
-                Si un outil d’analyse d’audience est ajouté ultérieurement, cette page sera mise à
-                jour afin de préciser son fonctionnement.
+              <p class="credits-resource__legal" data-i18n="legal.cookiesLegal">
+                If an analytics tool is added in the future, this page will be updated to explain how
+                it operates.
               </p>
             </div>
           </div>
         </section>
 
         <section class="credits-section" id="mise-a-jour">
-          <h2 class="credits-section__title">Mise à jour</h2>
+          <h2 class="credits-section__title" data-i18n="legal.updatesTitle">Updates</h2>
 
-          <p class="credits-section__intro">
-            Cette page pourra évoluer en fonction des outils intégrés au site.
+          <p class="credits-section__intro" data-i18n="legal.updatesIntro">
+            This page may be updated depending on the tools integrated into the website.
           </p>
 
           <div class="credits-section__body">
             <div class="credits-resource">
-              <h3 class="credits-resource__title">Dernière mise à jour</h3>
+              <h3 class="credits-resource__title" data-i18n="legal.lastUpdatedTitle">
+                Last Updated
+              </h3>
 
-              <p class="credits-resource__meta">Juillet 2026</p>
+              <p class="credits-resource__meta" data-i18n="legal.lastUpdatedDate">July 2026</p>
+
+              <p class="credits-resource__legal" data-i18n="legal.englishNotice">
+                This English version is provided for informational purposes. In case of discrepancy,
+                the French version prevails.
+              </p>
             </div>
           </div>
         </section>
       </div>
 
       <footer class="credits-footer">
-        <p class="credits-footer__label">Fin des mentions légales</p>
+        <p class="credits-footer__label" data-i18n="legal.footerLabel">End of Legal Notice</p>
 
         <a class="credits-footer__link" href="/">
-          <span>Retour à l’accueil</span>
+          <span data-i18n="legal.footerBack">Back to home</span>
           <span class="credits-footer__arrow" aria-hidden="true">↗</span>
         </a>
       </footer>

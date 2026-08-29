@@ -221,6 +221,81 @@ export default {
     keyboardHelp: "Use the left and right arrow keys to browse the explorations.",
   },
 
+  legal: {
+    title: "Legal Notice | Guillaume Zhu",
+    description:
+      "Legal notice for Guillaume Zhu’s portfolio: publisher, hosting, intellectual property and personal data.",
+    imageAlt:
+      "Guillaume Zhu’s 3D logo featuring the titles Front Creative Developer and Art Director",
+    backHome: "Back to home",
+
+    heroTitleLine1: "Legal",
+    heroTitleLine2: "Notice",
+    heroIntro:
+      "Information regarding the publication, hosting, intellectual property and use of data on this portfolio.",
+
+    navigationLabel: "Legal notice sections",
+    navigationPublisher: "Publisher",
+    navigationHosting: "Hosting",
+    navigationProperty: "Intellectual Property",
+    navigationData: "Personal Data",
+
+    publisherTitle: "Website Publisher",
+    publisherIntro:
+      "This website is a personal and professional portfolio showcasing projects in art direction, digital design and front-end development.",
+    publisherMeta: "Art Direction · Digital Design · Front-end Development",
+    publisherWebsite: "Website: guillaumezhu.com",
+    publisherLegal: "Publication manager: Guillaume Zhu.",
+
+    hostingTitle: "Hosting",
+    hostingIntro:
+      "The website is deployed through Vercel. The domain name is registered with OVHcloud.",
+    hostingDescription: "Technical hosting provider for the website.",
+    domainTitle: "Domain Name",
+    domainDescription: "The website’s domain name is registered with OVHcloud.",
+
+    propertyTitle: "Intellectual Property",
+    propertyIntro: "The content presented on this website is protected by intellectual property law.",
+    websiteContentTitle: "Website Content",
+    websiteContentParagraph1:
+      "Unless otherwise stated, all content featured on this website is the property of Guillaume Zhu, including texts, interfaces, animations, graphic elements, art direction, integrations and front-end development.",
+    websiteContentParagraph2:
+      "Any reproduction, representation, modification, distribution or full or partial use of this content without prior authorization is prohibited.",
+    externalResourcesTitle: "Projects, Images & External Resources",
+    externalResourcesParagraph1:
+      "Some projects may incorporate external resources, generated, composited or retouched elements, as well as creations produced within fictional, experimental, educational or personal contexts.",
+    externalResourcesParagraph2:
+      "Where necessary, specific credits are provided directly on the relevant project pages.",
+
+    personalDataTitle: "Personal Data",
+    personalDataIntro:
+      "This portfolio does not provide user accounts, registration forms or newsletters.",
+    emailTitle: "Contact by Email",
+    emailParagraph1:
+      "If you contact the website publisher by email, the information you provide will be used solely to respond to your request.",
+    emailParagraph2:
+      "You may request access to, correction or deletion of information concerning you by writing to the contact address provided on this page.",
+
+    cookiesIntro:
+      "The website prioritizes a simple experience without targeted advertising or marketing tracking.",
+    cookiesAnalyticsTitle: "Cookies & Analytics",
+    cookiesParagraph1: "This website does not use advertising cookies.",
+    cookiesParagraph2:
+      "At present, no audience measurement tool requiring prior consent is integrated into the website.",
+    cookiesLegal:
+      "If an analytics tool is added in the future, this page will be updated to explain how it operates.",
+
+    updatesTitle: "Updates",
+    updatesIntro: "This page may be updated depending on the tools integrated into the website.",
+    lastUpdatedTitle: "Last Updated",
+    lastUpdatedDate: "July 2026",
+    englishNotice:
+      "This English version is provided for informational purposes. In case of discrepancy, the French version prevails.",
+
+    footerLabel: "End of Legal Notice",
+    footerBack: "Back to home",
+  },
+
   credits: {
     ghibli: {
       title: "Credits & licenses — Memories of Ghibli | Guillaume Zhu",

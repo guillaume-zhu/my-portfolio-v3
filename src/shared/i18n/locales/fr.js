@@ -222,6 +222,81 @@ export default {
     keyboardHelp: "Utilisez les flèches gauche et droite pour parcourir les explorations.",
   },
 
+  legal: {
+    title: "Mentions légales | Guillaume Zhu",
+    description:
+      "Mentions légales du portfolio de Guillaume Zhu : édition, hébergement, propriété intellectuelle et données personnelles.",
+    imageAlt:
+      "Logo 3D de Guillaume Zhu avec les mentions Front Creative Developer et Art Director",
+    backHome: "Retour à l’accueil",
+
+    heroTitleLine1: "Mentions",
+    heroTitleLine2: "légales",
+    heroIntro:
+      "Informations relatives à l’édition, l’hébergement, la propriété intellectuelle et l’utilisation des données sur ce portfolio.",
+
+    navigationLabel: "Sections des mentions légales",
+    navigationPublisher: "Éditeur",
+    navigationHosting: "Hébergement",
+    navigationProperty: "Propriété intellectuelle",
+    navigationData: "Données personnelles",
+
+    publisherTitle: "Éditeur du site",
+    publisherIntro:
+      "Ce site est un portfolio personnel et professionnel présentant des projets de direction artistique, design digital et développement front-end.",
+    publisherMeta: "Direction artistique · Design digital · Développement front-end",
+    publisherWebsite: "Site web : guillaumezhu.com",
+    publisherLegal: "Responsable de la publication : Guillaume Zhu.",
+
+    hostingTitle: "Hébergement",
+    hostingIntro:
+      "Le site est déployé via Vercel. Le nom de domaine est conservé auprès d’OVHcloud.",
+    hostingDescription: "Hébergeur technique du site.",
+    domainTitle: "Nom de domaine",
+    domainDescription: "Le nom de domaine du site est enregistré auprès d’OVHcloud.",
+
+    propertyTitle: "Propriété intellectuelle",
+    propertyIntro:
+      "Les contenus présentés sur ce site sont protégés par le droit de la propriété intellectuelle.",
+    websiteContentTitle: "Contenus du site",
+    websiteContentParagraph1:
+      "Sauf mention contraire, l’ensemble des contenus présents sur ce site est la propriété de Guillaume Zhu : textes, interfaces, animations, éléments graphiques, choix de direction artistique, intégrations et développements front-end.",
+    websiteContentParagraph2:
+      "Toute reproduction, représentation, modification, diffusion ou exploitation totale ou partielle de ces contenus, sans autorisation préalable, est interdite.",
+    externalResourcesTitle: "Projets, images et ressources externes",
+    externalResourcesParagraph1:
+      "Certains projets peuvent intégrer des ressources externes, des éléments générés, composés ou retouchés, ainsi que des créations réalisées dans un cadre fictif, expérimental, pédagogique ou personnel.",
+    externalResourcesParagraph2:
+      "Lorsque nécessaire, les crédits spécifiques sont indiqués directement dans les pages projets concernées.",
+
+    personalDataTitle: "Données personnelles",
+    personalDataIntro:
+      "Ce portfolio ne propose pas de compte utilisateur, de formulaire d’inscription ou de newsletter.",
+    emailTitle: "Contact par email",
+    emailParagraph1:
+      "Si vous contactez l’éditeur du site par email, les informations transmises seront utilisées uniquement pour répondre à votre demande.",
+    emailParagraph2:
+      "Vous pouvez demander l’accès, la rectification ou la suppression des informations vous concernant en écrivant à l’adresse de contact indiquée sur cette page.",
+
+    cookiesIntro:
+      "Le site privilégie une expérience simple, sans publicité ciblée ni suivi marketing.",
+    cookiesAnalyticsTitle: "Cookies et mesure d’audience",
+    cookiesParagraph1: "Ce site n’utilise pas de cookies publicitaires.",
+    cookiesParagraph2:
+      "À ce jour, aucun outil de mesure d’audience nécessitant un consentement préalable n’est intégré au site.",
+    cookiesLegal:
+      "Si un outil d’analyse d’audience est ajouté ultérieurement, cette page sera mise à jour afin de préciser son fonctionnement.",
+
+    updatesTitle: "Mise à jour",
+    updatesIntro: "Cette page pourra évoluer en fonction des outils intégrés au site.",
+    lastUpdatedTitle: "Dernière mise à jour",
+    lastUpdatedDate: "Juillet 2026",
+    englishNotice: "",
+
+    footerLabel: "Fin des mentions légales",
+    footerBack: "Retour à l’accueil",
+  },
+
   credits: {
     ghibli: {
       title: "Crédits & licences — Memories of Ghibli | Guillaume Zhu",
