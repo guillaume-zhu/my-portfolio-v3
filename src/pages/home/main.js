@@ -5,13 +5,20 @@ import "lenis/dist/lenis.css"
 
 import { createHomeLoader } from "./loader/createHomeLoader"
 import { createSiteHeader } from "../../shared/site-header/createSiteHeader"
+import { prefersReducedMotion } from "../../shared/motion/preference"
 import { createIncomingPageTransition } from "../../shared/page-transition/createPageTransition"
 import { setupCrossPageTransitions } from "../../shared/page-transition/setupCrossPageTransitions"
 
 import { createThreeHero } from "./webgl/createThreeHero"
 import { createToolkitCardReveal } from "./webgl/createToolkitCardReveal"
-import { createProjectLetterPhysics } from "./projects/createProjectLetterPhysics"
-import { setupProjectImageHover } from "./projects/setupProjectImageHover"
+import {
+  createProjectLetterPhysics,
+  preloadProjectPhysicsModule,
+} from "./projects/createProjectLetterPhysics"
+import {
+  preloadProjectImages,
+  setupProjectImageHover,
+} from "./projects/setupProjectImageHover"
 
 // ----------------------
 // Global setup
@@ -96,6 +103,7 @@ const homeReady = (async () => {
   try {
     const threeHero = await createThreeHero({
       autoStart: false,
+      reducedMotion: prefersReducedMotion,
 
       onProgress: (progress) => {
         homeLoader.setProgress(progress)
@@ -150,7 +158,7 @@ document.fonts.ready.then(() => {
   setupTrajectorySentences()
   setupTrajectoryToToolkitTransition()
   setupToolkit()
-  const projectsTimeline = setupProjects()
+  const { projectsTimeline, ensureProjectPhysics } = setupProjects()
   const nextSectionTrigger = setupNextSection()
 
   setupHeaderTheme()
@@ -161,8 +169,11 @@ document.fonts.ready.then(() => {
   // Update Lenis with final document height with GSAP pin spacers
   lenis.resize()
 
+  setupDeferredHomeBackgrounds()
+
   sectionNavigation.init({
     projectsTimeline,
+    ensureProjectPhysics,
     nextSectionTrigger,
   })
 })
@@ -264,6 +275,18 @@ function createSectionNavigation() {
   // 2. Initial hash
   // ----------------------
   const initialHash = supportedHashes.has(window.location.hash) ? window.location.hash : null
+
+  if (initialHash === "#projects" && !prefersReducedMotion) {
+    void preloadProjectPhysicsModule().catch(() => {})
+  }
+
+  function loadSectionBackground(hash) {
+    if (hash === "#parcours") {
+      loadTrajectoryBackground()
+    } else if (hash === "#contact") {
+      loadFooterBackground()
+    }
+  }
 
   // Prevent native scrolling before GSAP creates its pin spacing
   if (initialHash) {
@@ -433,6 +456,13 @@ function createSectionNavigation() {
 
         if (targetScroll == null) return
 
+        loadSectionBackground(hash)
+
+        if (hash === "#projects") {
+          preloadProjectImages()
+          references.ensureProjectPhysics()
+        }
+
         event.preventDefault()
         event.stopPropagation()
 
@@ -476,6 +506,13 @@ function createSectionNavigation() {
 
       if (!supportedHashes.has(hash)) return
 
+      loadSectionBackground(hash)
+
+      if (hash === "#projects") {
+        preloadProjectImages()
+        references.ensureProjectPhysics()
+      }
+
       resetNativeAnchorContainer(hash)
 
       requestAnimationFrame(() => {
@@ -500,6 +537,13 @@ function createSectionNavigation() {
       // Recalculate every pin after all page resources are loaded
       ScrollTrigger.refresh()
       lenis.resize()
+
+      loadSectionBackground(initialHash)
+
+      if (initialHash === "#projects") {
+        preloadProjectImages()
+        references.ensureProjectPhysics()
+      }
 
       requestAnimationFrame(async () => {
         scrollToSection(initialHash, references, {
@@ -527,6 +571,49 @@ function createSectionNavigation() {
   return {
     init,
   }
+}
+
+function loadTrajectoryBackground() {
+  document.querySelector(".trajectory-sentences")?.classList.add("is-background-ready")
+}
+
+function loadFooterBackground() {
+  document.querySelector(".next-section")?.classList.add("is-background-ready")
+}
+
+function setupDeferredHomeBackgrounds() {
+  const targets = [
+    {
+      element: document.querySelector(".trajectory-sentences"),
+      load: loadTrajectoryBackground,
+    },
+    {
+      element: document.querySelector(".next-section"),
+      load: loadFooterBackground,
+    },
+  ].filter(({ element }) => element)
+
+  if (!targets.length) return
+
+  const loaders = new Map(targets.map(({ element, load }) => [element, load]))
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return
+
+        loaders.get(entry.target)?.()
+        observer.unobserve(entry.target)
+      })
+    },
+    {
+      rootMargin: "2000px 0px",
+    },
+  )
+
+  targets.forEach(({ element }) => {
+    observer.observe(element)
+  })
 }
 
 function setupScrollIndicator() {
@@ -746,7 +833,7 @@ function setupHeroScroll(threeHero) {
       "(hover: none) and (pointer: coarse)",
     ).matches
 
-    return isTouchDevice ? 2800 : 4000
+    return isTouchDevice ? 2800 : 3500
   }
 
   ScrollTrigger.create({
@@ -1279,7 +1366,9 @@ function setupToolkit() {
   const artTransitionSlot = artTransitionCard?.closest(".toolkit__slot")
   const artTransitionReveal = artTransitionCard?.querySelector(".toolkit-card__cream-reveal")
 
-  const cardReveal = createToolkitCardReveal(artTransitionReveal)
+  const cardReveal = createToolkitCardReveal(artTransitionReveal, {
+    reducedMotion: prefersReducedMotion,
+  })
 
   // ----------------------
   // 2. Settings
@@ -1945,12 +2034,31 @@ function setupProjects() {
 
   if (canHover) {
     setupProjectImageHover(links)
+
+    ScrollTrigger.create({
+      trigger: root,
+      start: () => `top bottom+=${window.innerHeight * 5}`,
+      once: true,
+      invalidateOnRefresh: true,
+      onEnter: preloadProjectImages,
+    })
   }
 
   // ----------------------
   // 5. Project physics
   // ----------------------
-  const projectPhysics = createProjectLetterPhysics(links)
+  const projectPhysics = createProjectLetterPhysics(links, {
+    monitorPerformance: !canHover,
+    disabled: prefersReducedMotion,
+  })
+
+  ScrollTrigger.create({
+    trigger: root,
+    start: () => `top bottom+=${window.innerHeight * 5}`,
+    once: true,
+    invalidateOnRefresh: true,
+    onEnter: projectPhysics.ensure,
+  })
 
   // ----------------------
   // 6. Initial state
@@ -2056,7 +2164,10 @@ function setupProjects() {
     ">",
   )
 
-  return tl
+  return {
+    projectsTimeline: tl,
+    ensureProjectPhysics: projectPhysics.ensure,
+  }
 }
 
 // What's next section
@@ -2144,6 +2255,25 @@ function setupNextSection() {
   // ----------------------
   // 5. Text preparation
   // ----------------------
+  function getPathLengthAtX(targetX) {
+    let start = 0
+    let end = path.getTotalLength()
+
+    // The path moves continuously from left to right.
+    for (let i = 0; i < 20; i++) {
+      const middle = (start + end) / 2
+      const point = path.getPointAtLength(middle)
+
+      if (point.x < targetX) {
+        start = middle
+      } else {
+        end = middle
+      }
+    }
+
+    return (start + end) / 2
+  }
+
   const creamFullText = creamTextPart.textContent.trim() + " "
   const gradientFullText = gradientTextPart.textContent.trim().replace(/\.$/, "")
 
@@ -2162,7 +2292,16 @@ function setupNextSection() {
   gradientTextPart.textContent = gradientFullText
   const textLength = textPath.getComputedTextLength()
 
-  const orbLength = textLength + (textLengthWithDot - textLength) / 2
+  const lastCharacterIndex = text.getNumberOfChars() - 1
+  const textEndPoint = text.getEndPositionOfChar(lastCharacterIndex)
+  const textEndLength = getPathLengthAtX(textEndPoint.x)
+
+  const orbGap = Math.max(
+    0,
+    (textLengthWithDot - textLength) / 2,
+  )
+
+  const orbLength = textEndLength + orbGap
 
   creamTextPart.textContent = ""
   gradientTextPart.textContent = ""
@@ -2320,7 +2459,7 @@ function setupNextSection() {
       const point = points[pointIndex]
 
       yTo(point.y - viewBoxHeight / 2 - 30)
-      xTo(point.x - (viewBoxWidth * scaleFactor) / 2 - textOffsetX)
+      xTo(point.x - footerCenterOffset.x - textOffsetX)
 
       // Text reveal
       const visibleCharacters = Math.floor(pathProgress * totalCharacters)

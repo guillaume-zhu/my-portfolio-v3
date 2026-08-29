@@ -2,6 +2,7 @@ import { gsap } from "gsap"
 import { Observer } from "gsap/Observer"
 
 import { createSiteHeader } from "../../shared/site-header/createSiteHeader"
+import { prefersReducedMotion } from "../../shared/motion/preference"
 import { createIncomingPageTransition } from "../../shared/page-transition/createPageTransition"
 import { setupCrossPageTransitions } from "../../shared/page-transition/setupCrossPageTransitions"
 
@@ -18,6 +19,7 @@ setupCrossPageTransitions({
 // ----------------------
 // 1. Dom selections
 // ----------------------
+const sphere = document.querySelector(".playground-sphere")
 const stage = document.querySelector(".playground-sphere__stage")
 const medias = stage.querySelectorAll(".playground-sphere__media")
 const totalMedias = medias.length
@@ -182,13 +184,13 @@ const container = document.querySelector(".playground-sphere__container")
 
 const mm = gsap.matchMedia()
 
-function applyFluidSphereSettings() {
+function applyFluidSphereSettings(radiusScale = 1) {
   const viewportWidth = window.innerWidth
   const cardWidth = medias[0].offsetWidth
 
-  const widthBasedRadius = 0.6 * viewportWidth
-  const cardBasedRadius = 2.5 * cardWidth
-  const heightBasedRadiusLimit = 1.1 * window.innerHeight
+  const widthBasedRadius = 0.6 * viewportWidth * radiusScale
+  const cardBasedRadius = 2.5 * cardWidth * radiusScale
+  const heightBasedRadiusLimit = 1.1 * window.innerHeight * radiusScale
 
   const cardSpacingRadius = Math.min(cardBasedRadius, heightBasedRadiusLimit)
 
@@ -217,13 +219,13 @@ mm.add(
     const { isMobile, isTablet, isCompactMobileLandscape } = context.conditions
 
     if (isMobile) {
-      radius = isCompactMobileLandscape ? 200 : 320
+      radius = isCompactMobileLandscape ? 215 : 340
       gsap.set(stage, {
-        translateZ: isCompactMobileLandscape ? "370px" : "250px",
+        translateZ: isCompactMobileLandscape ? "355px" : "230px",
       })
       gsap.set(container, { perspective: "1000px" })
     } else if (isTablet) {
-      applyFluidSphereSettings()
+      applyFluidSphereSettings(1.06)
     } else {
       applyFluidSphereSettings()
     }
@@ -310,6 +312,8 @@ function rebase() {
 // 13. Track gesture start/end
 // ----------------------
 function onInput() {
+  cancelSnap()
+
   if (!moving) {
     moving = true
     rebase()
@@ -395,9 +399,24 @@ function axisAngleMatrix(ax, ay, az, angle) {
   ]
 }
 
+let selectedMediaIndex = initialMediaIndex
 let snapTween = null
 
+function cancelSnap() {
+  const tween = snapTween
+  if (!tween) return
+
+  tween.kill()
+
+  if (snapTween === tween) {
+    snapTween = null
+  }
+}
+
 function snapToIndex(index, instant) {
+  selectedMediaIndex = index
+  cancelSnap()
+
   // Initial position
   const [vx, vy, vz] = getTransformedPosition(index)
 
@@ -423,10 +442,10 @@ function snapToIndex(index, instant) {
   const mStart = m.slice()
   const snap = { t: 0 }
 
-  snapTween = gsap.to(snap, {
+  const tween = gsap.to(snap, {
     t: 1,
-    duration: 1,
-    ease: "expo.inOut",
+    duration: prefersReducedMotion ? 0.25 : 1,
+    ease: prefersReducedMotion ? "power2.out" : "expo.inOut",
     onUpdate() {
       for (let k = 0; k < 9; k++) {
         m[k] = mStart[k]
@@ -438,9 +457,13 @@ function snapToIndex(index, instant) {
       updateVideoVisibility()
     },
     onComplete() {
-      snapTween = null
+      if (snapTween === tween) {
+        snapTween = null
+      }
     },
   })
+
+  snapTween = tween
 }
 
 // ----------------------
@@ -521,6 +544,12 @@ function playMediaClickWave(clickedIndex) {
   })
 }
 
+function selectMedia(index) {
+  moving = false
+  playMediaClickWave(index)
+  snapToIndex(index)
+}
+
 function onMediaClick(e) {
   if (dragDist > 3) return
 
@@ -530,12 +559,22 @@ function onMediaClick(e) {
   const index = Array.prototype.indexOf.call(medias, media)
   if (index === -1) return
 
-  moving = false
-  playMediaClickWave(index)
-  snapToIndex(index)
+  selectMedia(index)
+}
+
+function onSphereKeydown(event) {
+  if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return
+
+  event.preventDefault()
+
+  const direction = event.key === "ArrowRight" ? 1 : -1
+  const nextIndex = (selectedMediaIndex + direction + totalMedias) % totalMedias
+
+  selectMedia(nextIndex)
 }
 
 stage.addEventListener("click", onMediaClick)
+sphere.addEventListener("keydown", onSphereKeydown)
 
 // ----------------------
 // 19. Center the closest card immediately on page load
@@ -601,6 +640,15 @@ introTimeline.call(
 )
 
 function startPlaygroundIntro() {
+  if (prefersReducedMotion) {
+    if (shouldRevealTransition) {
+      pageTransition.reveal()
+    }
+
+    introTimeline.progress(1)
+    return
+  }
+
   if (shouldRevealTransition) {
     pageTransition.reveal()
     gsap.delayedCall(0.2, () => {
@@ -683,8 +731,8 @@ medias.forEach((media, index) => {
   videoStates[index] = video ? "paused" : null
 })
 
-const PLAY_THRESHOLD = 0.5
-const PAUSE_THRESHOLD = 0.2
+const PLAY_THRESHOLD = prefersReducedMotion ? 0.96 : 0.9
+const PAUSE_THRESHOLD = prefersReducedMotion ? 0.92 : 0.85
 
 function updateVideoVisibility() {
   for (let i = 0; i < totalMedias; i++) {

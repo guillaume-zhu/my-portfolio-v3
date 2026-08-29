@@ -246,7 +246,7 @@ body::-webkit-scrollbar {
 
 .project-context__link--credits {
   font-size: 0.75rem;
-  opacity: 0.6;
+  opacity: 0.65;
 }
 /* -------- PROJECT ELLIPSE -------- */
 .project-ellipse {
@@ -313,6 +313,11 @@ body::-webkit-scrollbar {
   color: inherit;
   text-decoration: none;
   cursor: pointer;
+}
+
+.project-next__link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
 }
 
 .project-next__link::before {
@@ -421,6 +426,11 @@ body::-webkit-scrollbar {
     width 0.55s cubic-bezier(0.77, 0, 0.18, 1),
     background-color 0.3s ease,
     color 0.3s ease;
+}
+
+.project-back:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
 }
 
 .project-back__icon {

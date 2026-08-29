@@ -2,13 +2,13 @@ import gsap from "gsap"
 
 const PROJECT_IMAGES = {
   ghibli: [
-    "/projects/memories-of-ghibli/previews/ghibli-01-square.png",
+    "/projects/memories-of-ghibli/previews/ghibli-01-square.webp",
     "/projects/memories-of-ghibli/previews/ghibli-02-square.webp",
-    "/projects/memories-of-ghibli/previews/ghibli-03-portrait.png",
-    "/projects/memories-of-ghibli/previews/ghibli-04-carre.png",
-    "/projects/memories-of-ghibli/previews/ghibli-05-portrait.png",
-    "/projects/memories-of-ghibli/previews/ghibli-06-carre.png",
-    "/projects/memories-of-ghibli/previews/ghibli-07-carre.png",
+    "/projects/memories-of-ghibli/previews/ghibli-03-portrait.webp",
+    "/projects/memories-of-ghibli/previews/ghibli-04-carre.webp",
+    "/projects/memories-of-ghibli/previews/ghibli-05-portrait.webp",
+    "/projects/memories-of-ghibli/previews/ghibli-06-carre.webp",
+    "/projects/memories-of-ghibli/previews/ghibli-07-carre.webp",
     "/projects/memories-of-ghibli/previews/ghibli-08-portrait.webp",
   ],
   pulse: [
@@ -50,19 +50,27 @@ const PROJECT_IMAGES = {
   ],
 }
 
-export function setupProjectImageHover(links) {
-  // ----------------------
-  // 1. Preload images
-  // ----------------------
+let projectImagesPreloadStarted = false
+
+export function preloadProjectImages() {
+  const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches
+
+  if (!canHover) return
+  if (projectImagesPreloadStarted) return
+
+  projectImagesPreloadStarted = true
+
   Object.values(PROJECT_IMAGES).forEach((images) => {
     images.forEach((imageSource) => {
       const image = new Image()
       image.src = imageSource
     })
   })
+}
 
+export function setupProjectImageHover(links) {
   // ----------------------
-  // 2. Setup project hovers
+  // Setup project hovers
   // ----------------------
   links.forEach((link) => {
     // Project data

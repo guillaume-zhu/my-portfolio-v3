@@ -15,9 +15,18 @@
 
     <meta
       name="description"
-      content="Portfolio de Guillaume Zhu, Front &amp; Creative Developer et Art Director spécialisé en expériences web immersives et interfaces interactives."
+      content="Direction artistique de trois éditions de Pulse Festival : identité visuelle, affiches, campagnes digitales, signalétique et motion."
     />
-    <title>Guillaume Zhu — Front Creative Developer &amp; Art Director</title>
+    <title>Pulse Festival — Direction artistique | Guillaume Zhu</title>
+    <link rel="canonical" href="https://guillaumezhu.com/projects/pulse-festival/" />
+    <meta property="og:title" content="Pulse Festival — Direction artistique | Guillaume Zhu" />
+    <meta property="og:description" content="Direction artistique de trois éditions de Pulse Festival : identité visuelle, affiches, campagnes digitales, signalétique et motion." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://guillaumezhu.com/projects/pulse-festival/" />
+    <meta property="og:image" content="https://guillaumezhu.com/og/pulse-festival.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Aperçu du projet Pulse Festival, direction artistique" />
   </head>
 
   <body class="project-page" data-project="pulse" data-theme="dark">
@@ -39,7 +48,12 @@
     <!-------- HEADER -------->
     <header class="site-header"></header>
 
-    <a class="project-back" href="/#projects" aria-label="Retour à la liste des projets">
+    <a
+      class="project-back"
+      href="/#projects"
+      tabindex="-1"
+      aria-label="Retour à la liste des projets"
+    >
       <svg
         class="project-back__icon"
         width="62"
@@ -78,11 +92,15 @@
               <!-- Section Intro -->
               <section class="project-panel project-panel--intro">
                 <div class="project-intro">
-                  <img
-                    src="/projects/pulse-festival/media/pulse-intro1.gif"
-                    alt=""
+                  <video
+                    src="/projects/pulse-festival/media/pulse-intro1.mp4"
                     class="project-intro__visual project-intro__visual--primary"
-                  />
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    aria-hidden="true"
+                  ></video>
 
                   <video
                     src="/projects/pulse-festival/media/pulse-intro2.mp4"
@@ -91,9 +109,16 @@
                     muted
                     loop
                     playsinline
+                    aria-hidden="true"
                   ></video>
 
                   <h1 class="project-intro__title">Pulse<br />festival</h1>
+
+                  <p class="visually-hidden">
+                    Aperçu de trois éditions de Pulse Festival : une première identité rouge et
+                    bleu électrique, puis une direction graphique en grille noire et blanche animée
+                    par des fluides numériques.
+                  </p>
                 </div>
               </section>
 
@@ -126,8 +151,10 @@
                 <div class="project-ellipse">
                   <img
                     src="/projects/pulse-festival/media/pulse-ellipse1.webp"
-                    alt=""
+                    alt="Variante de l’artwork principal de la première édition de Pulse Festival, avec son logotype dans une composition rouge et bleu électrique."
                     class="project-ellipse__visual"
+                  loading="lazy"
+                  decoding="async"
                   />
                 </div>
               </section>
@@ -156,7 +183,9 @@
                       <img
                         class="project-gallery__media"
                         src="/projects/pulse-festival/media/pulse-gallery1.webp"
-                        alt=""
+                        alt="Artwork principal de la deuxième édition de Pulse Festival, composé d’une grille blanche sur fond noir traversée par un fluide rouge et noir."
+                      loading="lazy"
+                      decoding="async"
                       />
                     </div>
 
@@ -165,7 +194,9 @@
                       <img
                         class="project-gallery__media"
                         src="/projects/pulse-festival/media/pulse-gallery2.webp"
-                        alt=""
+                        alt="Affiche de la première édition de Pulse Festival installée dans l’espace urbain."
+                      loading="lazy"
+                      decoding="async"
                       />
                     </div>
 
@@ -174,7 +205,9 @@
                       <img
                         class="project-gallery__media"
                         src="/projects/pulse-festival/media/pulse-gallery3.webp"
-                        alt=""
+                        alt="Visuel Focus consacré à l’artiste Bours pour la deuxième édition de Pulse Festival."
+                      loading="lazy"
+                      decoding="async"
                       />
                     </div>
 
@@ -183,13 +216,16 @@
                       <video
                         class="project-gallery__media"
                         src="/projects/pulse-festival/media/pulse-gallery4.mp4"
-                        autoplay
                         muted
                         loop
                         playsinline
                         preload="metadata"
                         aria-hidden="true"
                       ></video>
+                      <p class="visually-hidden">
+                        Animation du système graphique de la deuxième édition, où les fluides
+                        apparaissent et disparaissent à travers les cases de la grille.
+                      </p>
                     </div>
 
                     <!-- Gallery media 5 -->
@@ -197,7 +233,9 @@
                       <img
                         class="project-gallery__media"
                         src="/projects/pulse-festival/media/pulse-gallery5.webp"
-                        alt=""
+                        alt="Visuel d’annonce des artistes de la troisième édition de Pulse Festival."
+                      loading="lazy"
+                      decoding="async"
                       />
                     </div>
 
@@ -206,7 +244,9 @@
                       <img
                         class="project-gallery__media"
                         src="/projects/pulse-festival/media/pulse-gallery6.webp"
-                        alt=""
+                        alt="Plan du festival conçu pour la troisième édition de Pulse Festival."
+                      loading="lazy"
+                      decoding="async"
                       />
                     </div>
 
@@ -215,7 +255,9 @@
                       <img
                         class="project-gallery__media"
                         src="/projects/pulse-festival/media/pulse-gallery7.webp"
-                        alt=""
+                        alt="Artwork de la troisième édition de Pulse Festival composé de bulles translucides aux reflets bleus et rouges."
+                      loading="lazy"
+                      decoding="async"
                       />
                     </div>
 
@@ -224,7 +266,9 @@
                       <img
                         class="project-gallery__media"
                         src="/projects/pulse-festival/media/pulse-gallery8.webp"
-                        alt=""
+                        alt="Autre déclinaison de l’artwork principal de la première édition de Pulse Festival et de son identité rouge et bleu électrique."
+                      loading="lazy"
+                      decoding="async"
                       />
                     </div>
 
@@ -253,6 +297,7 @@
                   <a
                     href="/projects/mae-webflow/"
                     class="project-next__link"
+                    tabindex="-1"
                     aria-label="Découvrir le projet Maë Webflow"
                   >
                     <h2 class="project-next__title">

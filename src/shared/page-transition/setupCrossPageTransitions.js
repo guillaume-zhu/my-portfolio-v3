@@ -104,7 +104,16 @@ export function setupCrossPageTransitions({
         onNavigateCancelled?.()
       }
     } catch (error) {
+      pageTransition.reset()
       isNavigating = false
+
+      try {
+        sessionStorage.removeItem("pageTransitionPending")
+        sessionStorage.removeItem("pageTransitionColor")
+      } catch (storageError) {
+        console.warn("Unable to clear page transition state:", storageError)
+      }
+
       onNavigateCancelled?.()
 
       console.error("Page transition navigation failed:", error)

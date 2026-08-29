@@ -15,9 +15,18 @@
 
     <meta
       name="description"
-      content="Portfolio de Guillaume Zhu, Front &amp; Creative Developer et Art Director spécialisé en expériences web immersives et interfaces interactives."
+      content="Conception et développement du portfolio de Maë : direction visuelle, interactions, animations GSAP et base Webflow autonome."
     />
-    <title>Guillaume Zhu — Front Creative Developer &amp; Art Director</title>
+    <title>Maë — Portfolio Webflow | Guillaume Zhu</title>
+    <link rel="canonical" href="https://guillaumezhu.com/projects/mae-webflow/" />
+    <meta property="og:title" content="Maë — Portfolio Webflow | Guillaume Zhu" />
+    <meta property="og:description" content="Conception et développement du portfolio de Maë : direction visuelle, interactions, animations GSAP et base Webflow autonome." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://guillaumezhu.com/projects/mae-webflow/" />
+    <meta property="og:image" content="https://guillaumezhu.com/og/mae.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Aperçu du projet Maë, portfolio Webflow" />
   </head>
 
   <body class="project-page" data-project="webflow" data-theme="dark">
@@ -39,7 +48,12 @@
     <!-------- HEADER -------->
     <header class="site-header"></header>
 
-    <a class="project-back" href="/#projects" aria-label="Retour à la liste des projets">
+    <a
+      class="project-back"
+      href="/#projects"
+      tabindex="-1"
+      aria-label="Retour à la liste des projets"
+    >
       <svg
         class="project-back__icon"
         width="62"
@@ -101,6 +115,12 @@
                   ></video>
 
                   <h1 class="project-intro__title">Maë<br />webflow</h1>
+
+                  <p class="visually-hidden">
+                    Aperçu du portfolio de Maë : une navigation animée présentant ses projets,
+                    associée à une identité visuelle fondée sur des dégradés colorés et un logotype
+                    dédié.
+                  </p>
                 </div>
               </section>
 
@@ -129,6 +149,7 @@
                       <a
                         class="project-context__link project-context__link--experience"
                         href="URL_DE_LA_DEMO"
+                        tabindex="-1"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -145,8 +166,10 @@
                 <div class="project-ellipse">
                   <img
                     src="/projects/mae-webflow/media/webflow-ellipse1.webp"
-                    alt=""
+                    alt="Cartes en effet de verre présentant le positionnement et les compétences de Maë sur le dégradé caractéristique de son identité visuelle."
                     class="project-ellipse__visual"
+                  loading="lazy"
+                  decoding="async"
                   />
                 </div>
               </section>
@@ -175,7 +198,9 @@
                       <img
                         class="project-gallery__media"
                         src="/projects/mae-webflow/media/webflow-gallery1.webp"
-                        alt=""
+                        alt="Interface du portfolio présentant la sélection et la mise en avant d’un projet."
+                      loading="lazy"
+                      decoding="async"
                       />
                     </div>
 
@@ -184,7 +209,9 @@
                       <img
                         class="project-gallery__media"
                         src="/projects/mae-webflow/media/webflow-gallery2.webp"
-                        alt=""
+                        alt="Dégradé coloré caractéristique de l’identité visuelle du portfolio de Maë."
+                      loading="lazy"
+                      decoding="async"
                       />
                     </div>
 
@@ -193,13 +220,16 @@
                       <video
                         src="/projects/mae-webflow/media/webflow-gallery3.mp4"
                         class="project-gallery__media"
-                        autoplay
                         muted
                         loop
                         playsinline
                         preload="metadata"
                         aria-hidden="true"
                       ></video>
+                      <p class="visually-hidden">
+                        Section animée du portfolio présentant la vision globale de Maë et ses
+                        différents domaines d’expertise.
+                      </p>
                     </div>
 
                     <!-- Gallery media 4 -->
@@ -207,13 +237,16 @@
                       <video
                         src="/projects/mae-webflow/media/webflow-gallery4.mp4"
                         class="project-gallery__media"
-                        autoplay
                         muted
                         loop
                         playsinline
                         preload="metadata"
                         aria-hidden="true"
                       ></video>
+                      <p class="visually-hidden">
+                        Section du portfolio présentant son approche à travers un texte animé par
+                        des effets de révélation GSAP.
+                      </p>
                     </div>
 
                     <!-- Gallery media 5 -->
@@ -221,7 +254,9 @@
                       <img
                         class="project-gallery__media"
                         src="/projects/mae-webflow/media/webflow-gallery5.webp"
-                        alt=""
+                        alt="Page projet du portfolio présentant le contexte et la démarche du projet Vkard."
+                      loading="lazy"
+                      decoding="async"
                       />
                     </div>
 
@@ -230,7 +265,9 @@
                       <img
                         class="project-gallery__media"
                         src="/projects/mae-webflow/media/webflow-gallery6.webp"
-                        alt=""
+                        alt="Variante de l’identité visuelle du portfolio de Maë, associant son logotype à un dégradé coloré."
+                      loading="lazy"
+                      decoding="async"
                       />
                     </div>
 
@@ -259,6 +296,7 @@
                   <a
                     href="/projects/ornate/"
                     class="project-next__link"
+                    tabindex="-1"
                     aria-label="Découvrir le projet Ornate"
                   >
                     <h2 class="project-next__title">
