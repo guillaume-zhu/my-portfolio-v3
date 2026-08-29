@@ -4,6 +4,7 @@ import Lenis from "lenis"
 import "lenis/dist/lenis.css"
 
 import { createHomeLoader } from "./loader/createHomeLoader"
+import { createI18n } from "../../shared/i18n"
 import { createSiteHeader } from "../../shared/site-header/createSiteHeader"
 import { prefersReducedMotion } from "../../shared/motion/preference"
 import { createIncomingPageTransition } from "../../shared/page-transition/createPageTransition"
@@ -20,6 +21,14 @@ import {
   setupProjectImageHover,
 } from "./projects/setupProjectImageHover"
 
+const i18n = createI18n()
+
+i18n.applyTranslations()
+
+document.querySelectorAll(".trajectory-sentences__sentence > [data-i18n]").forEach((line) => {
+  line.replaceWith(line.textContent)
+})
+
 // ----------------------
 // Global setup
 // ----------------------
@@ -27,7 +36,7 @@ import {
 // GSAP and shared interface
 gsap.registerPlugin(ScrollTrigger)
 
-createSiteHeader()
+createSiteHeader(i18n)
 
 // Home loader session
 const shouldShowHomeLoader = document.documentElement.dataset.homeLoaderState === "pending"

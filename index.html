@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
 
@@ -32,7 +32,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Portfolio de Guillaume Zhu, Front Creative Developer &amp; Art Director, spécialisé en expériences web immersives, interfaces interactives et direction artistique."
+      content="Portfolio of Guillaume Zhu, Front Creative Developer &amp; Art Director, specializing in immersive web experiences, interactive interfaces and art direction."
+      data-i18n-attr="content:home.description"
     />
 
     <title>Guillaume Zhu — Front Creative Developer &amp; Art Director</title>
@@ -43,7 +44,8 @@
     />
     <meta
       property="og:description"
-      content="Portfolio de Guillaume Zhu, Front Creative Developer &amp; Art Director, spécialisé en expériences web immersives, interfaces interactives et direction artistique."
+      content="Portfolio of Guillaume Zhu, Front Creative Developer &amp; Art Director, specializing in immersive web experiences, interactive interfaces and art direction."
+      data-i18n-attr="content:home.description"
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://guillaumezhu.com/" />
@@ -52,12 +54,18 @@
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="Logo 3D de Guillaume Zhu avec les mentions Front Creative Developer et Art Director"
+      content="Guillaume Zhu’s 3D logo featuring the titles Front Creative Developer and Art Director"
+      data-i18n-attr="content:home.imageAlt"
     />
   </head>
   <body>
     <!-------- HOME LOADER -------->
-    <div class="home-loader" role="status" aria-label="Chargement de la page">
+    <div
+      class="home-loader"
+      role="status"
+      aria-label="Loading the page"
+      data-i18n-attr="aria-label:home.loaderLabel"
+    >
       <canvas class="home-loader__canvas" aria-hidden="true"></canvas>
     </div>
 
@@ -79,7 +87,11 @@
     <!-------- HEADER -------->
     <header class="site-header"></header>
 
-    <nav class="scroll-indicator" aria-label="Navigation entre les sections">
+    <nav
+      class="scroll-indicator"
+      aria-label="Section navigation"
+      data-i18n-attr="aria-label:home.sectionNavigationLabel"
+    >
       <a
         class="scroll-indicator__item is-active"
         href="#hero"
@@ -93,7 +105,12 @@
         <span class="scroll-indicator__bar" aria-hidden="true"></span>
       </a>
 
-      <a class="scroll-indicator__item" href="#parcours" aria-label="Trajectoire">
+      <a
+        class="scroll-indicator__item"
+        href="#parcours"
+        aria-label="Journey"
+        data-i18n-attr="aria-label:home.navigationJourney"
+      >
         <span class="scroll-indicator__bar" aria-hidden="true"></span>
       </a>
 
@@ -101,11 +118,21 @@
         <span class="scroll-indicator__bar" aria-hidden="true"></span>
       </a>
 
-      <a class="scroll-indicator__item" href="#projects" aria-label="Projets">
+      <a
+        class="scroll-indicator__item"
+        href="#projects"
+        aria-label="Projects"
+        data-i18n-attr="aria-label:home.navigationProjects"
+      >
         <span class="scroll-indicator__bar" aria-hidden="true"></span>
       </a>
 
-      <a class="scroll-indicator__item" href="#contact" aria-label="Next et footer">
+      <a
+        class="scroll-indicator__item"
+        href="#contact"
+        aria-label="Next and footer"
+        data-i18n-attr="aria-label:home.navigationNext"
+      >
         <span class="scroll-indicator__bar" aria-hidden="true"></span>
       </a>
     </nav>
@@ -127,7 +154,9 @@
       <!-------- MANIFESTO SECTION -------->
       <section class="manifesto" id="manifesto">
         <div class="container">
-          <p class="text">Je crée des expériences à la croisée du design et du code.</p>
+          <p class="text" data-i18n="home.manifesto">
+            I create experiences at the intersection of design and code.
+          </p>
         </div>
       </section>
 
@@ -135,7 +164,7 @@
       <section class="trajectory" id="parcours">
         <section class="entry">
           <div class="container">
-            <h2 class="title">Ma trajectoire</h2>
+            <h2 class="title" data-i18n="home.trajectoryTitle">My journey</h2>
           </div>
         </section>
 
@@ -148,24 +177,44 @@
               </div>
 
               <div class="trajectory-sentences__center">
-                <div class="trajectory-sentences__sentence">D'abord</div>
-
-                <div class="trajectory-sentences__sentence is-two-lines">
-                  direction <br />
-                  artistique.
+                <div class="trajectory-sentences__sentence" data-i18n="home.trajectorySentence1">
+                  First
                 </div>
 
-                <div class="trajectory-sentences__sentence">Puis</div>
-
                 <div class="trajectory-sentences__sentence is-two-lines">
-                  développement <br />front.
+                  <span data-i18n="home.trajectorySentence2Line1">art</span><br />
+                  <span data-i18n="home.trajectorySentence2Line2">direction.</span>
                 </div>
 
-                <div class="trajectory-sentences__sentence is-today">Aujourd'hui</div>
+                <div class="trajectory-sentences__sentence" data-i18n="home.trajectorySentence3">
+                  Then
+                </div>
 
-                <div class="trajectory-sentences__sentence is-dialogue">je fais dialoguer</div>
+                <div class="trajectory-sentences__sentence is-two-lines">
+                  <span data-i18n="home.trajectorySentence4Line1">front-end</span><br />
+                  <span data-i18n="home.trajectorySentence4Line2">development.</span>
+                </div>
 
-                <div class="trajectory-sentences__sentence is-both">les deux.</div>
+                <div
+                  class="trajectory-sentences__sentence is-today"
+                  data-i18n="home.trajectorySentence5"
+                >
+                  Today
+                </div>
+
+                <div
+                  class="trajectory-sentences__sentence is-dialogue"
+                  data-i18n="home.trajectorySentence6"
+                >
+                  I bridge
+                </div>
+
+                <div
+                  class="trajectory-sentences__sentence is-both"
+                  data-i18n="home.trajectorySentence7"
+                >
+                  the two.
+                </div>
               </div>
             </div>
           </div>
@@ -191,7 +240,8 @@
                 <div class="toolkit-card toolkit-card--javascript">
                   <img
                     class="toolkit-card__motion"
-                    src="/home/toolkit/frontend/javascript.svg"
+                    src="/home/toolkit/frontend/en/javascript.svg"
+                    data-i18n-attr="src:home.toolkitAssets.frontend.javascript"
                     alt="JavaScript"
                   />
                 </div>
@@ -201,7 +251,8 @@
                 <div class="toolkit-card toolkit-card--threejs">
                   <img
                     class="toolkit-card__motion"
-                    src="/home/toolkit/frontend/threejs.svg"
+                    src="/home/toolkit/frontend/en/threejs.svg"
+                    data-i18n-attr="src:home.toolkitAssets.frontend.threejs"
                     alt="Three.js"
                   />
                 </div>
@@ -211,7 +262,8 @@
                 <div class="toolkit-card toolkit-card--glsl">
                   <img
                     class="toolkit-card__motion"
-                    src="/home/toolkit/frontend/glsl.svg"
+                    src="/home/toolkit/frontend/en/glsl.svg"
+                    data-i18n-attr="src:home.toolkitAssets.frontend.glsl"
                     alt="GLSL"
                   />
                 </div>
@@ -221,7 +273,8 @@
                 <div class="toolkit-card toolkit-card--gsap">
                   <img
                     class="toolkit-card__motion"
-                    src="/home/toolkit/frontend/gsap.svg"
+                    src="/home/toolkit/frontend/en/gsap.svg"
+                    data-i18n-attr="src:home.toolkitAssets.frontend.gsap"
                     alt="GSAP"
                   />
                 </div>
@@ -231,7 +284,8 @@
                 <div class="toolkit-card toolkit-card--vuejs">
                   <img
                     class="toolkit-card__motion"
-                    src="/home/toolkit/frontend/vuejs.svg"
+                    src="/home/toolkit/frontend/en/vuejs.svg"
+                    data-i18n-attr="src:home.toolkitAssets.frontend.vuejs"
                     alt="Vue.js"
                   />
                 </div>
@@ -241,7 +295,8 @@
                 <div class="toolkit-card toolkit-card--react">
                   <img
                     class="toolkit-card__motion"
-                    src="/home/toolkit/frontend/react.svg"
+                    src="/home/toolkit/frontend/en/react.svg"
+                    data-i18n-attr="src:home.toolkitAssets.frontend.react"
                     alt="React"
                   />
                 </div>
@@ -251,7 +306,8 @@
                 <div class="toolkit-card toolkit-card--webflow">
                   <img
                     class="toolkit-card__motion"
-                    src="/home/toolkit/frontend/webflow.svg"
+                    src="/home/toolkit/frontend/en/webflow.svg"
+                    data-i18n-attr="src:home.toolkitAssets.frontend.webflow"
                     alt="Webflow"
                   />
                 </div>
@@ -261,11 +317,19 @@
                 <div class="toolkit-card toolkit-card--flip toolkit-card--shopify">
                   <div class="toolkit-card__flipper toolkit-card__motion">
                     <div class="toolkit-card__face toolkit-card--front">
-                      <img src="/home/toolkit/frontend/shopify.svg" alt="Shopify" />
+                      <img
+                        src="/home/toolkit/frontend/en/shopify.svg"
+                        alt="Shopify"
+                        data-i18n-attr="src:home.toolkitAssets.frontend.shopify"
+                      />
                     </div>
 
                     <div class="toolkit-card__face toolkit-card__face--back">
-                      <img src="/home/toolkit/art-direction/figma.svg" alt="Figma" />
+                      <img
+                        src="/home/toolkit/art-direction/en/figma.svg"
+                        alt="Figma"
+                        data-i18n-attr="src:home.toolkitAssets.artDirection.figma"
+                      />
                     </div>
                   </div>
                 </div>
@@ -278,7 +342,8 @@
                 <div class="toolkit-card toolkit-card--figma">
                   <img
                     class="toolkit-card__motion"
-                    src="/home/toolkit/art-direction/figma.svg"
+                    src="/home/toolkit/art-direction/en/figma.svg"
+                    data-i18n-attr="src:home.toolkitAssets.artDirection.figma"
                     alt="Figma"
                   />
                 </div>
@@ -288,7 +353,8 @@
                 <div class="toolkit-card toolkit-card--photoshop">
                   <img
                     class="toolkit-card__motion"
-                    src="/home/toolkit/art-direction/photoshop.svg"
+                    src="/home/toolkit/art-direction/en/photoshop.svg"
+                    data-i18n-attr="src:home.toolkitAssets.artDirection.photoshop"
                     alt="Photoshop"
                   />
                 </div>
@@ -298,7 +364,8 @@
                 <div class="toolkit-card toolkit-card--illustrator">
                   <img
                     class="toolkit-card__motion"
-                    src="/home/toolkit/art-direction/illustrator.svg"
+                    src="/home/toolkit/art-direction/en/illustrator.svg"
+                    data-i18n-attr="src:home.toolkitAssets.artDirection.illustrator"
                     alt="Illustrator"
                   />
                 </div>
@@ -308,7 +375,8 @@
                 <div class="toolkit-card toolkit-card--indesign">
                   <img
                     class="toolkit-card__motion"
-                    src="/home/toolkit/art-direction/indesign.svg"
+                    src="/home/toolkit/art-direction/en/indesign.svg"
+                    data-i18n-attr="src:home.toolkitAssets.artDirection.indesign"
                     alt="InDesign"
                   />
                 </div>
@@ -318,7 +386,8 @@
                 <div class="toolkit-card toolkit-card--after-effects">
                   <img
                     class="toolkit-card__motion"
-                    src="/home/toolkit/art-direction/aftereffects.svg"
+                    src="/home/toolkit/art-direction/en/aftereffects.svg"
+                    data-i18n-attr="src:home.toolkitAssets.artDirection.afterEffects"
                     alt="After Effects"
                   />
                 </div>
@@ -328,7 +397,8 @@
                 <div class="toolkit-card toolkit-card--capcut">
                   <img
                     class="toolkit-card__motion"
-                    src="/home/toolkit/art-direction/capcut.svg"
+                    src="/home/toolkit/art-direction/en/capcut.svg"
+                    data-i18n-attr="src:home.toolkitAssets.artDirection.capcut"
                     alt="CapCut"
                   />
                 </div>
@@ -338,7 +408,8 @@
                 <div class="toolkit-card toolkit-card--lightroom">
                   <img
                     class="toolkit-card__motion"
-                    src="/home/toolkit/art-direction/lightroom.svg"
+                    src="/home/toolkit/art-direction/en/lightroom.svg"
+                    data-i18n-attr="src:home.toolkitAssets.artDirection.lightroom"
                     alt="Lightroom"
                   />
                 </div>
@@ -348,7 +419,7 @@
                 <div class="toolkit-card toolkit-card--transition">
                   <img
                     class="toolkit-card__motion"
-                    src="/home/toolkit/art-direction/transition.png"
+                    src="/home/toolkit/art-direction/en/transition.png"
                     alt=""
                     loading="lazy"
                     decoding="async"
@@ -368,7 +439,7 @@
       <section class="projects" id="projects">
         <div class="projects__pin-height">
           <div class="projects__container">
-            <h2 class="projects__title">Projets</h2>
+            <h2 class="projects__title" data-i18n="home.projectsTitle">Projects</h2>
 
             <nav class="projects__list" aria-label="Projects">
               <a
@@ -425,9 +496,13 @@
         <div class="next-section__pin-height">
           <div class="next-section__container">
             <div class="next-section__intro">
-              <p>La suite ?</p>
-              <a class="next-section__playground-link playground-link" href="/playground/">
-                Un détour par le Playground ↗
+              <p data-i18n="home.nextIntro">What’s next?</p>
+              <a
+                class="next-section__playground-link playground-link"
+                href="/playground/"
+                data-i18n="home.playgroundLink"
+              >
+                A detour through the Playground ↗
               </a>
             </div>
 
@@ -454,9 +529,15 @@
 
               <text class="next-section__text">
                 <textPath id="nextTextPath" href="#nextPath" text-anchor="start">
-                  <tspan id="nextTextCream">Si nos visions se rejoignent,</tspan>
-                  <tspan id="nextTextGradientPart" fill="url(#nextTextGradient)">
-                    traçons la suite ensemble
+                  <tspan id="nextTextCream" data-i18n="home.nextTextCream">
+                    If our visions align,
+                  </tspan>
+                  <tspan
+                    id="nextTextGradientPart"
+                    fill="url(#nextTextGradient)"
+                    data-i18n="home.nextTextGradient"
+                  >
+                    let’s shape what’s next together
                   </tspan>
                 </textPath>
               </text>
@@ -465,33 +546,51 @@
             </svg>
 
             <!-------- FOOTER REVEAL -------->
-            <footer id="contact" class="next-footer" aria-label="Pied de page">
+            <footer
+              id="contact"
+              class="next-footer"
+              aria-label="Footer"
+              data-i18n-attr="aria-label:home.footerLabel"
+            >
               <div class="next-footer__background" aria-hidden="true"></div>
 
               <div class="next-footer__content">
                 <div class="next-footer__inner">
                   <div class="next-footer__main">
                     <p class="next-footer__headline">
-                      Disponible pour une alternance<br />
-                      en front-end créatif <br />
-                      dès octobre 2026
+                      <span data-i18n="home.footerLine1">Open to joining</span><br />
+                      <span data-i18n="home.footerLine2">a creative team</span><br />
+                      <span data-i18n="home.footerLine3">Apprenticeship · October 2026</span>
                     </p>
 
                     <div class="next-footer__meta">
-                      <a href="/mentions-legales/" class="next-footer__meta-link text-link"
-                        >Mentions légales</a
+                      <a
+                        href="/mentions-legales/"
+                        class="next-footer__meta-link text-link"
+                        data-i18n="home.legalNotice"
+                        >Legal notice</a
                       >
                       <p>© 2026 Guillaume Zhu</p>
                     </div>
                   </div>
 
-                  <nav class="next-footer__nav" aria-label="Navigation du pied de page">
+                  <nav
+                    class="next-footer__nav"
+                    aria-label="Footer navigation"
+                    data-i18n-attr="aria-label:home.footerNavigationLabel"
+                  >
                     <div class="next-footer__group">
-                      <p class="next-footer__group-title">Explorer</p>
+                      <p class="next-footer__group-title" data-i18n="home.footerExplore">
+                        Explore
+                      </p>
 
-                      <a href="#parcours" class="text-link">Parcours</a>
+                      <a href="#parcours" class="text-link" data-i18n="home.footerJourney">
+                        Journey
+                      </a>
                       <a href="#toolkit" class="text-link">Toolkit</a>
-                      <a href="#projects" class="text-link">Projets</a>
+                      <a href="#projects" class="text-link" data-i18n="home.footerProjects">
+                        Projects
+                      </a>
                       <a class="playground-link" href="/playground/">Playground</a>
                     </div>
 

@@ -7,6 +7,71 @@ export default {
     languageSwitchLabel: "Passer en anglais",
   },
 
+  home: {
+    description:
+      "Portfolio de Guillaume Zhu, Front Creative Developer & Art Director, spécialisé en expériences web immersives, interfaces interactives et direction artistique.",
+    imageAlt:
+      "Logo 3D de Guillaume Zhu avec les mentions Front Creative Developer et Art Director",
+    loaderLabel: "Chargement de la page",
+
+    sectionNavigationLabel: "Navigation entre les sections",
+    navigationJourney: "Trajectoire",
+    navigationProjects: "Projets",
+    navigationNext: "Next et footer",
+
+    manifesto: "Je crée des expériences à la croisée du design et du code.",
+
+    trajectoryTitle: "Ma trajectoire",
+    trajectorySentence1: "D'abord",
+    trajectorySentence2Line1: "direction",
+    trajectorySentence2Line2: "artistique.",
+    trajectorySentence3: "Puis",
+    trajectorySentence4Line1: "développement",
+    trajectorySentence4Line2: "front.",
+    trajectorySentence5: "Aujourd'hui",
+    trajectorySentence6: "je fais dialoguer",
+    trajectorySentence7: "les deux.",
+
+    projectsTitle: "Projets",
+
+    nextIntro: "La suite ?",
+    playgroundLink: "Un détour par le Playground ↗",
+    nextTextCream: "Si nos visions se rejoignent,",
+    nextTextGradient: "traçons la suite ensemble",
+
+    footerLine1: "Disponible pour rejoindre",
+    footerLine2: "une équipe créative",
+    footerLine3: "Alternance · octobre 2026",
+    footerLabel: "Pied de page",
+    legalNotice: "Mentions légales",
+    footerNavigationLabel: "Navigation du pied de page",
+    footerExplore: "Explorer",
+    footerJourney: "Parcours",
+    footerProjects: "Projets",
+
+    toolkitAssets: {
+      frontend: {
+        javascript: "/home/toolkit/frontend/fr/javascript.svg",
+        threejs: "/home/toolkit/frontend/fr/threejs.svg",
+        glsl: "/home/toolkit/frontend/fr/glsl.svg",
+        gsap: "/home/toolkit/frontend/fr/gsap.svg",
+        vuejs: "/home/toolkit/frontend/fr/vuejs.svg",
+        react: "/home/toolkit/frontend/fr/react.svg",
+        webflow: "/home/toolkit/frontend/fr/webflow.svg",
+        shopify: "/home/toolkit/frontend/fr/shopify.svg",
+      },
+      artDirection: {
+        figma: "/home/toolkit/art-direction/fr/figma.svg",
+        photoshop: "/home/toolkit/art-direction/fr/photoshop.svg",
+        illustrator: "/home/toolkit/art-direction/fr/illustrator.svg",
+        indesign: "/home/toolkit/art-direction/fr/indesign.svg",
+        afterEffects: "/home/toolkit/art-direction/fr/aftereffects.svg",
+        capcut: "/home/toolkit/art-direction/fr/capcut.svg",
+        lightroom: "/home/toolkit/art-direction/fr/lightroom.svg",
+      },
+    },
+  },
+
   projects: {
     ghibli: {
       title: "Memories of Ghibli — Expérience 3D interactive | Guillaume Zhu",
