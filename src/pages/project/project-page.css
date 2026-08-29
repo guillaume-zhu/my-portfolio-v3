@@ -274,7 +274,7 @@ body::-webkit-scrollbar {
 
 .project-gallery__slides {
   height: 100%;
-  width: 50vh;
+  width: min(70vw, 65vh);
   display: flex;
   flex-direction: column;
   gap: 1vh;
