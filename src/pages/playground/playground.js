@@ -1,13 +1,17 @@
 import { gsap } from "gsap"
 import { Observer } from "gsap/Observer"
 
+import { createI18n } from "../../shared/i18n"
 import { createSiteHeader } from "../../shared/site-header/createSiteHeader"
 import { prefersReducedMotion } from "../../shared/motion/preference"
 import { createIncomingPageTransition } from "../../shared/page-transition/createPageTransition"
 import { setupCrossPageTransitions } from "../../shared/page-transition/setupCrossPageTransitions"
 
+const i18n = createI18n()
+
+i18n.applyTranslations()
+createSiteHeader(i18n)
 gsap.registerPlugin(Observer)
-createSiteHeader()
 
 // Page transition
 const { pageTransition, shouldRevealTransition } = createIncomingPageTransition()

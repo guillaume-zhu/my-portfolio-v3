@@ -211,6 +211,16 @@ export default {
     },
   },
 
+  playground: {
+    title: "Playground — Creative Explorations | Guillaume Zhu",
+    description:
+      "Creative explorations by Guillaume Zhu: interfaces, shader studies, motion design, 3D experiments and visual research.",
+    imageAlt: "Preview of Guillaume Zhu’s Playground",
+    heading: "Playground — Creative Explorations",
+    sphereLabel: "Creative explorations",
+    keyboardHelp: "Use the left and right arrow keys to browse the explorations.",
+  },
+
   credits: {
     ghibli: {
       title: "Credits & licenses — Memories of Ghibli | Guillaume Zhu",
