@@ -285,6 +285,25 @@ export default {
     heading: "Playground — Explorations créatives",
     sphereLabel: "Explorations créatives",
     keyboardHelp: "Utilisez les flèches gauche et droite pour parcourir les explorations.",
+    metadata: {
+      shopifyStudent2026: "Shopify · Projet étudiant · 2026",
+      interfaceDesignStudent2026: "Design d’interface · Projet étudiant · 2026",
+      aiVisualExperiment2026: "Expérimentation visuelle IA · 2026",
+      threeJsShaderStudy2026: "Étude de shader Three.js · 2026",
+      visualArtwork2020: "Création visuelle · 2020",
+      motionDesignStudy2020: "Étude de motion design · 2020",
+      webDesignStudent2026: "Web design · Projet étudiant · 2026",
+      cinema4DStudy2019: "Étude Cinema 4D · 2019",
+      gameInterfaceDesignStudent2026:
+        "Game design & interface design · Projet étudiant · 2026",
+      dataVisualization3D2026: "Visualisation de données 3D · 2026",
+      interactiveGameStudent2026: "Jeu interactif · Projet étudiant · 2026",
+      webDesignStudent2019: "Web design · Projet étudiant · 2019",
+      brandIdentityStudent2026: "Identité visuelle · Projet étudiant · 2026",
+      motionDesign2019: "Motion design · 2019",
+      artDirection2020: "Direction artistique · 2020",
+      cinema4DStudy2020: "Étude Cinema 4D · 2020",
+    },
   },
 
   legal: {
@@ -390,6 +409,7 @@ export default {
 
       musicTitle: "Musique & ambiance sonore",
       etherealDescription: "Musique d’ambiance intégrée à l’expérience.",
+      seaCliffMeta: "BBC Sound Effects · Référence NHU05067080",
       seaCliffLegal:
         "Utilisé dans le cadre d’un projet étudiant expérimental, gratuit et non commercial.",
 

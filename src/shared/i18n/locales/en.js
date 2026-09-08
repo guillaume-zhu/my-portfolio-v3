@@ -284,6 +284,25 @@ export default {
     heading: "Playground — Creative Explorations",
     sphereLabel: "Creative explorations",
     keyboardHelp: "Use the left and right arrow keys to browse the explorations.",
+    metadata: {
+      shopifyStudent2026: "Shopify · Student project · 2026",
+      interfaceDesignStudent2026: "Interface design · Student project · 2026",
+      aiVisualExperiment2026: "AI visual experiment · 2026",
+      threeJsShaderStudy2026: "Three.js shader study · 2026",
+      visualArtwork2020: "Visual artwork · 2020",
+      motionDesignStudy2020: "Motion design study · 2020",
+      webDesignStudent2026: "Web design · Student project · 2026",
+      cinema4DStudy2019: "Cinema 4D study · 2019",
+      gameInterfaceDesignStudent2026:
+        "Game & interface design · Student project · 2026",
+      dataVisualization3D2026: "3D data visualization · 2026",
+      interactiveGameStudent2026: "Interactive game · Student project · 2026",
+      webDesignStudent2019: "Web design · Student project · 2019",
+      brandIdentityStudent2026: "Brand identity · Student project · 2026",
+      motionDesign2019: "Motion design · 2019",
+      artDirection2020: "Art direction · 2020",
+      cinema4DStudy2020: "Cinema 4D study · 2020",
+    },
   },
 
   legal: {
@@ -389,6 +408,7 @@ export default {
 
       musicTitle: "Music & Sound",
       etherealDescription: "Ambient music featured in the experience.",
+      seaCliffMeta: "BBC Sound Effects · Reference NHU05067080",
       seaCliffLegal:
         "Used as part of an experimental, free and non-commercial student project.",
 
