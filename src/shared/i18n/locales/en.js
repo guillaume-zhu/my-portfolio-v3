@@ -109,7 +109,7 @@ export default {
 
       nextLeft: "Up",
       nextRight: "next",
-      nextLabel: "Discover Pulse Festival",
+      nextLabel: "Discover Mirage",
     },
 
     pulse: {
@@ -148,7 +148,7 @@ export default {
 
       nextLeft: "Up",
       nextRight: "next",
-      nextLabel: "Discover Maë Webflow",
+      nextLabel: "Discover Ornate",
     },
 
     mae: {
@@ -185,7 +185,7 @@ export default {
 
       nextLeft: "Up",
       nextRight: "next",
-      nextLabel: "Discover Ornate",
+      nextLabel: "Discover Memories of Ghibli",
     },
 
     mirage: {
@@ -208,26 +208,26 @@ export default {
       ellipseAlt:
         "Mirage mood image featuring blurred model silhouettes in a smoky haze, framed by flowers in the foreground and background.",
 
-      gallery1Alt:
-        "Mirage campaign featuring a woman in lace inside a greenhouse filled with flowers, plants and neon lights, enveloped in a mysterious haze.",
+      gallery1Description:
+        "Website animation presenting Mirage’s creative projects through a layered carousel of campaign images.",
       gallery2Alt:
         "Mirage campaign featuring a man carrying a leather bag against a blurred orange, pink and green gradient.",
       gallery3Description:
         "Website animation presenting Mirage’s philosophy, with a gradient progressively filling the text on scroll.",
       gallery4Alt:
-        "Mirage campaign featuring a man in a white outfit adorned with feathers and threads in a mountain landscape covered with red flowers.",
-      gallery5Alt:
-        "Mirage campaign featuring a man in lace inside a greenhouse filled with flowers, plants and neon lights, immersed in a mysterious haze.",
+        "Mirage campaign featuring a woman in lace inside a greenhouse filled with flowers, plants and neon lights, enveloped in a mysterious haze.",
+      gallery5Description:
+        "Website animation presenting a list of selected Mirage projects.",
       gallery6Alt:
-        "Variation of the Mirage campaign featuring a man carrying a leather bag against a blurred orange, pink and green gradient.",
-      gallery7Alt:
-        "Mirage campaign featuring a man in a black outfit adorned with feathers and threads in a mountain landscape covered with white flowers.",
+        "Mirage campaign featuring a model in a flowing red garment outdoors beneath a deep blue sky.",
+      gallery7Description:
+        "Website animation presenting Mirage in figures, including 32 completed projects.",
       gallery8Alt:
         "Mirage campaign featuring a woman in lace inside a greenhouse filled with flowers and plants, surrounded by distorted vintage CRT televisions.",
 
       nextLeft: "Up",
       nextRight: "next",
-      nextLabel: "Discover Memories of Ghibli",
+      nextLabel: "Discover Pulse Festival",
     },
 
     ornate: {
@@ -272,7 +272,7 @@ export default {
 
       nextLeft: "Up",
       nextRight: "next",
-      nextLabel: "Discover Mirage",
+      nextLabel: "Discover Maë Webflow",
     },
   },
 

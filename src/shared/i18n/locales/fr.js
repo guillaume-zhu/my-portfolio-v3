@@ -110,7 +110,7 @@ export default {
 
       nextLeft: "À",
       nextRight: "suivre",
-      nextLabel: "Découvrir le projet Pulse Festival",
+      nextLabel: "Découvrir le projet Mirage",
     },
 
     pulse: {
@@ -149,7 +149,7 @@ export default {
 
       nextLeft: "À",
       nextRight: "suivre",
-      nextLabel: "Découvrir le projet Maë Webflow",
+      nextLabel: "Découvrir le projet Ornate",
     },
 
     mae: {
@@ -186,7 +186,7 @@ export default {
 
       nextLeft: "À",
       nextRight: "suivre",
-      nextLabel: "Découvrir le projet Ornate",
+      nextLabel: "Découvrir le projet Memories of Ghibli",
     },
 
     mirage: {
@@ -209,26 +209,26 @@ export default {
       ellipseAlt:
         "Image d’ambiance de Mirage montrant des silhouettes de mannequins floues dans une brume fumée, encadrées par des fleurs au premier et à l’arrière-plan.",
 
-      gallery1Alt:
-        "Campagne de Mirage montrant une femme en dentelle dans une serre remplie de fleurs, de plantes et de néons, traversée par un brouillard mystérieux.",
+      gallery1Description:
+        "Animation du site présentant les projets créatifs de Mirage à travers un carrousel superposé d’images de campagne.",
       gallery2Alt:
         "Campagne de Mirage montrant un homme portant une sacoche en cuir sur un dégradé flou mêlant orange, rose et vert.",
       gallery3Description:
         "Animation du site présentant la philosophie de Mirage, avec un dégradé qui remplit progressivement le texte au scroll.",
       gallery4Alt:
-        "Campagne de Mirage montrant un homme en tenue blanche ornée de plumes et de fils dans un paysage de montagne couvert de fleurs rouges.",
-      gallery5Alt:
-        "Campagne de Mirage montrant un homme en dentelle dans une serre remplie de fleurs, de plantes et de néons, plongée dans un brouillard mystérieux.",
+        "Campagne de Mirage montrant une femme en dentelle dans une serre remplie de fleurs, de plantes et de néons, traversée par un brouillard mystérieux.",
+      gallery5Description:
+        "Animation du site présentant une liste de projets sélectionnés de Mirage.",
       gallery6Alt:
-        "Variante de la campagne Mirage montrant un homme portant une sacoche en cuir sur un dégradé flou orange, rose et vert.",
-      gallery7Alt:
-        "Campagne de Mirage montrant un homme en tenue noire ornée de plumes et de fils dans un paysage de montagne couvert de fleurs blanches.",
+        "Campagne Mirage montrant un modèle vêtu d’une tenue rouge fluide en extérieur sous un ciel bleu profond.",
+      gallery7Description:
+        "Animation du site présentant Mirage en chiffres, dont 32 projets réalisés.",
       gallery8Alt:
         "Campagne de Mirage montrant une femme en dentelle dans une serre remplie de fleurs et de plantes, entourée de télévisions cathodiques brouillées.",
 
       nextLeft: "À",
       nextRight: "suivre",
-      nextLabel: "Découvrir le projet Memories of Ghibli",
+      nextLabel: "Découvrir le projet Pulse Festival",
     },
 
     ornate: {
@@ -273,7 +273,7 @@ export default {
 
       nextLeft: "À",
       nextRight: "suivre",
-      nextLabel: "Découvrir le projet Mirage",
+      nextLabel: "Découvrir le projet Maë Webflow",
     },
   },
 
