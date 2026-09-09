@@ -45,7 +45,7 @@ const PROJECT_IMAGES = {
     "/projects/mirage/previews/mirage-02-square.webp",
     "/projects/mirage/previews/mirage-03-portrait.webp",
     "/projects/mirage/previews/mirage-04-square.webp",
-    "/projects/mirage/previews/mirage-05-square.webp",
+    "/projects/mirage/previews/mirage-05-portrait.webp",
     "/projects/mirage/previews/mirage-06-portrait.webp",
   ],
 }
