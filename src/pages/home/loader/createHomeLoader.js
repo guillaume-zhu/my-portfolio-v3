@@ -25,6 +25,7 @@ export const createHomeLoader = ({ enabled = true, minimumDuration = 1.2 } = {})
   let progressTween = null
   let revealTween = null
   let heroRevealTween = null
+  let resizeObserver = null
   let targetProgress = 0
   let isDisposed = false
 
@@ -43,11 +44,11 @@ export const createHomeLoader = ({ enabled = true, minimumDuration = 1.2 } = {})
   const updateSize = () => {
     if (!renderer || !material) return
 
-    const width = window.innerWidth
-    const height = window.innerHeight
+    const width = loaderElement.clientWidth
+    const height = loaderElement.clientHeight
     const pixelRatio = Math.min(window.devicePixelRatio, 2)
 
-    renderer.setSize(width, height)
+    renderer.setSize(width, height, false)
     renderer.setPixelRatio(pixelRatio)
 
     material.uniforms.uResolution.value.set(width, height)
@@ -129,6 +130,8 @@ export const createHomeLoader = ({ enabled = true, minimumDuration = 1.2 } = {})
       scene.add(loaderPlane)
 
       updateSize()
+      resizeObserver = new ResizeObserver(updateSize)
+      resizeObserver.observe(loaderElement)
       window.addEventListener("resize", updateSize)
 
       await renderer.compileAsync(scene, camera)
@@ -207,6 +210,7 @@ export const createHomeLoader = ({ enabled = true, minimumDuration = 1.2 } = {})
 
     isDisposed = true
 
+    resizeObserver?.disconnect()
     window.removeEventListener("resize", updateSize)
 
     progressTween?.kill()

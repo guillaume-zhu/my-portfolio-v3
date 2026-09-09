@@ -32,6 +32,7 @@ export const createThreeHero = async ({
 
   // Canvas
   const canvas = document.querySelector(".webgl")
+  const renderContainer = canvas.closest(".hero-three__frame")
 
   // Scene
   const scene = new THREE.Scene()
@@ -51,8 +52,8 @@ export const createThreeHero = async ({
   }
 
   const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: renderContainer.clientWidth,
+    height: renderContainer.clientHeight,
     pixelRatio: Math.min(window.devicePixelRatio, qualityProfile.maxPixelRatio),
   }
 
@@ -73,7 +74,7 @@ export const createThreeHero = async ({
     canvas: canvas,
     antialias: true,
   })
-  renderer.setSize(sizes.width, sizes.height)
+  renderer.setSize(sizes.width, sizes.height, false)
   renderer.setPixelRatio(sizes.pixelRatio)
   renderer.setClearColor("#6b6baf")
   renderer.outputColorSpace = THREE.SRGBColorSpace
@@ -439,10 +440,10 @@ export const createThreeHero = async ({
   // ------------------------------------------------
 
   // Resize
-  window.addEventListener("resize", () => {
+  const updateSize = () => {
     // Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
+    sizes.width = renderContainer.clientWidth
+    sizes.height = renderContainer.clientHeight
     sizes.pixelRatio = Math.min(window.devicePixelRatio, qualityProfile.maxPixelRatio)
 
     // Update camera
@@ -453,11 +454,16 @@ export const createThreeHero = async ({
     updateRoleTextsLayout()
 
     // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
+    renderer.setSize(sizes.width, sizes.height, false)
     renderer.setPixelRatio(sizes.pixelRatio)
 
     sceneRenderTarget.setSize(sizes.width * sizes.pixelRatio, sizes.height * sizes.pixelRatio)
-  })
+  }
+
+  const resizeObserver = new ResizeObserver(updateSize)
+
+  resizeObserver.observe(renderContainer)
+  window.addEventListener("resize", updateSize)
 
   // Mouse
   window.addEventListener("mousemove", (event) => {
