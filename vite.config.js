@@ -8,6 +8,7 @@ export default defineConfig({
     rolldownOptions: {
       input: {
         home: resolve(import.meta.dirname, "index.html"),
+        notFound: resolve(import.meta.dirname, "404.html"),
         legal: resolve(import.meta.dirname, "mentions-legales/index.html"),
         playground: resolve(import.meta.dirname, "playground/index.html"),
         maeWebflow: resolve(import.meta.dirname, "projects/mae-webflow/index.html"),

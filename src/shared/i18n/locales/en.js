@@ -7,6 +7,13 @@ export default {
     languageSwitchLabel: "Switch to French",
   },
 
+  notFound: {
+    title: "404 — Page Not Found | Guillaume Zhu",
+    messageLine1: "Lost between",
+    messageLine2: "design and code",
+    backHome: "Go back home",
+  },
+
   home: {
     description:
       "Portfolio of Guillaume Zhu, Front Creative Developer & Art Director, specializing in immersive web experiences, interactive interfaces and art direction.",
