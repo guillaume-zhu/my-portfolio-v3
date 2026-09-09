@@ -7,6 +7,13 @@ export default {
     languageSwitchLabel: "Passer en anglais",
   },
 
+  notFound: {
+    title: "404 — Page introuvable | Guillaume Zhu",
+    messageLine1: "Perdu entre",
+    messageLine2: "design et code",
+    backHome: "Retour à l’accueil",
+  },
+
   home: {
     description:
       "Portfolio de Guillaume Zhu, Front Creative Developer & Art Director, spécialisé en expériences web immersives, interfaces interactives et direction artistique.",
