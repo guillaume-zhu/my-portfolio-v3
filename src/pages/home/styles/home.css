@@ -602,7 +602,7 @@ body[data-interface-color="dark"] {
 
 /* Pin */
 .projects__pin-height {
-  height: 400vh;
+  height: 360vh;
 }
 
 .projects__container {
@@ -698,7 +698,7 @@ body[data-interface-color="dark"] {
 
 @media (max-width: 1024px) and (orientation: portrait) {
   .projects__pin-height {
-    height: 350vh;
+    height: 317vh;
   }
 
   .projects__title {

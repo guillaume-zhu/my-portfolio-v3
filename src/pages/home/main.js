@@ -321,7 +321,9 @@ function createSectionNavigation() {
     }
 
     if (hash === "#projects") {
-      return projectsTimeline?.scrollTrigger?.labelToScroll("projects-visible")
+      const projectsVisibleScroll = projectsTimeline?.scrollTrigger?.labelToScroll("projects-visible")
+
+      return projectsVisibleScroll == null ? null : projectsVisibleScroll - 1
     }
 
     if (hash === "#contact") {
@@ -2253,18 +2255,22 @@ function setupProjects() {
   tl.addLabel("projects-visible")
 
   // Projects to what's next section transition
-  tl.to(
-    container,
-    {
-      scaleX: getResponsiveFrameScaleX,
-      scaleY: 0.98,
-      borderRadius: "0px 0px 32px 32px",
-      transformOrigin: "center top",
-      duration: 0.2,
-      ease: "none",
+  gsap.to(container, {
+    scaleX: getResponsiveFrameScaleX,
+    scaleY: 0.98,
+    borderRadius: "0px 0px 32px 32px",
+    transformOrigin: "center top",
+    ease: "none",
+
+    scrollTrigger: {
+      trigger: ".next-section",
+      start: "top bottom",
+      end: "top 30%",
+      scrub: true,
+      invalidateOnRefresh: true,
+      markers: false,
     },
-    ">",
-  )
+  })
 
   return {
     projectsTimeline: tl,
