@@ -1049,9 +1049,7 @@ function setupTrajectory() {
 
 // Trajectory sentences
 function setupTrajectorySentences() {
-  const supportsPointerInteraction = window.matchMedia(
-    "(hover: hover) and (pointer: fine)",
-  ).matches
+  const supportsPointerInteraction = window.matchMedia("(hover: hover) and (pointer: fine)").matches
 
   const webglSequence = {
     idlePeak: 0.01,
@@ -1070,6 +1068,7 @@ function setupTrajectorySentences() {
   const pinHeight = root.querySelector(".trajectory-sentences__pin-height")
   const container = root.querySelector(".trajectory-sentences__container")
   const sentences = root.querySelectorAll(".trajectory-sentences__sentence")
+  const finalSentence = sentences[sentences.length - 1]
 
   const visualLeft = root.querySelector(".trajectory-sentences__visual--left")
   const visualRight = root.querySelector(".trajectory-sentences__visual--right")
@@ -1091,6 +1090,7 @@ function setupTrajectorySentences() {
     wrapLettersInSpan(sentence)
   })
 
+  const finalSentenceLetters = finalSentence.querySelectorAll("span")
   const firstSentence = sentences[0]
   const firstSentenceLetters = firstSentence.querySelectorAll("span")
 
@@ -1341,6 +1341,28 @@ function setupTrajectorySentences() {
           "trajectoryWakeUp",
         )
 
+        if (supportsPointerInteraction) {
+          tl.to(
+            finalSentenceLetters,
+            {
+              color: "rgba(255, 245, 238, 0)",
+              duration: webglSequence.wakeDuration,
+              ease: "sine.inOut",
+            },
+            "trajectoryWakeUp",
+          )
+
+          tl.to(
+            finalSentence,
+            {
+              "--trajectory-text-stroke-width": "1.5px",
+              duration: webglSequence.wakeDuration,
+              ease: "sine.inOut",
+            },
+            "trajectoryWakeUp",
+          )
+        }
+
         tl.addLabel("trajectoryPlay")
         tl.to({}, { duration: webglSequence.playDuration })
       }
@@ -1357,7 +1379,17 @@ function setupTrajectorySentences() {
   })
   const syncBackground = () => {
     const handoff = tl.labels.trajectoryStaticHandoff
+    const play = tl.labels.trajectoryPlay
+
     trajectoryBackground.setActive(handoff !== undefined && tl.time() >= handoff, shaderState)
+
+    finalSentence.classList.toggle(
+      "is-pointer-play",
+      supportsPointerInteraction &&
+        play !== undefined &&
+        tl.time() >= play &&
+        tl.time() < tl.duration(),
+    )
   }
 
   tl.eventCallback("onUpdate", syncBackground)

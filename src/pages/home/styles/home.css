@@ -280,6 +280,38 @@ body[data-interface-color="dark"] {
   left: 0;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .trajectory-sentences__sentence.is-both {
+    --trajectory-text-stroke-width: 0px;
+
+    -webkit-text-stroke-color: var(--color-cream);
+    -webkit-text-stroke-width: var(--trajectory-text-stroke-width);
+    text-stroke-color: var(--color-cream);
+    text-stroke-width: var(--trajectory-text-stroke-width);
+  }
+
+  .trajectory-sentences__sentence.is-both.is-pointer-play {
+    pointer-events: none;
+    transition:
+      -webkit-text-stroke-width 0.25s ease,
+      text-stroke-width 0.25s ease;
+  }
+
+  .trajectory-sentences__sentence.is-both.is-pointer-play > span {
+    pointer-events: auto;
+    transition: color 0.25s ease;
+  }
+
+  .trajectory-sentences__sentence.is-both.is-pointer-play:hover > span {
+    color: var(--color-cream) !important;
+  }
+
+  .trajectory-sentences__sentence.is-both.is-pointer-play:hover {
+    -webkit-text-stroke-width: 0 !important;
+    text-stroke-width: 0 !important;
+  }
+}
+
 /* Viusal blocks */
 .trajectory-sentences {
   background-color: var(--color-dark);
