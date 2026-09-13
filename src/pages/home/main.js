@@ -12,14 +12,14 @@ import { setupCrossPageTransitions } from "../../shared/page-transition/setupCro
 
 import { createThreeHero } from "./webgl/createThreeHero"
 import { createToolkitCardReveal } from "./webgl/createToolkitCardReveal"
+import { createTrajectoryBackground } from "./webgl/createTrajectoryBackground"
 import {
   createProjectLetterPhysics,
   preloadProjectPhysicsModule,
 } from "./projects/createProjectLetterPhysics"
-import {
-  preloadProjectImages,
-  setupProjectImageHover,
-} from "./projects/setupProjectImageHover"
+import { preloadProjectImages, setupProjectImageHover } from "./projects/setupProjectImageHover"
+
+let trajectoryBackground = null
 
 const i18n = createI18n()
 
@@ -584,6 +584,7 @@ function createSectionNavigation() {
 
 function loadTrajectoryBackground() {
   document.querySelector(".trajectory-sentences")?.classList.add("is-background-ready")
+  void trajectoryBackground?.prepare()
 }
 
 function loadFooterBackground() {
@@ -838,9 +839,7 @@ function setupHeroRenderVisibility(threeHero) {
 // Scene Hero
 function setupHeroScroll(threeHero) {
   const getScrollDistance = () => {
-    const isTouchDevice = window.matchMedia(
-      "(hover: none) and (pointer: coarse)",
-    ).matches
+    const isTouchDevice = window.matchMedia("(hover: none) and (pointer: coarse)").matches
 
     return isTouchDevice ? 2800 : 3500
   }
@@ -1050,6 +1049,21 @@ function setupTrajectory() {
 
 // Trajectory sentences
 function setupTrajectorySentences() {
+  const supportsPointerInteraction = window.matchMedia(
+    "(hover: hover) and (pointer: fine)",
+  ).matches
+
+  const webglSequence = {
+    idlePeak: 0.01,
+    idleStable: 0.012,
+    interactionMax: supportsPointerInteraction ? 1 : 0,
+    zoomActive: 1.02,
+    neutralHold: 0.08,
+    wakeDuration: 0.4,
+    wakePeakRatio: 0.5,
+    playDuration: 0.42,
+  }
+  const shaderState = { idleStrength: 0, interactionStrength: 0, zoom: 1 }
   const root = document.querySelector(".trajectory-sentences")
   if (!root) return
 
@@ -1059,6 +1073,8 @@ function setupTrajectorySentences() {
 
   const visualLeft = root.querySelector(".trajectory-sentences__visual--left")
   const visualRight = root.querySelector(".trajectory-sentences__visual--right")
+
+  trajectoryBackground = createTrajectoryBackground(root, { reducedMotion: prefersReducedMotion })
 
   // Initial visuals positions
   gsap.set(visualLeft, {
@@ -1278,6 +1294,8 @@ function setupTrajectorySentences() {
         ">+=0.2",
       )
 
+      tl.addLabel("trajectoryStaticHandoff", tl.recent().endTime())
+
       // Change header color over fullscreen visuals
       tl.to(
         {},
@@ -1295,8 +1313,37 @@ function setupTrajectorySentences() {
         ">-35%",
       )
 
-      // Hold final state
-      tl.to({}, { duration: 0.4 })
+      if (prefersReducedMotion) {
+        tl.to({}, { duration: 0.4 })
+      } else {
+        // Keep the validated handoff neutral before waking the shader.
+        tl.to({}, { duration: webglSequence.neutralHold })
+        tl.addLabel("trajectoryWakeUp")
+
+        tl.to(shaderState, {
+          idleStrength: webglSequence.idlePeak,
+          duration: webglSequence.wakeDuration * webglSequence.wakePeakRatio,
+          ease: "sine.inOut",
+        })
+        tl.to(shaderState, {
+          idleStrength: webglSequence.idleStable,
+          duration: webglSequence.wakeDuration * (1 - webglSequence.wakePeakRatio),
+          ease: "sine.inOut",
+        })
+        tl.to(
+          shaderState,
+          {
+            interactionStrength: webglSequence.interactionMax,
+            zoom: webglSequence.zoomActive,
+            duration: webglSequence.wakeDuration,
+            ease: "sine.inOut",
+          },
+          "trajectoryWakeUp",
+        )
+
+        tl.addLabel("trajectoryPlay")
+        tl.to({}, { duration: webglSequence.playDuration })
+      }
 
       // Change backgroud color for transition
       tl.set(
@@ -1308,6 +1355,15 @@ function setupTrajectorySentences() {
       )
     }
   })
+  const syncBackground = () => {
+    const handoff = tl.labels.trajectoryStaticHandoff
+    trajectoryBackground.setActive(handoff !== undefined && tl.time() >= handoff, shaderState)
+  }
+
+  tl.eventCallback("onUpdate", syncBackground)
+  ScrollTrigger.addEventListener("refresh", syncBackground)
+  syncBackground()
+
   return tl
 }
 
@@ -2305,10 +2361,7 @@ function setupNextSection() {
   const textEndPoint = text.getEndPositionOfChar(lastCharacterIndex)
   const textEndLength = getPathLengthAtX(textEndPoint.x)
 
-  const orbGap = Math.max(
-    0,
-    (textLengthWithDot - textLength) / 2,
-  )
+  const orbGap = Math.max(0, (textLengthWithDot - textLength) / 2)
 
   const orbLength = textEndLength + orbGap
 
@@ -2428,11 +2481,9 @@ function setupNextSection() {
     const footerCenterX = footerRect.left + footerRect.width / 2
     const footerCenterY = footerRect.top + footerRect.height / 2
 
-    footerCenterOffset.x =
-      (footerCenterX - svgRect.left) * (viewBoxWidth / svgRect.width)
+    footerCenterOffset.x = (footerCenterX - svgRect.left) * (viewBoxWidth / svgRect.width)
 
-    footerCenterOffset.y =
-      (footerCenterY - svgRect.top) * (viewBoxHeight / svgRect.height)
+    footerCenterOffset.y = (footerCenterY - svgRect.top) * (viewBoxHeight / svgRect.height)
   }
 
   refreshNextMeasurements()
@@ -2475,10 +2526,7 @@ function setupNextSection() {
 
       if (visibleCharacters !== previousVisibleCharacters) {
         const visibleCreamCharacters = Math.min(visibleCharacters, creamCharacters.length)
-        const visibleGradientCharacters = Math.max(
-          0,
-          visibleCharacters - creamCharacters.length,
-        )
+        const visibleGradientCharacters = Math.max(0, visibleCharacters - creamCharacters.length)
 
         creamTextPart.textContent = creamCharacters.slice(0, visibleCreamCharacters).join("")
         gradientTextPart.textContent = gradientCharacters
@@ -2507,8 +2555,7 @@ function setupNextSection() {
       // Orb movement
       const orbMoveProgress = getPhaseProgress(finalProgress, orbMoveStart, orbMoveEnd)
 
-      const footerCenterPoint =
-        orbMoveProgress > 0 ? getFooterCenterAsSvgPoint() : orbPoint
+      const footerCenterPoint = orbMoveProgress > 0 ? getFooterCenterAsSvgPoint() : orbPoint
 
       const orbX = gsap.utils.interpolate(orbPoint.x, footerCenterPoint.x, orbMoveProgress)
       const orbY = gsap.utils.interpolate(orbPoint.y, footerCenterPoint.y, orbMoveProgress)
@@ -2528,8 +2575,7 @@ function setupNextSection() {
         footerRevealProgress,
       )
 
-      const shouldUpdateFooterReveal =
-        footerRevealProgress > 0 || previousFooterRevealProgress > 0
+      const shouldUpdateFooterReveal = footerRevealProgress > 0 || previousFooterRevealProgress > 0
 
       if (shouldUpdateFooterReveal) {
         const footerClipPath = `circle(${footerRevealRadius}px at 50% 50%)`

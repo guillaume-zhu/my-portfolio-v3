@@ -15,6 +15,12 @@ uniform float u_strength;
 uniform float u_radius;
 uniform float u_zoom;
 
+#ifdef TRAJECTORY_MAPPING
+uniform float u_interactionStrength;
+uniform vec2 u_cssScale;
+uniform float u_split;
+#endif
+
 varying vec2 v_uv;
 
 vec2 coverUv(vec2 uv, vec2 viewportResolution, vec2 imageResolution) {
@@ -30,6 +36,20 @@ vec2 coverUv(vec2 uv, vec2 viewportResolution, vec2 imageResolution) {
 
   return (uv - 0.5) * scale + 0.5;
 }
+
+#ifdef TRAJECTORY_MAPPING
+vec2 stretchUv(vec2 uv) {
+  vec2 imageUv = vec2(
+    uv.x * u_cssScale.x,
+    (uv.y - 0.5) * u_cssScale.y + 0.5
+  );
+  // Keep the split anchored to the frame, including during distortion.
+  if (v_uv.x >= u_split) {
+    imageUv.x += 1.0 - u_cssScale.x;
+  }
+  return imageUv;
+}
+#endif
 
 void main() {
   vec2 uv = v_uv;
@@ -49,7 +69,19 @@ void main() {
   float mouseInfluence = smoothstep(u_radius, 0.0, length(mouseDelta));
   vec2 mouseOffset = u_velocity * mouseInfluence * u_strength;
 
+#ifdef TRAJECTORY_MAPPING
+  vec2 imageUv = uv;
+  if (u_idleStrength != 0.0) {
+    imageUv += idleOffset;
+  }
+  if (u_interactionStrength != 0.0) {
+    imageUv -= mouseOffset * u_interactionStrength;
+  }
+  imageUv = stretchUv(imageUv);
+  imageUv = (imageUv - 0.5) / u_zoom + 0.5;
+#else
   vec2 imageUv = coverUv(uv + idleOffset - mouseOffset, u_resolution, u_imageResolution);
   imageUv = (imageUv - 0.5) / u_zoom + 0.5;
+#endif
   gl_FragColor = texture2D(u_image, imageUv);
 }
