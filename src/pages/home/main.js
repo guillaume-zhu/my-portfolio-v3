@@ -321,7 +321,8 @@ function createSectionNavigation() {
     }
 
     if (hash === "#projects") {
-      const projectsVisibleScroll = projectsTimeline?.scrollTrigger?.labelToScroll("projects-visible")
+      const projectsVisibleScroll =
+        projectsTimeline?.scrollTrigger?.labelToScroll("projects-visible")
 
       return projectsVisibleScroll == null ? null : projectsVisibleScroll - 1
     }
@@ -1409,6 +1410,7 @@ function setupTrajectorySentences() {
 // Trajectory to Toolkit transition
 function setupTrajectoryToToolkitTransition() {
   const trajectoryFrame = document.querySelector(".trajectory-sentences__container")
+  const trajectoryContent = document.querySelector(".trajectory-sentences__center")
   const toolkit = document.querySelector(".toolkit")
   const toolkitTitle = document.querySelector(".toolkit__title")
 
@@ -1430,6 +1432,16 @@ function setupTrajectoryToToolkitTransition() {
       scaleY: 0.98,
       borderRadius: "0px 0px 32px 32px",
       transformOrigin: "center top",
+      ease: "none",
+    },
+    0,
+  )
+
+  tl.to(
+    trajectoryContent,
+    {
+      scale: 0.85,
+      transformOrigin: "center center",
       ease: "none",
     },
     0,
@@ -2117,6 +2129,7 @@ function setupProjects() {
   const container = root.querySelector(".projects__container")
 
   const title = root.querySelector(".projects__title")
+  const list = root.querySelector(".projects__list")
   const links = root.querySelectorAll(".projects__link")
 
   // ----------------------
@@ -2255,13 +2268,7 @@ function setupProjects() {
   tl.addLabel("projects-visible")
 
   // Projects to what's next section transition
-  gsap.to(container, {
-    scaleX: getResponsiveFrameScaleX,
-    scaleY: 0.98,
-    borderRadius: "0px 0px 32px 32px",
-    transformOrigin: "center top",
-    ease: "none",
-
+  const nextTransitionTl = gsap.timeline({
     scrollTrigger: {
       trigger: ".next-section",
       start: "top bottom",
@@ -2271,6 +2278,29 @@ function setupProjects() {
       markers: false,
     },
   })
+
+  nextTransitionTl.to(
+    container,
+    {
+      scaleX: getResponsiveFrameScaleX,
+      scaleY: 0.98,
+      borderRadius: "0px 0px 32px 32px",
+      transformOrigin: "center top",
+      ease: "none",
+    },
+    0,
+  )
+
+  // Shared origin at the frame center so title and list recede as one block
+  nextTransitionTl.to(
+    [title, list],
+    {
+      scale: 0.85,
+      transformOrigin: (index, target) => `50% ${container.clientHeight / 2 - target.offsetTop}px`,
+      ease: "none",
+    },
+    0,
+  )
 
   return {
     projectsTimeline: tl,
