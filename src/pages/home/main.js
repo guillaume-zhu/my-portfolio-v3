@@ -1440,7 +1440,7 @@ function setupTrajectoryToToolkitTransition() {
   tl.to(
     trajectoryContent,
     {
-      scale: 0.85,
+      scale: 0.9,
       transformOrigin: "center center",
       ease: "none",
     },
@@ -2295,7 +2295,7 @@ function setupProjects() {
   nextTransitionTl.to(
     [title, list],
     {
-      scale: 0.85,
+      scale: 0.9,
       transformOrigin: (index, target) => `50% ${container.clientHeight / 2 - target.offsetTop}px`,
       ease: "none",
     },
