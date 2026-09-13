@@ -239,7 +239,7 @@ function getPhaseProgress(progress, start, end) {
 }
 
 function getResponsiveFrameScaleX() {
-  const sideInset = Math.max(8, window.innerWidth * 0.01)
+  const sideInset = gsap.utils.clamp(8, 40, window.innerWidth * 0.025 - 8)
 
   return 1 - (sideInset * 2) / window.innerWidth
 }
@@ -884,7 +884,7 @@ function setupHeroToManifestoTransition() {
 
     scrollTrigger: {
       trigger: ".manifesto",
-      start: "top bottom-=500",
+      start: "top bottom-=250",
       end: "top bottom-=900",
       scrub: true,
       invalidateOnRefresh: true,
@@ -969,7 +969,7 @@ function setupManifesto() {
     scrollTrigger: {
       trigger: ".trajectory",
       start: "top bottom",
-      end: "top 50%",
+      end: "top 30%",
       scrub: true,
       invalidateOnRefresh: true,
       markers: false,
@@ -1414,7 +1414,7 @@ function setupTrajectoryToToolkitTransition() {
     scrollTrigger: {
       trigger: toolkit,
       start: "top bottom",
-      end: "top 50%",
+      end: "top 30%",
       scrub: true,
       invalidateOnRefresh: true,
       markers: false,
