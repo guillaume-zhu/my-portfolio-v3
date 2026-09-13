@@ -239,7 +239,7 @@ function getPhaseProgress(progress, start, end) {
 }
 
 function getResponsiveFrameScaleX() {
-  const sideInset = Math.max(8, window.innerWidth * 0.01)
+  const sideInset = gsap.utils.clamp(8, 40, window.innerWidth * 0.025 - 8)
 
   return 1 - (sideInset * 2) / window.innerWidth
 }
@@ -321,7 +321,10 @@ function createSectionNavigation() {
     }
 
     if (hash === "#projects") {
-      return projectsTimeline?.scrollTrigger?.labelToScroll("projects-visible")
+      const projectsVisibleScroll =
+        projectsTimeline?.scrollTrigger?.labelToScroll("projects-visible")
+
+      return projectsVisibleScroll == null ? null : projectsVisibleScroll - 1
     }
 
     if (hash === "#contact") {
@@ -884,7 +887,7 @@ function setupHeroToManifestoTransition() {
 
     scrollTrigger: {
       trigger: ".manifesto",
-      start: "top bottom-=500",
+      start: "top bottom-=250",
       end: "top bottom-=900",
       scrub: true,
       invalidateOnRefresh: true,
@@ -906,11 +909,16 @@ function setupManifesto() {
     return text.clientWidth - document.body.clientWidth
   }
 
-  const getPinDistance = () => {
-    const scrollDistance = getScrollDistance()
-    const overlapDistance = Math.min(1175, scrollDistance * 0.2)
+  const manifestoScrollRatio = 0.65
+  const getScrollDuration = () => {
+    return getScrollDistance() * manifestoScrollRatio
+  }
 
-    return Math.max(scrollDistance - overlapDistance, 1)
+  const getPinDistance = () => {
+    const scrollDuration = getScrollDuration()
+    const overlapDistance = Math.min(1175 * manifestoScrollRatio, scrollDuration * 0.2)
+
+    return Math.max(scrollDuration - overlapDistance, 1)
   }
 
   // 1. Pin only
@@ -930,7 +938,7 @@ function setupManifesto() {
     scrollTrigger: {
       trigger: ".manifesto .container",
       start: "top top",
-      end: () => `+=${getScrollDistance()}`,
+      end: () => `+=${getScrollDuration()}`,
       scrub: true,
       invalidateOnRefresh: true,
       markers: false,
@@ -964,7 +972,7 @@ function setupManifesto() {
     scrollTrigger: {
       trigger: ".trajectory",
       start: "top bottom",
-      end: "top 50%",
+      end: "top 30%",
       scrub: true,
       invalidateOnRefresh: true,
       markers: false,
@@ -1402,6 +1410,7 @@ function setupTrajectorySentences() {
 // Trajectory to Toolkit transition
 function setupTrajectoryToToolkitTransition() {
   const trajectoryFrame = document.querySelector(".trajectory-sentences__container")
+  const trajectoryContent = document.querySelector(".trajectory-sentences__center")
   const toolkit = document.querySelector(".toolkit")
   const toolkitTitle = document.querySelector(".toolkit__title")
 
@@ -1409,7 +1418,7 @@ function setupTrajectoryToToolkitTransition() {
     scrollTrigger: {
       trigger: toolkit,
       start: "top bottom",
-      end: "top 50%",
+      end: "top 30%",
       scrub: true,
       invalidateOnRefresh: true,
       markers: false,
@@ -1423,6 +1432,16 @@ function setupTrajectoryToToolkitTransition() {
       scaleY: 0.98,
       borderRadius: "0px 0px 32px 32px",
       transformOrigin: "center top",
+      ease: "none",
+    },
+    0,
+  )
+
+  tl.to(
+    trajectoryContent,
+    {
+      scale: 0.85,
+      transformOrigin: "center center",
       ease: "none",
     },
     0,
@@ -2110,6 +2129,7 @@ function setupProjects() {
   const container = root.querySelector(".projects__container")
 
   const title = root.querySelector(".projects__title")
+  const list = root.querySelector(".projects__list")
   const links = root.querySelectorAll(".projects__link")
 
   // ----------------------
@@ -2248,17 +2268,38 @@ function setupProjects() {
   tl.addLabel("projects-visible")
 
   // Projects to what's next section transition
-  tl.to(
+  const nextTransitionTl = gsap.timeline({
+    scrollTrigger: {
+      trigger: ".next-section",
+      start: "top bottom",
+      end: "top 30%",
+      scrub: true,
+      invalidateOnRefresh: true,
+      markers: false,
+    },
+  })
+
+  nextTransitionTl.to(
     container,
     {
       scaleX: getResponsiveFrameScaleX,
       scaleY: 0.98,
       borderRadius: "0px 0px 32px 32px",
       transformOrigin: "center top",
-      duration: 0.2,
       ease: "none",
     },
-    ">",
+    0,
+  )
+
+  // Shared origin at the frame center so title and list recede as one block
+  nextTransitionTl.to(
+    [title, list],
+    {
+      scale: 0.85,
+      transformOrigin: (index, target) => `50% ${container.clientHeight / 2 - target.offsetTop}px`,
+      ease: "none",
+    },
+    0,
   )
 
   return {
@@ -2462,7 +2503,7 @@ function setupNextSection() {
     scrollTrigger: {
       trigger: pinHeight,
       start: "top top",
-      end: "top+=25% top",
+      end: "top+=8% top",
       scrub: true,
       markers: false,
     },
@@ -2472,7 +2513,7 @@ function setupNextSection() {
   // 8. Scroll settings
   // ----------------------
   // Text path progression
-  const pathStart = 0.28
+  const pathStart = 0.1
   const pathEnd = 0.82
 
   // Keep the writing edge toward the right, then center it before the orb transition.
