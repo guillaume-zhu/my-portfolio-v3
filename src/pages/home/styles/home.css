@@ -236,12 +236,12 @@ body[data-interface-color="dark"] {
 
 /* Sentences */
 .trajectory-sentences__pin-height {
-  height: 1280vh;
+  height: 1100vh;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .trajectory-sentences__pin-height {
-    height: 1200vh;
+    height: 1080vh;
   }
 }
 
@@ -394,7 +394,7 @@ body[data-interface-color="dark"] {
 
 /* Scroll distance */
 .toolkit__pin-height {
-  height: 900vh;
+  height: 600vh;
 }
 
 /* Pinned scene */

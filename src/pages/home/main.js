@@ -906,11 +906,16 @@ function setupManifesto() {
     return text.clientWidth - document.body.clientWidth
   }
 
-  const getPinDistance = () => {
-    const scrollDistance = getScrollDistance()
-    const overlapDistance = Math.min(1175, scrollDistance * 0.2)
+  const manifestoScrollRatio = 0.65
+  const getScrollDuration = () => {
+    return getScrollDistance() * manifestoScrollRatio
+  }
 
-    return Math.max(scrollDistance - overlapDistance, 1)
+  const getPinDistance = () => {
+    const scrollDuration = getScrollDuration()
+    const overlapDistance = Math.min(1175 * manifestoScrollRatio, scrollDuration * 0.2)
+
+    return Math.max(scrollDuration - overlapDistance, 1)
   }
 
   // 1. Pin only
@@ -930,7 +935,7 @@ function setupManifesto() {
     scrollTrigger: {
       trigger: ".manifesto .container",
       start: "top top",
-      end: () => `+=${getScrollDistance()}`,
+      end: () => `+=${getScrollDuration()}`,
       scrub: true,
       invalidateOnRefresh: true,
       markers: false,
@@ -2462,7 +2467,7 @@ function setupNextSection() {
     scrollTrigger: {
       trigger: pinHeight,
       start: "top top",
-      end: "top+=25% top",
+      end: "top+=8% top",
       scrub: true,
       markers: false,
     },
@@ -2472,7 +2477,7 @@ function setupNextSection() {
   // 8. Scroll settings
   // ----------------------
   // Text path progression
-  const pathStart = 0.28
+  const pathStart = 0.1
   const pathEnd = 0.82
 
   // Keep the writing edge toward the right, then center it before the orb transition.
