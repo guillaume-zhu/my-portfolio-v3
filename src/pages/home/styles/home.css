@@ -78,6 +78,8 @@ body[data-interface-color="dark"] {
 
 /* -------- HERO THREE SECTION -------- */
 .hero-three {
+  --hero-frame-inset: clamp(8px, calc(2.5vw - 8px), 16px);
+
   position: relative;
   height: 100vh;
   width: 100%;
@@ -91,10 +93,12 @@ body[data-interface-color="dark"] {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  border-radius: 0px 0px 0px 0px;
+  border-radius: 18px;
+  -webkit-clip-path: inset(var(--hero-frame-inset) round 18px);
+  clip-path: inset(var(--hero-frame-inset) round 18px);
   transform-origin: center top;
   z-index: 1;
-  will-change: transform, border-radius;
+  will-change: transform;
 }
 
 .webgl {
@@ -830,15 +834,15 @@ body[data-interface-color="dark"] {
 /* -------- FOOTER -------- */
 .next-footer {
   position: absolute;
-  left: 24px;
-  right: 24px;
-  bottom: 24px;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
   z-index: 1;
 
-  height: calc(50vh - 24px);
+  height: calc(50vh - 18px);
 
   overflow: hidden;
-  border-radius: 32px;
+  border-radius: 18px;
 
   clip-path: circle(0px at 50% 50%);
   will-change: clip-path;

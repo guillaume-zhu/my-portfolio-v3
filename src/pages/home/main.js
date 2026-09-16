@@ -247,6 +247,19 @@ function getResponsiveFrameScaleX() {
   return 1 - (sideInset * 2) / window.innerWidth
 }
 
+function getResponsiveHeroFrameInset() {
+  return gsap.utils.clamp(8, 18, window.innerWidth * 0.025 - 8)
+}
+
+function getResponsiveHeroFrameScaleX() {
+  const viewportWidth = window.innerWidth
+  const initialInset = getResponsiveHeroFrameInset()
+  const initialVisibleWidth = viewportWidth - initialInset * 2
+  const historicalFinalWidth = viewportWidth * getResponsiveFrameScaleX()
+
+  return historicalFinalWidth / initialVisibleWidth
+}
+
 // Header body interface color
 function setInterfaceColor(color) {
   if (document.body.dataset.interfaceColor === color) return
@@ -904,15 +917,14 @@ function setupHeroScroll(threeHero) {
 // Hero to Manifesto transition
 function setupHeroToManifestoTransition() {
   gsap.to(".hero-three__frame", {
-    scaleX: getResponsiveFrameScaleX,
+    scaleX: getResponsiveHeroFrameScaleX,
     scaleY: 0.98,
-    borderRadius: "0px 0px 32px 32px",
     ease: "none",
 
     scrollTrigger: {
       trigger: ".manifesto",
       start: "top bottom-=250",
-      end: "top bottom-=900",
+      end: "top bottom-=1100",
       scrub: true,
       invalidateOnRefresh: true,
       markers: false,
