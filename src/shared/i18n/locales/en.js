@@ -42,7 +42,7 @@ export default {
     projectsTitle: "Projects",
 
     nextIntro: "What’s next?",
-    playgroundLink: "A detour through the Playground ↗",
+    playgroundLink: "A detour through the Playground",
     nextTextCream: "If our visions align,",
     nextTextGradient: "let’s shape what’s next together",
 

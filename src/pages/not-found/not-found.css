@@ -3,6 +3,7 @@
 @import "../../shared/styles/typography.css";
 @import "../../shared/styles/variables.css";
 @import "../../shared/site-header/header.css";
+@import "../../shared/link-hover/link-hover.css";
 
 html,
 body {
@@ -13,7 +14,7 @@ body {
 
 .not-found-page {
   --current-interface-color: var(--color-cream);
-  --not-found-side-inset: max(8px, 1vw);
+  --not-found-frame-inset: clamp(8px, calc(2.5vw - 8px), 16px);
 
   min-height: 100vh;
   min-height: 100svh;
@@ -38,11 +39,7 @@ body {
 
 .not-found__scene {
   position: fixed;
-  top: var(--not-found-side-inset);
-  right: var(--not-found-side-inset);
-  bottom: 2vh;
-  bottom: 2dvh;
-  left: var(--not-found-side-inset);
+  inset: var(--not-found-frame-inset);
 
   overflow: hidden;
 

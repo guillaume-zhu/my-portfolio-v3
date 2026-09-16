@@ -3,11 +3,8 @@
 @import "../../shared/styles/typography.css";
 @import "../../shared/styles/variables.css";
 @import "../../shared/site-header/header.css";
+@import "../../shared/link-hover/link-hover.css";
 @import "../../shared/page-transition/page-transition.css";
-
-html {
-  scroll-behavior: smooth;
-}
 
 /* -------- CREDITS PAGE -------- */
 .credits-page {
@@ -220,8 +217,7 @@ html {
 
 .credits-list__license {
   white-space: nowrap;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
+  text-decoration: none;
 }
 
 .credits-section__note {
@@ -271,8 +267,7 @@ html {
 .credits-resource__links a {
   color: inherit;
   font-size: 0.875rem;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
+  text-decoration: none;
 }
 
 .credits-resource__legal {

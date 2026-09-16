@@ -5,7 +5,9 @@ import "lenis/dist/lenis.css"
 
 import { createHomeLoader } from "./loader/createHomeLoader"
 import { createI18n } from "../../shared/i18n"
+import { setupPlaygroundLinkHover } from "../../shared/link-hover/setupPlaygroundLinkHover"
 import { createSiteHeader } from "../../shared/site-header/createSiteHeader"
+import { setupHeaderVisibility } from "../../shared/site-header/setupHeaderVisibility"
 import { prefersReducedMotion } from "../../shared/motion/preference"
 import { createIncomingPageTransition } from "../../shared/page-transition/createPageTransition"
 import { setupCrossPageTransitions } from "../../shared/page-transition/setupCrossPageTransitions"
@@ -37,6 +39,8 @@ document.querySelectorAll(".trajectory-sentences__sentence > [data-i18n]").forEa
 gsap.registerPlugin(ScrollTrigger)
 
 createSiteHeader(i18n)
+setupPlaygroundLinkHover()
+setHeaderCapsuleVariant("soft-white")
 
 // Home loader session
 const shouldShowHomeLoader = document.documentElement.dataset.homeLoaderState === "pending"
@@ -51,6 +55,7 @@ const lenis = new Lenis({
 })
 
 lenis.on("scroll", ScrollTrigger.update)
+setupHeaderVisibility(lenis)
 
 // Drive Lenis from the GSAP ticker
 gsap.ticker.add((time) => {
@@ -169,6 +174,7 @@ document.fonts.ready.then(() => {
   setupToolkit()
   const { projectsTimeline, ensureProjectPhysics } = setupProjects()
   const nextSectionTrigger = setupNextSection()
+  setupNextPlaygroundLinkCue()
 
   setupHeaderTheme()
   setupScrollIndicator()
@@ -244,10 +250,32 @@ function getResponsiveFrameScaleX() {
   return 1 - (sideInset * 2) / window.innerWidth
 }
 
+function getResponsiveHeroFrameInset() {
+  return gsap.utils.clamp(8, 18, window.innerWidth * 0.025 - 8)
+}
+
+function getResponsiveHeroFrameScaleX() {
+  const viewportWidth = window.innerWidth
+  const initialInset = getResponsiveHeroFrameInset()
+  const initialVisibleWidth = viewportWidth - initialInset * 2
+  const historicalFinalWidth = viewportWidth * getResponsiveFrameScaleX()
+
+  return historicalFinalWidth / initialVisibleWidth
+}
+
 // Header body interface color
 function setInterfaceColor(color) {
   if (document.body.dataset.interfaceColor === color) return
   document.body.dataset.interfaceColor = color
+}
+
+function setHeaderCapsuleVariant(variant = null) {
+  if (variant) {
+    document.body.dataset.headerCapsuleVariant = variant
+    return
+  }
+
+  delete document.body.dataset.headerCapsuleVariant
 }
 
 // ----------------------
@@ -365,12 +393,16 @@ function createSectionNavigation() {
     lenis.scrollTo(targetScroll, {
       immediate,
       force: true,
+      userData: {
+        keepHeaderVisible: true,
+      },
     })
 
     // An immediate jump does not naturally pass through every theme trigger
     if (immediate) {
       ScrollTrigger.update()
       setInterfaceColor(interfaceColorByHash[hash])
+      setHeaderCapsuleVariant(hash === "#hero" ? "soft-white" : null)
     }
 
     updateUrl(hash, historyMode)
@@ -420,10 +452,14 @@ function createSectionNavigation() {
             lenis.scrollTo(0, {
               immediate: true,
               force: true,
+              userData: {
+                keepHeaderVisible: true,
+              },
             })
 
             ScrollTrigger.update()
             setInterfaceColor("cream")
+            setHeaderCapsuleVariant("soft-white")
 
             history.pushState(null, "", window.location.pathname + window.location.search)
           },
@@ -857,18 +893,22 @@ function setupHeroScroll(threeHero) {
     markers: false,
 
     onEnter: () => {
+      setHeaderCapsuleVariant("soft-white")
       threeHero.setInteractive(true)
     },
 
     onEnterBack: () => {
+      setHeaderCapsuleVariant("soft-white")
       threeHero.setInteractive(true)
     },
 
     onLeave: () => {
+      setHeaderCapsuleVariant()
       threeHero.setInteractive(false)
     },
 
     onLeaveBack: () => {
+      setHeaderCapsuleVariant("soft-white")
       threeHero.setInteractive(false)
     },
 
@@ -880,15 +920,14 @@ function setupHeroScroll(threeHero) {
 // Hero to Manifesto transition
 function setupHeroToManifestoTransition() {
   gsap.to(".hero-three__frame", {
-    scaleX: getResponsiveFrameScaleX,
+    scaleX: getResponsiveHeroFrameScaleX,
     scaleY: 0.98,
-    borderRadius: "0px 0px 32px 32px",
     ease: "none",
 
     scrollTrigger: {
       trigger: ".manifesto",
       start: "top bottom-=250",
-      end: "top bottom-=900",
+      end: "top bottom-=300",
       scrub: true,
       invalidateOnRefresh: true,
       markers: false,
@@ -995,6 +1034,12 @@ function setupTrajectory() {
     const title = container.querySelector(".title")
     wrapLettersInSpan(title)
 
+    // Inner layer for the entry offset, the pinned h2 stays untouched
+    const titleMotion = document.createElement("span")
+    titleMotion.className = "trajectory-title__motion"
+    titleMotion.append(...title.childNodes)
+    title.append(titleMotion)
+
     const getDistance = () => {
       return Math.max(container.clientHeight - title.clientHeight, 1)
     }
@@ -1003,11 +1048,31 @@ function setupTrajectory() {
       trigger: container,
       pin: title,
       start: "top top",
-      end: () => `+=${getDistance()}`,
+      end: () => `+=${getDistance() * 1.2}`,
       invalidateOnRefresh: true,
     })
 
-    const letters = container.querySelectorAll("span")
+    // Bring the title closer during Manifesto to trajectory transition
+    gsap.fromTo(
+      titleMotion,
+      {
+        y: () => -getDistance() * 0.5,
+      },
+      {
+        y: 0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: root,
+          start: "top bottom",
+          end: "top 30%",
+          scrub: true,
+          invalidateOnRefresh: true,
+          markers: false,
+        },
+      },
+    )
+
+    const letters = titleMotion.querySelectorAll(".letter")
     letters.forEach((letter) => {
       const randomDistanceRatio = Math.random()
       const getRandomDistance = () => getDistance() * randomDistanceRatio
@@ -1031,8 +1096,8 @@ function setupTrajectory() {
       ease: "none",
       scrollTrigger: {
         trigger: container,
-        start: () => `top+=${getDistance() * 0.75} top`,
-        end: () => `top+=${getDistance()} top`,
+        start: () => `top+=${getDistance() * 0.8} top`,
+        end: () => `top+=${getDistance() * 1.5} top`,
         scrub: true,
         invalidateOnRefresh: true,
       },
@@ -1312,10 +1377,12 @@ function setupTrajectorySentences() {
 
           onStart: () => {
             setInterfaceColor("cream")
+            setHeaderCapsuleVariant("soft-white")
           },
 
           onReverseComplete: () => {
             setInterfaceColor("dark")
+            setHeaderCapsuleVariant()
           },
         },
         ">-35%",
@@ -1353,7 +1420,7 @@ function setupTrajectorySentences() {
           tl.to(
             finalSentenceLetters,
             {
-              color: "rgba(255, 245, 238, 0)",
+              color: "rgba(245, 231, 223, 0)",
               duration: webglSequence.wakeDuration,
               ease: "sine.inOut",
             },
@@ -1422,6 +1489,8 @@ function setupTrajectoryToToolkitTransition() {
       scrub: true,
       invalidateOnRefresh: true,
       markers: false,
+      onEnter: () => setHeaderCapsuleVariant(),
+      onLeaveBack: () => setHeaderCapsuleVariant("soft-white"),
     },
   })
 
@@ -2308,6 +2377,78 @@ function setupProjects() {
   }
 }
 
+function setupNextPlaygroundLinkCue() {
+  if (prefersReducedMotion) return
+
+  const link = document.querySelector(".next-section__playground-link")
+  const section = link?.closest(".next-section")
+  const letters = link ? Array.from(link.querySelectorAll(".playground-link__letter")) : []
+
+  if (!section || !letters.length) return
+
+  let cue = null
+
+  link.addEventListener("playground-hover-start", () => {
+    if (!cue) return
+
+    cue.kill()
+    cue = null
+    gsap.set(letters, { yPercent: 0 })
+  })
+
+  ScrollTrigger.create({
+    trigger: section,
+    start: "top 75%",
+    once: true,
+
+    onEnter: () => {
+      if (link.matches(":hover")) return
+
+      const propagationDuration = 0.22
+      const stagger = letters.length > 1 ? propagationDuration / (letters.length - 1) : 0
+
+      cue = gsap.timeline({
+        onComplete: () => {
+          cue = null
+        },
+      })
+
+      letters.forEach((letter, index) => {
+        const start = index * stagger
+
+        cue
+          .to(
+            letter,
+            {
+              yPercent: -12,
+              duration: 0.12,
+              ease: "power2.out",
+            },
+            start,
+          )
+          .to(
+            letter,
+            {
+              yPercent: 5,
+              duration: 0.1,
+              ease: "sine.inOut",
+            },
+            start + 0.12,
+          )
+          .to(
+            letter,
+            {
+              yPercent: 0,
+              duration: 0.14,
+              ease: "power2.out",
+            },
+            start + 0.22,
+          )
+      })
+    },
+  })
+}
+
 // What's next section
 function setupNextSection() {
   // ----------------------
@@ -2502,8 +2643,8 @@ function setupNextSection() {
 
     scrollTrigger: {
       trigger: pinHeight,
-      start: "top top",
-      end: "top+=8% top",
+      start: "top+=3% top",
+      end: "top+=7.5% top",
       scrub: true,
       markers: false,
     },

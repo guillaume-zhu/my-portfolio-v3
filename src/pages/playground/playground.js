@@ -2,6 +2,7 @@ import { gsap } from "gsap"
 import { Observer } from "gsap/Observer"
 
 import { createI18n } from "../../shared/i18n"
+import { setupPlaygroundLinkHover } from "../../shared/link-hover/setupPlaygroundLinkHover"
 import { createSiteHeader } from "../../shared/site-header/createSiteHeader"
 import { prefersReducedMotion } from "../../shared/motion/preference"
 import { createIncomingPageTransition } from "../../shared/page-transition/createPageTransition"
@@ -9,8 +10,11 @@ import { setupCrossPageTransitions } from "../../shared/page-transition/setupCro
 
 const i18n = createI18n()
 
+document.body.dataset.headerCapsuleVariant = "soft-white"
+
 i18n.applyTranslations()
 createSiteHeader(i18n)
+setupPlaygroundLinkHover()
 gsap.registerPlugin(Observer)
 
 // Page transition

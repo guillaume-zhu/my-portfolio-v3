@@ -98,7 +98,7 @@ export const createHomeLoader = ({ enabled = true, minimumDuration = 1.2 } = {})
       geometry = new THREE.PlaneGeometry(2, 2)
 
       const rootStyles = getComputedStyle(document.documentElement)
-      const creamColor = rootStyles.getPropertyValue("--color-cream").trim() || "#fff5ee"
+      const creamColor = rootStyles.getPropertyValue("--color-cream").trim() || "#f5e7df"
       const darkColor = rootStyles.getPropertyValue("--color-dark").trim() || "#1f1d1d"
 
       material = new THREE.ShaderMaterial({
