@@ -237,7 +237,8 @@ body[data-interface-color="dark"] {
   text-align: center;
 }
 
-.trajectory .title span {
+.trajectory-title__motion,
+.trajectory-title__motion span {
   display: inline-block;
   will-change: transform;
 }

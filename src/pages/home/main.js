@@ -924,7 +924,7 @@ function setupHeroToManifestoTransition() {
     scrollTrigger: {
       trigger: ".manifesto",
       start: "top bottom-=250",
-      end: "top bottom-=1100",
+      end: "top bottom-=300",
       scrub: true,
       invalidateOnRefresh: true,
       markers: false,
@@ -1031,6 +1031,12 @@ function setupTrajectory() {
     const title = container.querySelector(".title")
     wrapLettersInSpan(title)
 
+    // Inner layer for the entry offset, the pinned h2 stays untouched
+    const titleMotion = document.createElement("span")
+    titleMotion.className = "trajectory-title__motion"
+    titleMotion.append(...title.childNodes)
+    title.append(titleMotion)
+
     const getDistance = () => {
       return Math.max(container.clientHeight - title.clientHeight, 1)
     }
@@ -1043,7 +1049,27 @@ function setupTrajectory() {
       invalidateOnRefresh: true,
     })
 
-    const letters = container.querySelectorAll("span")
+    // Bring the title closer during Manifesto to trajectory transition
+    gsap.fromTo(
+      titleMotion,
+      {
+        y: () => -getDistance() * 0.5,
+      },
+      {
+        y: 0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: root,
+          start: "top bottom",
+          end: "top 30%",
+          scrub: true,
+          invalidateOnRefresh: true,
+          markers: false,
+        },
+      },
+    )
+
+    const letters = titleMotion.querySelectorAll(".letter")
     letters.forEach((letter) => {
       const randomDistanceRatio = Math.random()
       const getRandomDistance = () => getDistance() * randomDistanceRatio
@@ -1067,8 +1093,8 @@ function setupTrajectory() {
       ease: "none",
       scrollTrigger: {
         trigger: container,
-        start: () => `top+=${getDistance() * 0.75} top`,
-        end: () => `top+=${getDistance()} top`,
+        start: () => `top+=${getDistance() * 0.8} top`,
+        end: () => `top+=${getDistance() * 1.2} top`,
         scrub: true,
         invalidateOnRefresh: true,
       },
