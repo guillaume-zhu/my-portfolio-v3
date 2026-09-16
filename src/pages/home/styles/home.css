@@ -11,14 +11,18 @@
 
 body {
   --current-interface-color: var(--color-cream);
+  --header-capsule-color: #646464;
+
   background-color: var(--color-cream);
 }
 
 body[data-interface-color="cream"] {
   --current-interface-color: var(--color-cream);
+  --header-capsule-color: #646464;
 }
 body[data-interface-color="dark"] {
   --current-interface-color: var(--color-dark);
+  --header-capsule-color: #ffffff;
 }
 
 .tag {

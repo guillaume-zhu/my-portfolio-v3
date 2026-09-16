@@ -1353,7 +1353,7 @@ function setupTrajectorySentences() {
           tl.to(
             finalSentenceLetters,
             {
-              color: "rgba(255, 245, 238, 0)",
+              color: "rgba(245, 231, 223, 0)",
               duration: webglSequence.wakeDuration,
               ease: "sine.inOut",
             },
