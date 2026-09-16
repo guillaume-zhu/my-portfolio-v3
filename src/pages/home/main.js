@@ -38,6 +38,7 @@ document.querySelectorAll(".trajectory-sentences__sentence > [data-i18n]").forEa
 gsap.registerPlugin(ScrollTrigger)
 
 createSiteHeader(i18n)
+setHeaderCapsuleVariant("soft-white")
 
 // Home loader session
 const shouldShowHomeLoader = document.documentElement.dataset.homeLoaderState === "pending"
@@ -252,6 +253,15 @@ function setInterfaceColor(color) {
   document.body.dataset.interfaceColor = color
 }
 
+function setHeaderCapsuleVariant(variant = null) {
+  if (variant) {
+    document.body.dataset.headerCapsuleVariant = variant
+    return
+  }
+
+  delete document.body.dataset.headerCapsuleVariant
+}
+
 // ----------------------
 // Functions
 // ----------------------
@@ -376,6 +386,7 @@ function createSectionNavigation() {
     if (immediate) {
       ScrollTrigger.update()
       setInterfaceColor(interfaceColorByHash[hash])
+      setHeaderCapsuleVariant(hash === "#hero" ? "soft-white" : null)
     }
 
     updateUrl(hash, historyMode)
@@ -432,6 +443,7 @@ function createSectionNavigation() {
 
             ScrollTrigger.update()
             setInterfaceColor("cream")
+            setHeaderCapsuleVariant("soft-white")
 
             history.pushState(null, "", window.location.pathname + window.location.search)
           },
@@ -865,18 +877,22 @@ function setupHeroScroll(threeHero) {
     markers: false,
 
     onEnter: () => {
+      setHeaderCapsuleVariant("soft-white")
       threeHero.setInteractive(true)
     },
 
     onEnterBack: () => {
+      setHeaderCapsuleVariant("soft-white")
       threeHero.setInteractive(true)
     },
 
     onLeave: () => {
+      setHeaderCapsuleVariant()
       threeHero.setInteractive(false)
     },
 
     onLeaveBack: () => {
+      setHeaderCapsuleVariant("soft-white")
       threeHero.setInteractive(false)
     },
 
@@ -1320,10 +1336,12 @@ function setupTrajectorySentences() {
 
           onStart: () => {
             setInterfaceColor("cream")
+            setHeaderCapsuleVariant("soft-white")
           },
 
           onReverseComplete: () => {
             setInterfaceColor("dark")
+            setHeaderCapsuleVariant()
           },
         },
         ">-35%",
@@ -1430,6 +1448,8 @@ function setupTrajectoryToToolkitTransition() {
       scrub: true,
       invalidateOnRefresh: true,
       markers: false,
+      onEnter: () => setHeaderCapsuleVariant(),
+      onLeaveBack: () => setHeaderCapsuleVariant("soft-white"),
     },
   })
 

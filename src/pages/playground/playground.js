@@ -9,6 +9,8 @@ import { setupCrossPageTransitions } from "../../shared/page-transition/setupCro
 
 const i18n = createI18n()
 
+document.body.dataset.headerCapsuleVariant = "soft-white"
+
 i18n.applyTranslations()
 createSiteHeader(i18n)
 gsap.registerPlugin(Observer)
