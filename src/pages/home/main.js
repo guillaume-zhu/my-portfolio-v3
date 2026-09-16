@@ -2380,15 +2380,9 @@ function setupProjects() {
 function setupNextPlaygroundLinkCue() {
   if (prefersReducedMotion) return
 
-  const link = document.querySelector(
-    ".next-section__playground-link",
-  )
+  const link = document.querySelector(".next-section__playground-link")
   const section = link?.closest(".next-section")
-  const letters = link
-    ? Array.from(
-        link.querySelectorAll(".playground-link__letter"),
-      )
-    : []
+  const letters = link ? Array.from(link.querySelectorAll(".playground-link__letter")) : []
 
   if (!section || !letters.length) return
 
@@ -2411,10 +2405,7 @@ function setupNextPlaygroundLinkCue() {
       if (link.matches(":hover")) return
 
       const propagationDuration = 0.22
-      const stagger =
-        letters.length > 1
-          ? propagationDuration / (letters.length - 1)
-          : 0
+      const stagger = letters.length > 1 ? propagationDuration / (letters.length - 1) : 0
 
       cue = gsap.timeline({
         onComplete: () => {
@@ -2652,8 +2643,8 @@ function setupNextSection() {
 
     scrollTrigger: {
       trigger: pinHeight,
-      start: "top top",
-      end: "top+=8% top",
+      start: "top+=3% top",
+      end: "top+=7.5% top",
       scrub: true,
       markers: false,
     },
