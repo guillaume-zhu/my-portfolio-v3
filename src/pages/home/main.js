@@ -1045,7 +1045,7 @@ function setupTrajectory() {
       trigger: container,
       pin: title,
       start: "top top",
-      end: () => `+=${getDistance()}`,
+      end: () => `+=${getDistance() * 1.2}`,
       invalidateOnRefresh: true,
     })
 
@@ -1094,7 +1094,7 @@ function setupTrajectory() {
       scrollTrigger: {
         trigger: container,
         start: () => `top+=${getDistance() * 0.8} top`,
-        end: () => `top+=${getDistance() * 1.2} top`,
+        end: () => `top+=${getDistance() * 1.5} top`,
         scrub: true,
         invalidateOnRefresh: true,
       },
