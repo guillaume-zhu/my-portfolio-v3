@@ -3,6 +3,7 @@
 @import "../../../shared/styles/typography.css";
 @import "../../../shared/styles/variables.css";
 @import "../../../shared/site-header/header.css";
+@import "../../../shared/link-hover/link-hover.css";
 @import "./scroll-indicator.css";
 @import "../../../shared/page-transition/page-transition.css";
 @import "../loader/home-loader.css";
@@ -50,30 +51,6 @@ body[data-interface-color="dark"] {
 
   color: inherit;
   text-decoration: none;
-}
-
-.text-link::after {
-  content: "";
-
-  position: absolute;
-  left: 0;
-  bottom: -0.15em;
-
-  width: 100%;
-  height: 1px;
-
-  background-color: currentColor;
-
-  transform: scaleX(0);
-  transform-origin: left center;
-
-  transition: transform 0.35s ease;
-  pointer-events: none;
-}
-
-.text-link:hover::after,
-.text-link:focus-visible::after {
-  transform: scaleX(1);
 }
 
 /* -------- HERO THREE SECTION -------- */
@@ -809,6 +786,13 @@ body[data-interface-color="dark"] {
   transform: translateX(-50%);
 }
 
+.next-section__playground-arrow {
+  display: inline-block;
+  margin-left: 0.35em;
+
+  will-change: transform;
+}
+
 .next-section__svg {
   position: absolute;
   left: 0;
@@ -1106,15 +1090,4 @@ body[data-interface-color="dark"] {
 
   letter-spacing: 0;
   font-weight: 400;
-
-  transition:
-    letter-spacing 0.35s ease,
-    font-weight 0.35s ease,
-    opacity 0.35s ease;
-}
-
-.playground-link:hover,
-.playground-link:focus-visible {
-  letter-spacing: 0.02em;
-  font-weight: 700;
 }

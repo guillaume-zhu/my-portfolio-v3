@@ -5,6 +5,7 @@ import Lenis from "lenis"
 import "lenis/dist/lenis.css"
 
 import { createI18n } from "../../shared/i18n"
+import { setupPlaygroundLinkHover } from "../../shared/link-hover/setupPlaygroundLinkHover"
 import { createSiteHeader } from "../../shared/site-header/createSiteHeader"
 import { setupHeaderVisibility } from "../../shared/site-header/setupHeaderVisibility"
 import { createIncomingPageTransition } from "../../shared/page-transition/createPageTransition"
@@ -17,6 +18,7 @@ const i18n = supportsI18n ? createI18n() : null
 
 i18n?.applyTranslations()
 createSiteHeader(i18n)
+setupPlaygroundLinkHover()
 
 gsap.registerPlugin(ScrollTrigger, SplitText)
 

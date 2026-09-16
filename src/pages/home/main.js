@@ -5,6 +5,7 @@ import "lenis/dist/lenis.css"
 
 import { createHomeLoader } from "./loader/createHomeLoader"
 import { createI18n } from "../../shared/i18n"
+import { setupPlaygroundLinkHover } from "../../shared/link-hover/setupPlaygroundLinkHover"
 import { createSiteHeader } from "../../shared/site-header/createSiteHeader"
 import { setupHeaderVisibility } from "../../shared/site-header/setupHeaderVisibility"
 import { prefersReducedMotion } from "../../shared/motion/preference"
@@ -38,6 +39,7 @@ document.querySelectorAll(".trajectory-sentences__sentence > [data-i18n]").forEa
 gsap.registerPlugin(ScrollTrigger)
 
 createSiteHeader(i18n)
+setupPlaygroundLinkHover()
 setHeaderCapsuleVariant("soft-white")
 
 // Home loader session
@@ -172,6 +174,7 @@ document.fonts.ready.then(() => {
   setupToolkit()
   const { projectsTimeline, ensureProjectPhysics } = setupProjects()
   const nextSectionTrigger = setupNextSection()
+  setupNextPlaygroundLinkCue()
 
   setupHeaderTheme()
   setupScrollIndicator()
@@ -2372,6 +2375,87 @@ function setupProjects() {
     projectsTimeline: tl,
     ensureProjectPhysics: projectPhysics.ensure,
   }
+}
+
+function setupNextPlaygroundLinkCue() {
+  if (prefersReducedMotion) return
+
+  const link = document.querySelector(
+    ".next-section__playground-link",
+  )
+  const section = link?.closest(".next-section")
+  const letters = link
+    ? Array.from(
+        link.querySelectorAll(".playground-link__letter"),
+      )
+    : []
+
+  if (!section || !letters.length) return
+
+  let cue = null
+
+  link.addEventListener("playground-hover-start", () => {
+    if (!cue) return
+
+    cue.kill()
+    cue = null
+    gsap.set(letters, { yPercent: 0 })
+  })
+
+  ScrollTrigger.create({
+    trigger: section,
+    start: "top 75%",
+    once: true,
+
+    onEnter: () => {
+      if (link.matches(":hover")) return
+
+      const propagationDuration = 0.22
+      const stagger =
+        letters.length > 1
+          ? propagationDuration / (letters.length - 1)
+          : 0
+
+      cue = gsap.timeline({
+        onComplete: () => {
+          cue = null
+        },
+      })
+
+      letters.forEach((letter, index) => {
+        const start = index * stagger
+
+        cue
+          .to(
+            letter,
+            {
+              yPercent: -12,
+              duration: 0.12,
+              ease: "power2.out",
+            },
+            start,
+          )
+          .to(
+            letter,
+            {
+              yPercent: 5,
+              duration: 0.1,
+              ease: "sine.inOut",
+            },
+            start + 0.12,
+          )
+          .to(
+            letter,
+            {
+              yPercent: 0,
+              duration: 0.14,
+              ease: "power2.out",
+            },
+            start + 0.22,
+          )
+      })
+    },
+  })
 }
 
 // What's next section
