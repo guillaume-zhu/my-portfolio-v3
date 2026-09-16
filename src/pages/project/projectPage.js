@@ -6,6 +6,7 @@ import "lenis/dist/lenis.css"
 
 import { createI18n } from "../../shared/i18n"
 import { createSiteHeader } from "../../shared/site-header/createSiteHeader"
+import { setupHeaderVisibility } from "../../shared/site-header/setupHeaderVisibility"
 import { createIncomingPageTransition } from "../../shared/page-transition/createPageTransition"
 import { setupCrossPageTransitions } from "../../shared/page-transition/setupCrossPageTransitions"
 
@@ -27,6 +28,7 @@ const lenis = new Lenis({
 })
 
 lenis.on("scroll", ScrollTrigger.update)
+setupHeaderVisibility(lenis)
 
 gsap.ticker.add((time) => {
   lenis.raf(time * 1000)

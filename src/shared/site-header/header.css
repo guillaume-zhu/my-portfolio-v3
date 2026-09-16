@@ -16,6 +16,7 @@
   pointer-events: none;
 
   transition: color 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
 }
 
 .site-header__logo,

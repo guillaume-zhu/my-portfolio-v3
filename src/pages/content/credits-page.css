@@ -5,10 +5,6 @@
 @import "../../shared/site-header/header.css";
 @import "../../shared/page-transition/page-transition.css";
 
-html {
-  scroll-behavior: smooth;
-}
-
 /* -------- CREDITS PAGE -------- */
 .credits-page {
   --current-interface-color: var(--color-dark);

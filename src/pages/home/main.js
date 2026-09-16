@@ -6,6 +6,7 @@ import "lenis/dist/lenis.css"
 import { createHomeLoader } from "./loader/createHomeLoader"
 import { createI18n } from "../../shared/i18n"
 import { createSiteHeader } from "../../shared/site-header/createSiteHeader"
+import { setupHeaderVisibility } from "../../shared/site-header/setupHeaderVisibility"
 import { prefersReducedMotion } from "../../shared/motion/preference"
 import { createIncomingPageTransition } from "../../shared/page-transition/createPageTransition"
 import { setupCrossPageTransitions } from "../../shared/page-transition/setupCrossPageTransitions"
@@ -51,6 +52,7 @@ const lenis = new Lenis({
 })
 
 lenis.on("scroll", ScrollTrigger.update)
+setupHeaderVisibility(lenis)
 
 // Drive Lenis from the GSAP ticker
 gsap.ticker.add((time) => {
@@ -365,6 +367,9 @@ function createSectionNavigation() {
     lenis.scrollTo(targetScroll, {
       immediate,
       force: true,
+      userData: {
+        keepHeaderVisible: true,
+      },
     })
 
     // An immediate jump does not naturally pass through every theme trigger
@@ -420,6 +425,9 @@ function createSectionNavigation() {
             lenis.scrollTo(0, {
               immediate: true,
               force: true,
+              userData: {
+                keepHeaderVisible: true,
+              },
             })
 
             ScrollTrigger.update()
