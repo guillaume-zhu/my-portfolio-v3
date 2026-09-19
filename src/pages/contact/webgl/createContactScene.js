@@ -1,18 +1,22 @@
 import * as THREE from "three"
 
+import { loadContactEnvironment } from "./loadContactEnvironment"
 import { loadContactTextures } from "./loadContactTextures"
 
 const MOBILE_BREAKPOINT = 700
 const MAX_PIXEL_RATIO = 1.5
 const SPHERE_ROTATION_SPEED = 0.04
+const SPHERE_ROTATION_HERO_SPEED = 0.3
 const SPHERE_FLOAT_SPEED = 0.55
+const INITIAL_VISUAL_MODE = "hero"
+const HERO_VIEW_ROTATION_Y = THREE.MathUtils.degToRad(-10)
 
 const LAYOUTS = {
   desktop: {
     referenceWidth: 1440,
     referenceHeight: 1023,
     exportScale: 2,
-    floatAmplitude: 10,
+    floatAmplitude: 25,
     planes: {
       headline: {
         align: "center",
@@ -47,7 +51,7 @@ const LAYOUTS = {
     referenceWidth: 390,
     referenceHeight: 844,
     exportScale: 1,
-    floatAmplitude: 7,
+    floatAmplitude: 30,
     planes: {
       headline: {
         align: "center",
@@ -95,6 +99,47 @@ function createTextPlane(scene) {
   return mesh
 }
 
+function createRoundedFrameGeometry(width, height, radius) {
+  const halfWidth = width * 0.5
+  const halfHeight = height * 0.5
+  const safeRadius = Math.min(Math.max(radius, 0), halfWidth, halfHeight)
+  const shape = new THREE.Shape()
+
+  shape.moveTo(-halfWidth + safeRadius, -halfHeight)
+  shape.lineTo(halfWidth - safeRadius, -halfHeight)
+  shape.absarc(
+    halfWidth - safeRadius,
+    -halfHeight + safeRadius,
+    safeRadius,
+    -Math.PI * 0.5,
+    0,
+    false,
+  )
+  shape.lineTo(halfWidth, halfHeight - safeRadius)
+  shape.absarc(halfWidth - safeRadius, halfHeight - safeRadius, safeRadius, 0, Math.PI * 0.5, false)
+  shape.lineTo(-halfWidth + safeRadius, halfHeight)
+  shape.absarc(
+    -halfWidth + safeRadius,
+    halfHeight - safeRadius,
+    safeRadius,
+    Math.PI * 0.5,
+    Math.PI,
+    false,
+  )
+  shape.lineTo(-halfWidth, -halfHeight + safeRadius)
+  shape.absarc(
+    -halfWidth + safeRadius,
+    -halfHeight + safeRadius,
+    safeRadius,
+    Math.PI,
+    Math.PI * 1.5,
+    false,
+  )
+  shape.closePath()
+
+  return new THREE.ShapeGeometry(shape)
+}
+
 export function createContactScene({ canvas, root, language = "en", reducedMotion = false } = {}) {
   if (!(canvas instanceof HTMLCanvasElement) || !(root instanceof HTMLElement)) {
     return null
@@ -113,6 +158,7 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
       canvas,
       alpha: true,
       antialias: true,
+      stencil: true,
       premultipliedAlpha: true,
       powerPreference: "high-performance",
     })
@@ -122,16 +168,78 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
   }
 
   renderer.outputColorSpace = THREE.SRGBColorSpace
+  renderer.toneMapping = THREE.ACESFilmicToneMapping
+  renderer.toneMappingExposure = 1
   renderer.setClearColor(0x000000, 0)
+  renderer.autoClear = false
 
   const scene = new THREE.Scene()
+  const backgroundScene = new THREE.Scene()
+  const backgroundMaskScene = new THREE.Scene()
 
   scene.background = null
 
   const camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 2000)
+  const backgroundCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 100)
 
   camera.position.set(0, 0, 1000)
   camera.lookAt(0, 0, 0)
+  backgroundCamera.position.set(0, 0, 6)
+  backgroundCamera.lookAt(0, 0, 0)
+
+  backgroundCamera.rotation.y = HERO_VIEW_ROTATION_Y
+
+  const backgroundMaskMaterial = new THREE.MeshBasicMaterial({
+    colorWrite: false,
+    depthTest: false,
+    depthWrite: false,
+    stencilWrite: true,
+    stencilRef: 1,
+    stencilFunc: THREE.AlwaysStencilFunc,
+    stencilFail: THREE.ReplaceStencilOp,
+    stencilZFail: THREE.ReplaceStencilOp,
+    stencilZPass: THREE.ReplaceStencilOp,
+  })
+  const backgroundMask = new THREE.Mesh(new THREE.BufferGeometry(), backgroundMaskMaterial)
+
+  backgroundMaskScene.add(backgroundMask)
+
+  const backgroundUniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.backgroundCube.uniforms)
+  const backgroundMaterial = new THREE.ShaderMaterial({
+    name: "ContactHeroBackgroundMaterial",
+    uniforms: backgroundUniforms,
+    vertexShader: THREE.ShaderLib.backgroundCube.vertexShader,
+    fragmentShader: THREE.ShaderLib.backgroundCube.fragmentShader,
+    side: THREE.BackSide,
+    depthTest: false,
+    depthWrite: false,
+    toneMapped: false,
+    stencilWrite: true,
+    stencilRef: 1,
+    stencilFunc: THREE.EqualStencilFunc,
+    stencilFail: THREE.KeepStencilOp,
+    stencilZFail: THREE.KeepStencilOp,
+    stencilZPass: THREE.KeepStencilOp,
+  })
+
+  Object.defineProperty(backgroundMaterial, "envMap", {
+    get() {
+      return this.uniforms.envMap.value
+    },
+  })
+
+  const backgroundGeometry = new THREE.BoxGeometry(1, 1, 1)
+  const backgroundMesh = new THREE.Mesh(backgroundGeometry, backgroundMaterial)
+
+  backgroundMesh.onBeforeRender = function handleBackgroundBeforeRender(
+    renderer,
+    renderedScene,
+    activeCamera,
+  ) {
+    this.matrixWorld.copyPosition(activeCamera.matrixWorld)
+  }
+
+  backgroundScene.add(backgroundMesh)
 
   const headlinePlane = createTextPlane(scene)
   const availabilityPlane = createTextPlane(scene)
@@ -146,25 +254,34 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
   }
 
   const sphereGeometry = new THREE.SphereGeometry(1, 64, 48)
-  const sphereMaterial = new THREE.MeshBasicMaterial({
+  const texturedSphereMaterial = new THREE.MeshBasicMaterial({
     depthTest: true,
     depthWrite: true,
     toneMapped: false,
   })
-  const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
-  const sphereInitialRotationY = -Math.PI * 0.25
+  const silverSphereMaterial = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    metalness: 1,
+    roughness: 0.4,
+    envMapIntensity: 1.2,
+  })
+  const sphere = new THREE.Mesh(sphereGeometry, texturedSphereMaterial)
+  const sphereInitialRotationY = -Math.PI * 0.25 + HERO_VIEW_ROTATION_Y
 
   sphere.rotation.y = sphereInitialRotationY
   sphere.renderOrder = 0
   scene.add(sphere)
 
   const textureLoader = loadContactTextures({ language })
+  const environmentLoader = loadContactEnvironment({ renderer })
   const viewport = {
     width: 1,
     height: 1,
   }
 
   let textures = null
+  let environmentMap = null
+  let currentVisualMode = INITIAL_VISUAL_MODE
   let currentLayoutName = null
   let sphereBaseY = 0
   let sphereFloatAmplitude = 0
@@ -199,6 +316,25 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
       x: screenX - viewport.width * 0.5,
       y: viewport.height * 0.5 - screenY,
       z,
+    }
+  }
+
+  function setVisualMode(mode) {
+    if (mode !== "contact" && mode !== "hero") return
+
+    currentVisualMode = mode
+
+    if (mode === "hero") {
+      sphere.material = silverSphereMaterial
+      scene.environment = environmentMap
+      scene.environmentRotation.y = HERO_VIEW_ROTATION_Y
+    } else {
+      sphere.material = texturedSphereMaterial
+      scene.environment = null
+    }
+
+    if (isReady && !contextLost) {
+      render()
     }
   }
 
@@ -252,10 +388,27 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
       plane.material.needsUpdate = true
     })
 
-    sphereMaterial.map = textures[layoutName].sphere.texture
-    sphereMaterial.needsUpdate = true
+    texturedSphereMaterial.map = textures[layoutName].sphere.texture
+    texturedSphereMaterial.needsUpdate = true
 
     currentLayoutName = layoutName
+  }
+
+  function applyEnvironmentBackdropLayout(frameBounds) {
+    const frameWidth = Math.max(frameBounds.width, 1)
+    const frameHeight = Math.max(frameBounds.height, 1)
+    const frameRadius = Number.parseFloat(window.getComputedStyle(frame).borderTopLeftRadius) || 0
+    const position = screenToWorld(
+      frameBounds.left + frameWidth * 0.5,
+      frameBounds.top + frameHeight * 0.5,
+    )
+
+    backgroundMask.geometry.dispose()
+    backgroundMask.geometry = createRoundedFrameGeometry(frameWidth, frameHeight, frameRadius)
+    backgroundMask.position.set(position.x, position.y, 0)
+
+    backgroundCamera.aspect = frameWidth / frameHeight
+    backgroundCamera.updateProjectionMatrix()
   }
 
   function applyLayout() {
@@ -264,7 +417,7 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     const layoutName = getLayoutName()
     const layout = LAYOUTS[layoutName]
     const transform = getLayoutTransform(layout)
-    const frameBounds = layoutName === "desktop" ? frame.getBoundingClientRect() : null
+    const frameBounds = frame.getBoundingClientRect()
     let desktopTextGroupCenterY = null
 
     if (layoutName === "desktop") {
@@ -280,6 +433,7 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     }
 
     applyTextureSet(layoutName)
+    applyEnvironmentBackdropLayout(frameBounds)
 
     Object.entries(textPlanes).forEach(([name, plane]) => {
       const item = layout.planes[name]
@@ -319,6 +473,14 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
 
   function render() {
     if (isDestroyed || contextLost) return false
+
+    renderer.clear(true, true, true)
+
+    if (currentVisualMode === "hero" && environmentMap) {
+      renderer.render(backgroundMaskScene, camera)
+      renderer.render(backgroundScene, backgroundCamera)
+      renderer.clearDepth()
+    }
 
     renderer.render(scene, camera)
     return true
@@ -368,6 +530,10 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     sphere.rotation.y = sphereInitialRotationY + elapsedTime * SPHERE_ROTATION_SPEED
     sphere.position.y =
       sphereBaseY + Math.sin(elapsedTime * SPHERE_FLOAT_SPEED) * sphereFloatAmplitude
+
+    if (currentVisualMode === "hero") {
+      scene.environmentRotation.y = HERO_VIEW_ROTATION_Y + elapsedTime * SPHERE_ROTATION_HERO_SPEED
+    }
 
     try {
       render()
@@ -461,14 +627,26 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
 
   const ready = (async () => {
     try {
-      textures = await textureLoader.ready
+      const [loadedTextures, loadedEnvironment] = await Promise.all([
+        textureLoader.ready,
+        environmentLoader.ready,
+      ])
 
-      if (!textures || isDestroyed) return false
+      if (!loadedTextures || !loadedEnvironment || isDestroyed) return false
+
+      textures = loadedTextures
+      environmentMap = loadedEnvironment.environmentMap
+      backgroundMaterial.uniforms.envMap.value = loadedEnvironment.backgroundMap
+      setVisualMode(currentVisualMode)
 
       currentLayoutName = null
       applyLayout()
 
-      await renderer.compileAsync(scene, camera)
+      await Promise.all([
+        renderer.compileAsync(backgroundMaskScene, camera),
+        renderer.compileAsync(backgroundScene, backgroundCamera),
+        renderer.compileAsync(scene, camera),
+      ])
 
       if (isDestroyed || contextLost) return false
       if (!render()) return false
@@ -507,18 +685,31 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     canvas.removeEventListener("webglcontextrestored", handleContextRestored)
 
     textureLoader.dispose()
+    environmentLoader.dispose()
 
     Object.values(textPlanes).forEach((plane) => {
       plane.geometry.dispose()
       plane.material.dispose()
     })
 
+    scene.environment = null
+    backgroundMaterial.uniforms.envMap.value = null
+
     sphereGeometry.dispose()
-    sphereMaterial.dispose()
+    texturedSphereMaterial.dispose()
+    silverSphereMaterial.dispose()
+    backgroundMask.geometry.dispose()
+    backgroundMaskMaterial.dispose()
+    backgroundGeometry.dispose()
+    backgroundMaterial.dispose()
+
     scene.clear()
+    backgroundScene.clear()
+    backgroundMaskScene.clear()
     renderer.dispose()
 
     textures = null
+    environmentMap = null
   }
 
   return {
@@ -527,5 +718,6 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     stop,
     resize,
     destroy,
+    setVisualMode,
   }
 }
