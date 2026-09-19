@@ -79,6 +79,23 @@ export default {
     },
   },
 
+  contact: {
+    title: "Contact — Guillaume Zhu",
+    description:
+      "Contact Guillaume Zhu for creative development, immersive experiences and interactive front-end work. Available for an apprenticeship in Paris from October 2026.",
+    headingLine1: "Let’s create",
+    headingLine2: "something worth",
+    headingLine3: "remembering",
+    availability: "Available for an apprenticeship",
+    availabilityMeta: "October 2026 · Paris",
+    servicesLabel: "Services",
+    serviceCreativeDevelopment: "creative development",
+    serviceImmersiveExperiences: "immersive experiences",
+    serviceInteractiveInterfaces: "front-end craft",
+    email: "contact@guillaumezhu.com",
+    emailLabel: "Send an email to Guillaume Zhu",
+  },
+
   projects: {
     ghibli: {
       title: "Memories of Ghibli — Interactive 3D Experience | Guillaume Zhu",

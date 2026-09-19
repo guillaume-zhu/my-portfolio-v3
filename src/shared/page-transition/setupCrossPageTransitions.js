@@ -8,6 +8,7 @@ const transitionColorByPath = {
   "/projects/ornate": "dark",
   "/projects/mirage": "dark",
   "/playground": "dark",
+  "/contact": "cream",
   "/mentions-legales": "dark",
 }
 

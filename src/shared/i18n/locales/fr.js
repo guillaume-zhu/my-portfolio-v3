@@ -79,6 +79,23 @@ export default {
     },
   },
 
+  contact: {
+    title: "Contact — Guillaume Zhu",
+    description:
+      "Contactez Guillaume Zhu pour des projets de creative development, d’expériences immersives et d’interfaces interactives. Disponible en alternance à Paris à partir d’octobre 2026.",
+    headingLine1: "Créons",
+    headingLine2: "des expériences",
+    headingLine3: "qui se vivent",
+    availability: "Disponible en alternance",
+    availabilityMeta: "Octobre 2026 · Paris",
+    servicesLabel: "Services",
+    serviceCreativeDevelopment: "creative development",
+    serviceImmersiveExperiences: "expériences immersives",
+    serviceInteractiveInterfaces: "interfaces interactives",
+    email: "contact@guillaumezhu.com",
+    emailLabel: "Envoyer un email à Guillaume Zhu",
+  },
+
   projects: {
     ghibli: {
       title: "Memories of Ghibli — Expérience 3D interactive | Guillaume Zhu",

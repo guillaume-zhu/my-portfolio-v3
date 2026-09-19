@@ -60,7 +60,7 @@ export function createSiteHeader(i18n = null) {
         playground
       </a>
 
-      <a class="site-header__link" href="/#contact">
+      <a class="site-header__link" href="/contact/">
         contact
       </a>
 
