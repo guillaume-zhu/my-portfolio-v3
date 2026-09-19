@@ -23,7 +23,7 @@ const DISTORTION_CONFIG = Object.freeze({
   strengthDecay: 0.03,
   sphereIdleStrength: {
     desktop: 0.04,
-    mobile: 0.01,
+    mobile: 0.005,
   },
   interactionStrength: 1,
   idleSpeed: 0.25,
@@ -459,14 +459,8 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     const centerX = contactPlane.position.x + viewport.width * 0.5
     const centerY = viewport.height * 0.5 - contactPlane.position.y
 
-    emailLink.style.setProperty(
-      "--contact-email-left",
-      `${centerX - width * 0.5}px`,
-    )
-    emailLink.style.setProperty(
-      "--contact-email-top",
-      `${centerY - height * 0.5}px`,
-    )
+    emailLink.style.setProperty("--contact-email-left", `${centerX - width * 0.5}px`)
+    emailLink.style.setProperty("--contact-email-top", `${centerY - height * 0.5}px`)
     emailLink.style.setProperty("--contact-email-width", `${width}px`)
     emailLink.style.setProperty("--contact-email-height", `${height}px`)
   }
@@ -790,7 +784,7 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
       render()
     } catch (error) {
       console.error("Unable to render the Contact WebGL scene.", error)
-      destroy()
+      handleFatalFailure()
       return
     }
 
@@ -866,7 +860,7 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
       }
     } catch (error) {
       console.error("Unable to restore the Contact WebGL scene.", error)
-      destroy()
+      handleFatalFailure()
     }
   }
 
@@ -925,6 +919,13 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
       return false
     }
   })()
+
+  function handleFatalFailure() {
+    root.classList.remove("is-webgl-ready")
+    root.classList.add("is-webgl-fallback")
+
+    destroy()
+  }
 
   function destroy() {
     if (isDestroyed) return
