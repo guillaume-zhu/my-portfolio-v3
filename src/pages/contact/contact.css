@@ -44,6 +44,7 @@ body {
 
   background-color: var(--color-dark);
   border-radius: var(--contact-frame-radius);
+  visibility: hidden;
 }
 
 .contact__canvas {
@@ -55,11 +56,18 @@ body {
   width: 100%;
   height: 100%;
 
+  visibility: hidden;
   opacity: 0;
   pointer-events: none;
 }
 
+.contact.is-webgl-ready .contact__frame,
+.contact.is-webgl-fallback .contact__frame {
+  visibility: visible;
+}
+
 .contact.is-webgl-ready .contact__canvas {
+  visibility: visible;
   opacity: 1;
 }
 
@@ -76,7 +84,13 @@ body {
 
   padding: clamp(96px, 8vw, 152px) clamp(24px, 4vw, 72px) clamp(28px, 4vw, 64px);
 
+  visibility: hidden;
   pointer-events: none;
+}
+
+.contact.is-webgl-ready .contact__fallback,
+.contact.is-webgl-fallback .contact__fallback {
+  visibility: visible;
 }
 
 .contact__heading {

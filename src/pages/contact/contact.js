@@ -23,6 +23,20 @@ const contactScene = createContactScene({
   reducedMotion: prefersReducedMotion,
 })
 
+const contactSceneReady = (contactScene?.ready ?? Promise.resolve(false))
+  .catch((error) => {
+    console.error("Unable to resolve the Contact WebGL scene.", error)
+    return false
+  })
+  .then((isReady) => {
+    if (isReady) return true
+
+    contact?.classList.remove("is-webgl-ready")
+    contact?.classList.add("is-webgl-fallback")
+
+    return false
+  })
+
 const { pageTransition, shouldRevealTransition } = createIncomingPageTransition()
 
 setupCrossPageTransitions({
@@ -34,7 +48,7 @@ async function revealIncomingPage() {
 
   await Promise.all([
     document.fonts.ready,
-    contactScene?.ready ?? Promise.resolve(false),
+    contactSceneReady,
   ])
 
   await pageTransition.reveal()
