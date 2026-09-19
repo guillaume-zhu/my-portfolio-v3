@@ -2,6 +2,8 @@ import * as THREE from "three"
 
 import { loadContactEnvironment } from "./loadContactEnvironment"
 import { loadContactTextures } from "./loadContactTextures"
+import distortionFragmentShader from "./shaders/distortion/fragment.glsl"
+import distortionVertexShader from "./shaders/distortion/vertex.glsl"
 
 const MOBILE_BREAKPOINT = 700
 const MAX_PIXEL_RATIO = 1.5
@@ -10,6 +12,24 @@ const SPHERE_ROTATION_HERO_SPEED = 0.3
 const SPHERE_FLOAT_SPEED = 0.55
 const INITIAL_VISUAL_MODE = "hero"
 const HERO_VIEW_ROTATION_Y = THREE.MathUtils.degToRad(-10)
+const CONTENT_OVERSCAN = 120
+
+const DISTORTION_CONFIG = Object.freeze({
+  radius: 0.3,
+  velocityGain: 0.25,
+  positionDamping: 0.1,
+  velocityDamping: 0.15,
+  strengthRise: 0.15,
+  strengthDecay: 0.03,
+  sphereIdleStrength: 0.04,
+  interactionStrength: 1,
+  idleSpeed: 0.25,
+  idleFrequency: [5, 20],
+})
+
+function frameIndependentDamping(damping, deltaTime) {
+  return 1 - Math.pow(1 - damping, deltaTime * 60)
+}
 
 const LAYOUTS = {
   desktop: {
@@ -99,47 +119,6 @@ function createTextPlane(scene) {
   return mesh
 }
 
-function createRoundedFrameGeometry(width, height, radius) {
-  const halfWidth = width * 0.5
-  const halfHeight = height * 0.5
-  const safeRadius = Math.min(Math.max(radius, 0), halfWidth, halfHeight)
-  const shape = new THREE.Shape()
-
-  shape.moveTo(-halfWidth + safeRadius, -halfHeight)
-  shape.lineTo(halfWidth - safeRadius, -halfHeight)
-  shape.absarc(
-    halfWidth - safeRadius,
-    -halfHeight + safeRadius,
-    safeRadius,
-    -Math.PI * 0.5,
-    0,
-    false,
-  )
-  shape.lineTo(halfWidth, halfHeight - safeRadius)
-  shape.absarc(halfWidth - safeRadius, halfHeight - safeRadius, safeRadius, 0, Math.PI * 0.5, false)
-  shape.lineTo(-halfWidth + safeRadius, halfHeight)
-  shape.absarc(
-    -halfWidth + safeRadius,
-    halfHeight - safeRadius,
-    safeRadius,
-    Math.PI * 0.5,
-    Math.PI,
-    false,
-  )
-  shape.lineTo(-halfWidth, -halfHeight + safeRadius)
-  shape.absarc(
-    -halfWidth + safeRadius,
-    -halfHeight + safeRadius,
-    safeRadius,
-    Math.PI,
-    Math.PI * 1.5,
-    false,
-  )
-  shape.closePath()
-
-  return new THREE.ShapeGeometry(shape)
-}
-
 export function createContactScene({ canvas, root, language = "en", reducedMotion = false } = {}) {
   if (!(canvas instanceof HTMLCanvasElement) || !(root instanceof HTMLElement)) {
     return null
@@ -158,7 +137,6 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
       canvas,
       alpha: true,
       antialias: true,
-      stencil: true,
       premultipliedAlpha: true,
       powerPreference: "high-performance",
     })
@@ -173,36 +151,27 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
   renderer.setClearColor(0x000000, 0)
   renderer.autoClear = false
 
-  const scene = new THREE.Scene()
+  const sphereScene = new THREE.Scene()
+  const textScene = new THREE.Scene()
   const backgroundScene = new THREE.Scene()
-  const backgroundMaskScene = new THREE.Scene()
+  const postProcessScene = new THREE.Scene()
 
-  scene.background = null
+  sphereScene.background = null
+  textScene.background = null
 
   const camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 2000)
+  const contentCamera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 2000)
   const backgroundCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 100)
+  const postProcessCamera = new THREE.Camera()
 
   camera.position.set(0, 0, 1000)
   camera.lookAt(0, 0, 0)
+  contentCamera.position.copy(camera.position)
+  contentCamera.quaternion.copy(camera.quaternion)
   backgroundCamera.position.set(0, 0, 6)
   backgroundCamera.lookAt(0, 0, 0)
 
   backgroundCamera.rotation.y = HERO_VIEW_ROTATION_Y
-
-  const backgroundMaskMaterial = new THREE.MeshBasicMaterial({
-    colorWrite: false,
-    depthTest: false,
-    depthWrite: false,
-    stencilWrite: true,
-    stencilRef: 1,
-    stencilFunc: THREE.AlwaysStencilFunc,
-    stencilFail: THREE.ReplaceStencilOp,
-    stencilZFail: THREE.ReplaceStencilOp,
-    stencilZPass: THREE.ReplaceStencilOp,
-  })
-  const backgroundMask = new THREE.Mesh(new THREE.BufferGeometry(), backgroundMaskMaterial)
-
-  backgroundMaskScene.add(backgroundMask)
 
   const backgroundUniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.backgroundCube.uniforms)
   const backgroundMaterial = new THREE.ShaderMaterial({
@@ -214,12 +183,6 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     depthTest: false,
     depthWrite: false,
     toneMapped: false,
-    stencilWrite: true,
-    stencilRef: 1,
-    stencilFunc: THREE.EqualStencilFunc,
-    stencilFail: THREE.KeepStencilOp,
-    stencilZFail: THREE.KeepStencilOp,
-    stencilZPass: THREE.KeepStencilOp,
   })
 
   Object.defineProperty(backgroundMaterial, "envMap", {
@@ -241,10 +204,89 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
 
   backgroundScene.add(backgroundMesh)
 
-  const headlinePlane = createTextPlane(scene)
-  const availabilityPlane = createTextPlane(scene)
-  const servicesPlane = createTextPlane(scene)
-  const contactPlane = createTextPlane(scene)
+  const useMobileRenderTargetQuality = window.matchMedia(
+    "(hover: none) and (pointer: coarse)",
+  ).matches
+
+  const environmentRenderTarget = new THREE.WebGLRenderTarget(1, 1, {
+    depthBuffer: false,
+    stencilBuffer: false,
+    colorSpace: THREE.NoColorSpace,
+  })
+  const sphereRenderTarget = new THREE.WebGLRenderTarget(1, 1, {
+    depthBuffer: true,
+    stencilBuffer: false,
+    samples: useMobileRenderTargetQuality ? 0 : 4,
+    colorSpace: THREE.NoColorSpace,
+  })
+  const textRenderTarget = new THREE.WebGLRenderTarget(1, 1, {
+    depthBuffer: false,
+    stencilBuffer: false,
+    samples: 0,
+    colorSpace: THREE.NoColorSpace,
+  })
+
+  environmentRenderTarget.texture.generateMipmaps = false
+  environmentRenderTarget.texture.minFilter = THREE.LinearFilter
+  environmentRenderTarget.texture.magFilter = THREE.LinearFilter
+  sphereRenderTarget.texture.generateMipmaps = false
+  sphereRenderTarget.texture.minFilter = THREE.LinearFilter
+  sphereRenderTarget.texture.magFilter = THREE.LinearFilter
+  textRenderTarget.texture.generateMipmaps = false
+  textRenderTarget.texture.minFilter = THREE.LinearFilter
+  textRenderTarget.texture.magFilter = THREE.LinearFilter
+
+  const postProcessGeometry = new THREE.BufferGeometry()
+
+  postProcessGeometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute([-1, -1, 0, 3, -1, 0, -1, 3, 0], 3),
+  )
+
+  const postProcessMaterial = new THREE.ShaderMaterial({
+    vertexShader: distortionVertexShader,
+    fragmentShader: distortionFragmentShader,
+    uniforms: {
+      uEnvironment: { value: environmentRenderTarget.texture },
+      uSphere: { value: sphereRenderTarget.texture },
+      uText: { value: textRenderTarget.texture },
+      uContentViewportOffset: { value: new THREE.Vector2() },
+      uContentViewportScale: { value: new THREE.Vector2(1, 1) },
+      uResolution: { value: new THREE.Vector2(1, 1) },
+      uFrameBounds: { value: new THREE.Vector4() },
+      uFrameRadius: { value: 0 },
+      uEnvironmentOpacity: { value: INITIAL_VISUAL_MODE === "hero" ? 1 : 0 },
+      uTime: { value: 0 },
+      uIdleSpeed: { value: DISTORTION_CONFIG.idleSpeed },
+      uSphereIdleStrength: {
+        value: reducedMotion ? 0 : DISTORTION_CONFIG.sphereIdleStrength,
+      },
+      uIdleFrequency: {
+        value: new THREE.Vector2(...DISTORTION_CONFIG.idleFrequency),
+      },
+      uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+      uVelocity: { value: new THREE.Vector2() },
+      uStrength: { value: 0 },
+      uRadius: { value: DISTORTION_CONFIG.radius },
+      uInteractionStrength: {
+        value: reducedMotion ? 0 : DISTORTION_CONFIG.interactionStrength,
+      },
+    },
+    transparent: true,
+    depthTest: false,
+    depthWrite: false,
+    toneMapped: false,
+    blending: THREE.NoBlending,
+  })
+  const postProcessMesh = new THREE.Mesh(postProcessGeometry, postProcessMaterial)
+
+  postProcessMesh.frustumCulled = false
+  postProcessScene.add(postProcessMesh)
+
+  const headlinePlane = createTextPlane(textScene)
+  const availabilityPlane = createTextPlane(textScene)
+  const servicesPlane = createTextPlane(textScene)
+  const contactPlane = createTextPlane(textScene)
 
   const textPlanes = {
     headline: headlinePlane,
@@ -264,13 +306,24 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     metalness: 1,
     roughness: 0.4,
     envMapIntensity: 1.2,
+    toneMapped: false,
   })
+
+  silverSphereMaterial.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader
+      .replace("#include <common>", "#include <common>\n#include <tonemapping_pars_fragment>")
+      .replace(
+        "#include <tonemapping_fragment>",
+        "gl_FragColor.rgb = ACESFilmicToneMapping(gl_FragColor.rgb);",
+      )
+  }
+
   const sphere = new THREE.Mesh(sphereGeometry, texturedSphereMaterial)
   const sphereInitialRotationY = -Math.PI * 0.25 + HERO_VIEW_ROTATION_Y
 
   sphere.rotation.y = sphereInitialRotationY
   sphere.renderOrder = 0
-  scene.add(sphere)
+  sphereScene.add(sphere)
 
   const textureLoader = loadContactTextures({ language })
   const environmentLoader = loadContactEnvironment({ renderer })
@@ -293,6 +346,20 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
   let wantsToRun = true
   let isDestroyed = false
   let contextLost = false
+  let environmentRenderTargetNeedsUpdate = true
+  let textRenderTargetNeedsUpdate = true
+
+  const targetPointer = new THREE.Vector2(0.5, 0.5)
+  const smoothedPointer = new THREE.Vector2(0.5, 0.5)
+  const previousPointer = new THREE.Vector2(0.5, 0.5)
+  const rawPointerVelocity = new THREE.Vector2()
+  const smoothedPointerVelocity = new THREE.Vector2()
+  const supportsPointerInteraction = window.matchMedia("(hover: hover) and (pointer: fine)").matches
+
+  let distortionStrength = 0
+  let pointerActive = false
+  let pointerListening = false
+  let needsPointerSeed = true
 
   function getLayoutName() {
     return viewport.width <= MOBILE_BREAKPOINT ? "mobile" : "desktop"
@@ -326,11 +393,13 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
 
     if (mode === "hero") {
       sphere.material = silverSphereMaterial
-      scene.environment = environmentMap
-      scene.environmentRotation.y = HERO_VIEW_ROTATION_Y
+      sphereScene.environment = environmentMap
+      sphereScene.environmentRotation.y = HERO_VIEW_ROTATION_Y
+      postProcessMaterial.uniforms.uEnvironmentOpacity.value = 1
     } else {
       sphere.material = texturedSphereMaterial
-      scene.environment = null
+      sphereScene.environment = null
+      postProcessMaterial.uniforms.uEnvironmentOpacity.value = 0
     }
 
     if (isReady && !contextLost) {
@@ -392,23 +461,28 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     texturedSphereMaterial.needsUpdate = true
 
     currentLayoutName = layoutName
+    textRenderTargetNeedsUpdate = true
   }
 
-  function applyEnvironmentBackdropLayout(frameBounds) {
+  function applyPostProcessLayout(frameBounds) {
     const frameWidth = Math.max(frameBounds.width, 1)
     const frameHeight = Math.max(frameBounds.height, 1)
     const frameRadius = Number.parseFloat(window.getComputedStyle(frame).borderTopLeftRadius) || 0
-    const position = screenToWorld(
-      frameBounds.left + frameWidth * 0.5,
-      frameBounds.top + frameHeight * 0.5,
-    )
-
-    backgroundMask.geometry.dispose()
-    backgroundMask.geometry = createRoundedFrameGeometry(frameWidth, frameHeight, frameRadius)
-    backgroundMask.position.set(position.x, position.y, 0)
+    const frameBottom = viewport.height - frameBounds.bottom
 
     backgroundCamera.aspect = frameWidth / frameHeight
     backgroundCamera.updateProjectionMatrix()
+
+    postProcessMaterial.uniforms.uResolution.value.set(viewport.width, viewport.height)
+    postProcessMaterial.uniforms.uFrameBounds.value.set(
+      frameBounds.left,
+      frameBottom,
+      frameWidth,
+      frameHeight,
+    )
+    postProcessMaterial.uniforms.uFrameRadius.value = frameRadius
+
+    environmentRenderTargetNeedsUpdate = true
   }
 
   function applyLayout() {
@@ -433,7 +507,7 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     }
 
     applyTextureSet(layoutName)
-    applyEnvironmentBackdropLayout(frameBounds)
+    applyPostProcessLayout(frameBounds)
 
     Object.entries(textPlanes).forEach(([name, plane]) => {
       const item = layout.planes[name]
@@ -469,20 +543,56 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     sphereBaseY = spherePosition.y
     sphereFloatAmplitude = layout.floatAmplitude * transform.scale
     sphere.position.y = sphereBaseY
+
+    textRenderTargetNeedsUpdate = true
+  }
+
+  function renderEnvironmentTarget() {
+    if (!environmentRenderTargetNeedsUpdate || !environmentMap) return
+
+    renderer.setRenderTarget(environmentRenderTarget)
+    renderer.clear(true, true, false)
+    renderer.render(backgroundScene, backgroundCamera)
+    renderer.setRenderTarget(null)
+
+    environmentRenderTargetNeedsUpdate = false
+  }
+
+  function renderSphereTarget() {
+    renderer.setRenderTarget(sphereRenderTarget)
+    renderer.clear(true, true, false)
+    renderer.render(sphereScene, contentCamera)
+    renderer.setRenderTarget(null)
+  }
+
+  function renderTextTarget() {
+    if (!textRenderTargetNeedsUpdate) return
+
+    renderer.setRenderTarget(textRenderTarget)
+    renderer.clear(true, true, false)
+    renderer.render(textScene, contentCamera)
+    renderer.setRenderTarget(null)
+
+    textRenderTargetNeedsUpdate = false
+  }
+
+  function renderFinalComposite() {
+    renderer.setRenderTarget(null)
+    renderer.clear(true, true, false)
+    renderer.render(postProcessScene, postProcessCamera)
   }
 
   function render() {
     if (isDestroyed || contextLost) return false
 
-    renderer.clear(true, true, true)
-
-    if (currentVisualMode === "hero" && environmentMap) {
-      renderer.render(backgroundMaskScene, camera)
-      renderer.render(backgroundScene, backgroundCamera)
-      renderer.clearDepth()
+    if (currentVisualMode === "hero") {
+      renderEnvironmentTarget()
     }
 
-    renderer.render(scene, camera)
+    renderTextTarget()
+    renderSphereTarget()
+    renderFinalComposite()
+
     return true
   }
 
@@ -492,19 +602,129 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     viewport.width = Math.max(root.clientWidth, 1)
     viewport.height = Math.max(root.clientHeight, 1)
 
+    const contentCaptureWidth = viewport.width + CONTENT_OVERSCAN * 2
+    const contentCaptureHeight = viewport.height + CONTENT_OVERSCAN * 2
+
     camera.left = viewport.width * -0.5
     camera.right = viewport.width * 0.5
     camera.top = viewport.height * 0.5
     camera.bottom = viewport.height * -0.5
     camera.updateProjectionMatrix()
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO))
+    contentCamera.left = contentCaptureWidth * -0.5
+    contentCamera.right = contentCaptureWidth * 0.5
+    contentCamera.top = contentCaptureHeight * 0.5
+    contentCamera.bottom = contentCaptureHeight * -0.5
+    contentCamera.updateProjectionMatrix()
+
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO)
+    const targetWidth = Math.max(1, Math.round(viewport.width * pixelRatio))
+    const targetHeight = Math.max(1, Math.round(viewport.height * pixelRatio))
+    const contentTargetWidth = Math.max(1, Math.round(contentCaptureWidth * pixelRatio))
+    const contentTargetHeight = Math.max(1, Math.round(contentCaptureHeight * pixelRatio))
+
+    renderer.setPixelRatio(pixelRatio)
     renderer.setSize(viewport.width, viewport.height, false)
+    environmentRenderTarget.setSize(targetWidth, targetHeight)
+    sphereRenderTarget.setSize(contentTargetWidth, contentTargetHeight)
+    textRenderTarget.setSize(contentTargetWidth, contentTargetHeight)
+
+    postProcessMaterial.uniforms.uContentViewportOffset.value.set(
+      CONTENT_OVERSCAN / contentCaptureWidth,
+      CONTENT_OVERSCAN / contentCaptureHeight,
+    )
+    postProcessMaterial.uniforms.uContentViewportScale.value.set(
+      viewport.width / contentCaptureWidth,
+      viewport.height / contentCaptureHeight,
+    )
 
     applyLayout()
 
     if (isReady && !contextLost) {
       render()
+    }
+  }
+
+  function advanceDistortion(deltaTime) {
+    const positionFactor = frameIndependentDamping(DISTORTION_CONFIG.positionDamping, deltaTime)
+
+    smoothedPointer.lerp(targetPointer, positionFactor)
+    rawPointerVelocity
+      .subVectors(smoothedPointer, previousPointer)
+      .multiplyScalar(DISTORTION_CONFIG.velocityGain / deltaTime)
+    previousPointer.copy(smoothedPointer)
+
+    const velocityFactor = frameIndependentDamping(DISTORTION_CONFIG.velocityDamping, deltaTime)
+
+    smoothedPointerVelocity.lerp(rawPointerVelocity, velocityFactor)
+
+    const pointerSpeed = smoothedPointerVelocity.length()
+    const targetStrength = pointerActive ? Math.min(pointerSpeed * 6, 1) : 0
+    const strengthDamping =
+      distortionStrength < targetStrength
+        ? DISTORTION_CONFIG.strengthRise
+        : DISTORTION_CONFIG.strengthDecay
+    const strengthFactor = frameIndependentDamping(strengthDamping, deltaTime)
+
+    distortionStrength += (targetStrength - distortionStrength) * strengthFactor
+
+    postProcessMaterial.uniforms.uTime.value = elapsedTime
+    postProcessMaterial.uniforms.uMouse.value.copy(smoothedPointer)
+    postProcessMaterial.uniforms.uVelocity.value.copy(smoothedPointerVelocity)
+    postProcessMaterial.uniforms.uStrength.value = distortionStrength
+  }
+
+  function resetPointerState() {
+    pointerActive = false
+    needsPointerSeed = true
+    rawPointerVelocity.set(0, 0)
+    smoothedPointerVelocity.set(0, 0)
+    distortionStrength = 0
+    postProcessMaterial.uniforms.uVelocity.value.set(0, 0)
+    postProcessMaterial.uniforms.uStrength.value = 0
+  }
+
+  function handlePointerMove(event) {
+    const bounds = root.getBoundingClientRect()
+
+    targetPointer.set(
+      (event.clientX - bounds.left) / bounds.width,
+      1 - (event.clientY - bounds.top) / bounds.height,
+    )
+
+    if (needsPointerSeed) {
+      smoothedPointer.copy(targetPointer)
+      previousPointer.copy(targetPointer)
+      postProcessMaterial.uniforms.uMouse.value.copy(targetPointer)
+      needsPointerSeed = false
+    }
+
+    pointerActive = true
+  }
+
+  function handlePointerLeave() {
+    pointerActive = false
+    needsPointerSeed = true
+  }
+
+  function setPointerInteraction(enabled) {
+    const next = Boolean(
+      enabled && supportsPointerInteraction && !reducedMotion && !isDestroyed && !contextLost,
+    )
+
+    if (next === pointerListening) return
+
+    pointerListening = next
+    resetPointerState()
+
+    if (next) {
+      root.addEventListener("pointerenter", handlePointerMove, { passive: true })
+      root.addEventListener("pointermove", handlePointerMove, { passive: true })
+      root.addEventListener("pointerleave", handlePointerLeave)
+    } else {
+      root.removeEventListener("pointerenter", handlePointerMove)
+      root.removeEventListener("pointermove", handlePointerMove)
+      root.removeEventListener("pointerleave", handlePointerLeave)
     }
   }
 
@@ -531,8 +751,11 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     sphere.position.y =
       sphereBaseY + Math.sin(elapsedTime * SPHERE_FLOAT_SPEED) * sphereFloatAmplitude
 
+    advanceDistortion(deltaTime || 1 / 60)
+
     if (currentVisualMode === "hero") {
-      scene.environmentRotation.y = HERO_VIEW_ROTATION_Y + elapsedTime * SPHERE_ROTATION_HERO_SPEED
+      sphereScene.environmentRotation.y =
+        HERO_VIEW_ROTATION_Y + elapsedTime * SPHERE_ROTATION_HERO_SPEED
     }
 
     try {
@@ -592,6 +815,7 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
   function handleContextLost(event) {
     event.preventDefault()
     contextLost = true
+    setPointerInteraction(false)
     stopAnimationLoop()
     root.classList.remove("is-webgl-ready")
   }
@@ -602,9 +826,12 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     contextLost = false
 
     try {
+      environmentRenderTargetNeedsUpdate = true
+      textRenderTargetNeedsUpdate = true
       resize()
       render()
       root.classList.add("is-webgl-ready")
+      setPointerInteraction(true)
 
       if (wantsToRun) {
         startAnimationLoop()
@@ -622,6 +849,7 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
   document.addEventListener("visibilitychange", handleVisibilityChange)
   canvas.addEventListener("webglcontextlost", handleContextLost)
   canvas.addEventListener("webglcontextrestored", handleContextRestored)
+  setPointerInteraction(true)
 
   resize()
 
@@ -643,9 +871,10 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
       applyLayout()
 
       await Promise.all([
-        renderer.compileAsync(backgroundMaskScene, camera),
         renderer.compileAsync(backgroundScene, backgroundCamera),
-        renderer.compileAsync(scene, camera),
+        renderer.compileAsync(sphereScene, contentCamera),
+        renderer.compileAsync(textScene, contentCamera),
+        renderer.compileAsync(postProcessScene, postProcessCamera),
       ])
 
       if (isDestroyed || contextLost) return false
@@ -683,6 +912,7 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     document.removeEventListener("visibilitychange", handleVisibilityChange)
     canvas.removeEventListener("webglcontextlost", handleContextLost)
     canvas.removeEventListener("webglcontextrestored", handleContextRestored)
+    setPointerInteraction(false)
 
     textureLoader.dispose()
     environmentLoader.dispose()
@@ -692,20 +922,24 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
       plane.material.dispose()
     })
 
-    scene.environment = null
+    sphereScene.environment = null
     backgroundMaterial.uniforms.envMap.value = null
 
     sphereGeometry.dispose()
     texturedSphereMaterial.dispose()
     silverSphereMaterial.dispose()
-    backgroundMask.geometry.dispose()
-    backgroundMaskMaterial.dispose()
     backgroundGeometry.dispose()
     backgroundMaterial.dispose()
+    environmentRenderTarget.dispose()
+    sphereRenderTarget.dispose()
+    textRenderTarget.dispose()
+    postProcessGeometry.dispose()
+    postProcessMaterial.dispose()
 
-    scene.clear()
+    sphereScene.clear()
+    textScene.clear()
     backgroundScene.clear()
-    backgroundMaskScene.clear()
+    postProcessScene.clear()
     renderer.dispose()
 
     textures = null
