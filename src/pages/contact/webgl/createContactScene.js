@@ -21,7 +21,10 @@ const DISTORTION_CONFIG = Object.freeze({
   velocityDamping: 0.15,
   strengthRise: 0.15,
   strengthDecay: 0.03,
-  sphereIdleStrength: 0.04,
+  sphereIdleStrength: {
+    desktop: 0.04,
+    mobile: 0.01,
+  },
   interactionStrength: 1,
   idleSpeed: 0.25,
   idleFrequency: [5, 20],
@@ -258,9 +261,7 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
       uEnvironmentOpacity: { value: INITIAL_VISUAL_MODE === "hero" ? 1 : 0 },
       uTime: { value: 0 },
       uIdleSpeed: { value: DISTORTION_CONFIG.idleSpeed },
-      uSphereIdleStrength: {
-        value: reducedMotion ? 0 : DISTORTION_CONFIG.sphereIdleStrength,
-      },
+      uSphereIdleStrength: { value: 0 },
       uIdleFrequency: {
         value: new THREE.Vector2(...DISTORTION_CONFIG.idleFrequency),
       },
@@ -601,6 +602,10 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
 
     viewport.width = Math.max(root.clientWidth, 1)
     viewport.height = Math.max(root.clientHeight, 1)
+
+    postProcessMaterial.uniforms.uSphereIdleStrength.value = reducedMotion
+      ? 0
+      : DISTORTION_CONFIG.sphereIdleStrength[getLayoutName()]
 
     const contentCaptureWidth = viewport.width + CONTENT_OVERSCAN * 2
     const contentCaptureHeight = viewport.height + CONTENT_OVERSCAN * 2
