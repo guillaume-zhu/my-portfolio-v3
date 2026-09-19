@@ -128,8 +128,8 @@ const homeReady = (async () => {
 
     await threeHero.ready
 
-    setupHeroScroll(threeHero)
-    setupHeroToManifestoTransition()
+    const heroScrollTrigger = setupHeroScroll(threeHero)
+    setupHeroToManifestoTransition(heroScrollTrigger)
 
     threeHero.setInteractive(false)
 
@@ -251,16 +251,18 @@ function getResponsiveFrameScaleX() {
 }
 
 function getResponsiveHeroFrameInset() {
-  return gsap.utils.clamp(8, 18, window.innerWidth * 0.025 - 8)
+  return gsap.utils.clamp(8, 16, window.innerWidth * 0.025 - 8)
 }
 
 function getResponsiveHeroFrameScaleX() {
   const viewportWidth = window.innerWidth
   const initialInset = getResponsiveHeroFrameInset()
   const initialVisibleWidth = viewportWidth - initialInset * 2
-  const historicalFinalWidth = viewportWidth * getResponsiveFrameScaleX()
+  const sharedTargetWidth = viewportWidth * getResponsiveFrameScaleX()
+  const extraSideInset = gsap.utils.clamp(8, 24, viewportWidth * 0.0125)
+  const heroTargetWidth = sharedTargetWidth - extraSideInset * 2
 
-  return historicalFinalWidth / initialVisibleWidth
+  return heroTargetWidth / initialVisibleWidth
 }
 
 // Header body interface color
@@ -876,17 +878,17 @@ function setupHeroRenderVisibility(threeHero) {
 }
 
 // Scene Hero
+function getHeroScrollDistance() {
+  const isTouchDevice = window.matchMedia("(hover: none) and (pointer: coarse)").matches
+
+  return isTouchDevice ? 2800 : 3500
+}
+
 function setupHeroScroll(threeHero) {
-  const getScrollDistance = () => {
-    const isTouchDevice = window.matchMedia("(hover: none) and (pointer: coarse)").matches
-
-    return isTouchDevice ? 2800 : 3500
-  }
-
-  ScrollTrigger.create({
+  return ScrollTrigger.create({
     trigger: ".hero-three",
     start: "top top",
-    end: () => `+=${getScrollDistance()}`,
+    end: () => `+=${getHeroScrollDistance()}`,
     scrub: true,
     pin: true,
     invalidateOnRefresh: true,
@@ -918,16 +920,21 @@ function setupHeroScroll(threeHero) {
   })
 }
 // Hero to Manifesto transition
-function setupHeroToManifestoTransition() {
+function setupHeroToManifestoTransition(heroScrollTrigger) {
+  if (!heroScrollTrigger) return
+
+  const getTransitionDistance = () => gsap.utils.clamp(500, 850, window.innerHeight * 0.85)
+
   gsap.to(".hero-three__frame", {
     scaleX: getResponsiveHeroFrameScaleX,
-    scaleY: 0.98,
-    ease: "none",
+    scaleY: 0.9,
+    ease: "power2.in",
 
     scrollTrigger: {
-      trigger: ".manifesto",
-      start: "top bottom-=250",
-      end: "top bottom-=300",
+      trigger: ".hero-three",
+      // Keep the frame untouched until the 3D scene has reached its final scroll state.
+      start: () => heroScrollTrigger.end,
+      end: () => heroScrollTrigger.end + getTransitionDistance(),
       scrub: true,
       invalidateOnRefresh: true,
       markers: false,
