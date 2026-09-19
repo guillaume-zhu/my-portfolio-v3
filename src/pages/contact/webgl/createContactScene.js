@@ -128,6 +128,7 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
   }
 
   const frame = root.querySelector(".contact__frame")
+  const emailLink = root.querySelector(".contact__email")
 
   if (!(frame instanceof HTMLElement)) {
     return null
@@ -450,6 +451,26 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
     plane.position.set(position.x, position.y, position.z)
   }
 
+  function applyEmailLinkLayout() {
+    if (!(emailLink instanceof HTMLAnchorElement)) return
+
+    const width = contactPlane.scale.x
+    const height = contactPlane.scale.y
+    const centerX = contactPlane.position.x + viewport.width * 0.5
+    const centerY = viewport.height * 0.5 - contactPlane.position.y
+
+    emailLink.style.setProperty(
+      "--contact-email-left",
+      `${centerX - width * 0.5}px`,
+    )
+    emailLink.style.setProperty(
+      "--contact-email-top",
+      `${centerY - height * 0.5}px`,
+    )
+    emailLink.style.setProperty("--contact-email-width", `${width}px`)
+    emailLink.style.setProperty("--contact-email-height", `${height}px`)
+  }
+
   function applyTextureSet(layoutName) {
     if (!textures || currentLayoutName === layoutName) return
 
@@ -532,6 +553,8 @@ export function createContactScene({ canvas, root, language = "en", reducedMotio
 
       applyPlaneLayout(plane, textures[layoutName][name], item, layout, transform, groupCenterY)
     })
+
+    applyEmailLinkLayout()
 
     const spherePosition = screenToWorld(
       transform.offsetX + layout.sphere.centerX * transform.scale,

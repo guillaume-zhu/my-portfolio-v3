@@ -161,8 +161,7 @@ body {
   outline-offset: 4px;
 }
 
-.contact.is-webgl-ready .contact__fallback > :not(.contact__email),
-.contact.is-webgl-ready .contact__email:not(:focus-visible) {
+.contact.is-webgl-ready .contact__fallback > :not(.contact__email) {
   position: fixed;
   width: 1px;
   height: 1px;
@@ -176,12 +175,35 @@ body {
 }
 
 .contact.is-webgl-ready .contact__email {
-  pointer-events: none;
+  --contact-email-hit-padding: 8px;
+
+  position: fixed;
+  top: calc(var(--contact-email-top) - var(--contact-email-hit-padding));
+  left: calc(var(--contact-email-left) - var(--contact-email-hit-padding));
+  z-index: 1;
+
+  width: calc(var(--contact-email-width) + var(--contact-email-hit-padding) * 2);
+  height: calc(var(--contact-email-height) + var(--contact-email-hit-padding) * 2);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip: auto;
+  clip-path: none;
+
+  color: transparent;
+  background: transparent;
+  border: 0;
+  white-space: nowrap;
+
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 .contact.is-webgl-ready .contact__email:focus-visible {
   position: fixed;
+  top: auto;
   left: 50%;
+  right: auto;
   bottom: max(24px, env(safe-area-inset-bottom));
   z-index: 1;
 
