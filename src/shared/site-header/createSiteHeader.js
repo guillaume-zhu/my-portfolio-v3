@@ -1,3 +1,5 @@
+export const LANGUAGE_CHANGE_REQUEST_EVENT = "portfolio:language-change-request"
+
 export function createSiteHeader(i18n = null) {
   const header = document.querySelector(".site-header")
 
@@ -73,6 +75,21 @@ export function createSiteHeader(i18n = null) {
   languageButton?.addEventListener("click", () => {
     const nextLanguage = i18n.language === "en" ? "fr" : "en"
 
-    i18n.changeLanguage(nextLanguage)
+    if (nextLanguage === i18n.language) return
+
+    const commitLanguageChange = () => i18n.changeLanguage(nextLanguage)
+    const request = new CustomEvent(LANGUAGE_CHANGE_REQUEST_EVENT, {
+      cancelable: true,
+      detail: {
+        nextLanguage,
+        commit: commitLanguageChange,
+      },
+    })
+
+    const shouldCommitImmediately = document.dispatchEvent(request)
+
+    if (shouldCommitImmediately) {
+      commitLanguageChange()
+    }
   })
 }

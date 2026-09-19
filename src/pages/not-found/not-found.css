@@ -4,6 +4,7 @@
 @import "../../shared/styles/variables.css";
 @import "../../shared/site-header/header.css";
 @import "../../shared/link-hover/link-hover.css";
+@import "../../shared/page-transition/page-transition.css";
 
 html,
 body {
