@@ -15,6 +15,21 @@
   </head>
 
   <body class="not-found-page">
+    <!-------- TRANSITION -------->
+    <script>
+      if (sessionStorage.getItem("pageTransitionPending") === "true") {
+        const storedColor = sessionStorage.getItem("pageTransitionColor")
+        const color = storedColor === "dark" ? "dark" : "cream"
+
+        const transition = document.createElement("div")
+
+        transition.classList.add("page-transition", `page-transition--${color}`)
+
+        transition.setAttribute("aria-hidden", "true")
+        document.body.prepend(transition)
+      }
+    </script>
+
     <main class="not-found">
       <div class="not-found__scene">
         <header class="site-header"></header>

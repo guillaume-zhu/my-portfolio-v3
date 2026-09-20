@@ -44,6 +44,11 @@ setHeaderCapsuleVariant("soft-white")
 
 // Home loader session
 const shouldShowHomeLoader = document.documentElement.dataset.homeLoaderState === "pending"
+
+// Scroll intent captured by the inline script in index.html
+const homeScrollIntent = window.__homeScrollIntent ?? { hash: null, offset: 0 }
+const isRestoringHomeScroll = document.documentElement.dataset.homeLoaderState === "restoring"
+
 const homeLoader = createHomeLoader({
   enabled: shouldShowHomeLoader,
   minimumDuration: 2,
@@ -104,6 +109,14 @@ setupCrossPageTransitions({
 // Restore the correct scroll state around browser cache navigation
 window.addEventListener("pagehide", () => {
   lenis.start()
+
+  // Read back on the next reload only
+  try {
+    sessionStorage.setItem("homeScrollOffset", String(Math.round(window.scrollY)))
+    sessionStorage.setItem("homeScrollTheme", document.body.dataset.interfaceColor ?? "cream")
+  } catch (error) {
+    // A missing sessionStorage only costs the restore
+  }
 })
 
 window.addEventListener("pageshow", () => {
@@ -313,7 +326,8 @@ function createSectionNavigation() {
   // ----------------------
   // 2. Initial hash
   // ----------------------
-  const initialHash = supportedHashes.has(window.location.hash) ? window.location.hash : null
+  // index.html already stripped the fragment from the URL
+  const initialHash = supportedHashes.has(homeScrollIntent.hash) ? homeScrollIntent.hash : null
 
   if (initialHash === "#projects" && !prefersReducedMotion) {
     void preloadProjectPhysicsModule().catch(() => {})
@@ -325,19 +339,6 @@ function createSectionNavigation() {
     } else if (hash === "#contact") {
       loadFooterBackground()
     }
-  }
-
-  // Prevent native scrolling before GSAP creates its pin spacing
-  if (initialHash) {
-    history.scrollRestoration = "manual"
-
-    history.replaceState(null, "", window.location.pathname + window.location.search)
-
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "auto",
-    })
   }
 
   // ----------------------
@@ -573,7 +574,20 @@ function createSectionNavigation() {
       })
     })
 
-    if (!initialHash) {
+    const initialScrollOffset = initialHash ? 0 : homeScrollIntent.offset
+
+    function finishHomeStartup() {
+      // Hand scroll restoration back to the browser, and to ScrollTrigger's snapshot
+      ScrollTrigger.clearScrollMemory("auto")
+
+      if (!isRestoringHomeScroll) return
+
+      document.documentElement.dataset.homeLoaderState = "skipped"
+    }
+
+    if (!initialHash && initialScrollOffset <= 0) {
+      finishHomeStartup()
+
       if (shouldRevealIncomingTransition) {
         pageTransition.reveal({
           mode: "circle",
@@ -583,36 +597,50 @@ function createSectionNavigation() {
       return
     }
 
-    function openInitialSection() {
+    function restoreInitialScroll() {
       // Recalculate every pin after all page resources are loaded
       ScrollTrigger.refresh()
       lenis.resize()
 
-      loadSectionBackground(initialHash)
+      if (initialHash) {
+        loadSectionBackground(initialHash)
 
-      if (initialHash === "#projects") {
-        preloadProjectImages()
-        references.ensureProjectPhysics()
+        if (initialHash === "#projects") {
+          preloadProjectImages()
+          references.ensureProjectPhysics()
+        }
       }
 
+      // One frame so the refresh above is committed to layout
       requestAnimationFrame(async () => {
-        scrollToSection(initialHash, references, {
-          immediate: true,
-          historyMode: "replace",
-        })
+        try {
+          if (initialHash) {
+            scrollToSection(initialHash, references, {
+              immediate: true,
+              historyMode: "replace",
+            })
+          } else {
+            lenis.scrollTo(initialScrollOffset, {
+              immediate: true,
+              force: true,
+            })
 
-        history.scrollRestoration = "auto"
+            ScrollTrigger.update()
+          }
+        } finally {
+          finishHomeStartup()
+        }
 
         if (shouldRevealIncomingTransition) {
-          await pageTransition.reveal()
+          await pageTransition.reveal(initialHash ? undefined : { mode: "circle" })
         }
       })
     }
 
     if (document.readyState === "complete") {
-      openInitialSection()
+      restoreInitialScroll()
     } else {
-      window.addEventListener("load", openInitialSection, {
+      window.addEventListener("load", restoreInitialScroll, {
         once: true,
       })
     }

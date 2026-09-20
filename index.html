@@ -3,18 +3,75 @@
   <head>
     <meta charset="UTF-8" />
 
-    <!-------- SHOW LOADER --------->
+    <!-------- SCROLL INTENT + LOADER STATE --------->
     <script>
       {
-        const homeLoaderSessionKey = "homeLoaderShown"
-        const shouldShowHomeLoader = sessionStorage.getItem(homeLoaderSessionKey) !== "true"
+        // Capture scroll and hash before native restoration.
+        const navigationType = performance.getEntriesByType("navigation")[0]?.type
+        const isReload = navigationType === "reload"
+
+        history.scrollRestoration = isReload ? "manual" : "auto"
+
+        const supportedHashes = [
+          "#hero",
+          "#manifesto",
+          "#parcours",
+          "#toolkit",
+          "#projects",
+          "#contact",
+        ]
+
+        const initialHash = supportedHashes.includes(location.hash) ? location.hash : null
+
+        // Strip the fragment before any element carries that id.
+        if (initialHash) {
+          history.replaceState(null, "", location.pathname + location.search)
+        }
+
+        let homeLoaderShown = false
+        let storedScroll = 0
+        let storedTheme = "cream"
+        let hasIncomingTransition = false
+
+        try {
+          homeLoaderShown = sessionStorage.getItem("homeLoaderShown") === "true"
+          storedScroll = Math.max(0, Number(sessionStorage.getItem("homeScrollOffset")) || 0)
+          storedTheme = sessionStorage.getItem("homeScrollTheme") === "dark" ? "dark" : "cream"
+          hasIncomingTransition = sessionStorage.getItem("pageTransitionPending") === "true"
+        } catch (error) {
+          // Without sessionStorage the default flow still works
+        }
+
+        const initialScroll = isReload && !initialHash ? storedScroll : 0
+
+        window.__homeScrollIntent = {
+          hash: initialHash,
+          offset: initialScroll,
+        }
+
+        const shouldShowHomeLoader = !homeLoaderShown
+        const hasScrollToRestore = initialHash !== null || initialScroll > 0
+
+        // Avoid stacking the restore cover with an incoming transition.
+        const shouldCoverRestore =
+          !shouldShowHomeLoader && hasScrollToRestore && !hasIncomingTransition
 
         document.documentElement.dataset.homeLoaderState = shouldShowHomeLoader
           ? "pending"
-          : "skipped"
+          : shouldCoverRestore
+            ? "restoring"
+            : "skipped"
+
+        if (shouldCoverRestore) {
+          document.documentElement.dataset.homeLoaderTheme = storedTheme
+        }
 
         if (shouldShowHomeLoader) {
-          sessionStorage.setItem(homeLoaderSessionKey, "true")
+          try {
+            sessionStorage.setItem("homeLoaderShown", "true")
+          } catch (error) {
+            // The loader will simply show again
+          }
         }
       }
     </script>
@@ -600,6 +657,7 @@
                         Projects
                       </a>
                       <a class="playground-link" href="/playground/">Playground</a>
+                      <a href="/contact/" class="text-link">Contact</a>
                     </div>
 
                     <div class="next-footer__group">

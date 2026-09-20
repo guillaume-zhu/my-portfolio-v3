@@ -170,7 +170,7 @@ export function createPageTransition({
     return true
   }
 
-  async function navigateTo(url, { color = DEFAULT_TRANSITION_COLOR } = {}) {
+  async function transitionTo(onCovered, { color = DEFAULT_TRANSITION_COLOR } = {}) {
     const transitionColor = setColor(color)
 
     const didCover = await cover()
@@ -180,9 +180,17 @@ export function createPageTransition({
     sessionStorage.setItem("pageTransitionPending", "true")
     sessionStorage.setItem("pageTransitionColor", transitionColor)
 
-    window.location.href = url
+    if (typeof onCovered === "function") {
+      await onCovered()
+    }
 
     return true
+  }
+
+  function navigateTo(url, options) {
+    return transitionTo(() => {
+      window.location.href = url
+    }, options)
   }
 
   function reset() {
@@ -205,6 +213,7 @@ export function createPageTransition({
     reset,
     run,
     navigateTo,
+    transitionTo,
     setColor,
   }
 }

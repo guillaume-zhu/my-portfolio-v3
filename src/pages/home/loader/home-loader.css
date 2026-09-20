@@ -19,8 +19,14 @@ html[data-home-loader-state].lenis.lenis-stopped {
   background-color: var(--color-cream);
 }
 
-html[data-home-loader-state="pending"] .home-loader {
+/* "restoring" is a flat cover: the WebGL loader stays disabled in that state */
+html[data-home-loader-state="pending"] .home-loader,
+html[data-home-loader-state="restoring"] .home-loader {
   display: block;
+}
+
+html[data-home-loader-theme="dark"] .home-loader {
+  background-color: var(--color-dark);
 }
 
 .home-loader--canvas-ready {

@@ -1,3 +1,5 @@
+import { LANGUAGE_CHANGE_REQUEST_EVENT } from "../site-header/createSiteHeader"
+
 // Detect color
 const DEFAULT_TRANSITION_COLOR = "cream"
 
@@ -8,6 +10,7 @@ const transitionColorByPath = {
   "/projects/ornate": "dark",
   "/projects/mirage": "dark",
   "/playground": "dark",
+  "/contact": "cream",
   "/mentions-legales": "dark",
 }
 
@@ -62,6 +65,61 @@ export function setupCrossPageTransitions({
 }) {
   let isNavigating = false
 
+  function cancelNavigation() {
+    isNavigating = false
+    onNavigateCancelled?.()
+  }
+
+  async function runNavigation(navigate) {
+    if (isNavigating) return false
+
+    isNavigating = true
+    onNavigateStart?.()
+
+    try {
+      const didNavigate = await navigate()
+
+      if (!didNavigate) {
+        cancelNavigation()
+      }
+
+      return didNavigate
+    } catch (error) {
+      pageTransition.reset()
+      cancelNavigation()
+
+      try {
+        sessionStorage.removeItem("pageTransitionPending")
+        sessionStorage.removeItem("pageTransitionColor")
+      } catch (storageError) {
+        console.warn("Unable to clear page transition state:", storageError)
+      }
+
+      console.error("Page transition navigation failed:", error)
+      return false
+    }
+  }
+
+  document.addEventListener(LANGUAGE_CHANGE_REQUEST_EVENT, (event) => {
+    const commitLanguageChange = event.detail?.commit
+
+    if (typeof commitLanguageChange !== "function") return
+
+    event.preventDefault()
+
+    const currentUrl = new URL(window.location.href)
+
+    void runNavigation(() =>
+      pageTransition.transitionTo(() => {
+        if (!commitLanguageChange()) {
+          throw new Error(`Unable to switch language to ${event.detail.nextLanguage}.`)
+        }
+      }, {
+        color: getTransitionColor(currentUrl),
+      }),
+    )
+  })
+
   window.addEventListener("pageshow", (event) => {
     if (!event.persisted) return
 
@@ -83,40 +141,25 @@ export function setupCrossPageTransitions({
     const targetUrl = new URL(link.href, window.location.href)
 
     if (targetUrl.origin !== window.location.origin) return
-    if (staysOnCurrentDocument(targetUrl)) return
+
+    const currentUrl = new URL(window.location.href)
+
+    if (staysOnCurrentDocument(targetUrl)) {
+      if (targetUrl.hash === currentUrl.hash) {
+        event.preventDefault()
+      }
+
+      return
+    }
 
     event.preventDefault()
 
-    if (isNavigating) return
+    const transitionColor = getTransitionColor(targetUrl)
 
-    isNavigating = true
-    onNavigateStart?.()
-
-    try {
-      const transitionColor = getTransitionColor(targetUrl)
-
-      const didNavigate = await pageTransition.navigateTo(targetUrl.href, {
+    await runNavigation(() =>
+      pageTransition.navigateTo(targetUrl.href, {
         color: transitionColor,
-      })
-
-      if (!didNavigate) {
-        isNavigating = false
-        onNavigateCancelled?.()
-      }
-    } catch (error) {
-      pageTransition.reset()
-      isNavigating = false
-
-      try {
-        sessionStorage.removeItem("pageTransitionPending")
-        sessionStorage.removeItem("pageTransitionColor")
-      } catch (storageError) {
-        console.warn("Unable to clear page transition state:", storageError)
-      }
-
-      onNavigateCancelled?.()
-
-      console.error("Page transition navigation failed:", error)
-    }
+      }),
+    )
   })
 }
