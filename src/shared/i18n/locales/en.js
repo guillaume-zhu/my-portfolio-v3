@@ -48,7 +48,7 @@ export default {
 
     footerLine1: "Open to joining",
     footerLine2: "a creative team",
-    footerLine3: "Apprenticeship · October 2026",
+    footerLine3: "Apprenticeship · November 2026",
     footerLabel: "Footer",
     legalNotice: "Legal notice",
     footerNavigationLabel: "Footer navigation",
@@ -82,12 +82,12 @@ export default {
   contact: {
     title: "Contact — Guillaume Zhu",
     description:
-      "Contact Guillaume Zhu for creative development, immersive experiences and interactive front-end work. Available for an apprenticeship in Paris from October 2026.",
+      "Contact Guillaume Zhu for creative development, immersive experiences and interactive front-end work. Available for an apprenticeship in Paris from November 2026.",
     headingLine1: "Let’s create",
     headingLine2: "something worth",
     headingLine3: "remembering",
     availability: "Available for an apprenticeship",
-    availabilityMeta: "October 2026 · Paris",
+    availabilityMeta: "November 2026 · Paris",
     servicesLabel: "Services",
     serviceCreativeDevelopment: "creative development",
     serviceImmersiveExperiences: "immersive experiences",
@@ -117,14 +117,12 @@ export default {
       viewExperience: "View the experience",
       credits: "Credits & licenses",
 
-      ellipseAlt:
-        "View of a distant cliff populated by characters integrated into the 3D scene.",
+      ellipseAlt: "View of a distant cliff populated by characters integrated into the 3D scene.",
 
       gallery1Alt: "Close-up view of a castle in the distance, resting on the water.",
       gallery2Alt: "Close-up view of a forest scene from the 3D experience.",
       gallery3Alt: "Calcifer at the center of a campfire in the 3D scene.",
-      gallery4Alt:
-        "Yubaba and Warawara in the foreground, with the cliff in the distance.",
+      gallery4Alt: "Yubaba and Warawara in the foreground, with the cliff in the distance.",
       gallery5Alt: "Haku’s dragon tail crossing the sky.",
       gallery6Alt: "Quiz interface with a reference image and multiple answer choices.",
       gallery7Alt: "Trivia panel displayed after a correct quiz answer.",
@@ -157,8 +155,7 @@ export default {
 
       gallery1Alt:
         "Main artwork for the second edition of Pulse Festival, featuring a white grid on a black background crossed by a red-and-black fluid.",
-      gallery2Alt:
-        "Poster for the first edition of Pulse Festival displayed in an urban setting.",
+      gallery2Alt: "Poster for the first edition of Pulse Festival displayed in an urban setting.",
       gallery3Alt:
         "Artist spotlight visual featuring Bours for the second edition of Pulse Festival.",
       gallery4Description:
@@ -186,8 +183,7 @@ export default {
       introDescription:
         "Preview of Maë’s portfolio: an animated navigation showcasing her projects, paired with a visual identity built around colorful gradients and a dedicated logotype.",
 
-      context1:
-        "Design and development of Maë’s portfolio, from visual direction to interactions.",
+      context1: "Design and development of Maë’s portfolio, from visual direction to interactions.",
       context2:
         "Driven by a series of GSAP animations, the site turns navigation into a narrative journey highlighting her personality, skills and projects, while providing an autonomous Webflow foundation that is easy to maintain and evolve.",
       viewPortfolio: "View the portfolio",
@@ -195,15 +191,13 @@ export default {
       ellipseAlt:
         "Glass-effect cards presenting Maë’s positioning and skills over the signature gradient of her visual identity.",
 
-      gallery1Alt:
-        "Portfolio interface showcasing the selection and presentation of a project.",
+      gallery1Alt: "Portfolio interface showcasing the selection and presentation of a project.",
       gallery2Alt: "Color gradient characteristic of Maë’s portfolio visual identity.",
       gallery3Description:
         "Animated portfolio section presenting Maë’s overall vision and areas of expertise.",
       gallery4Description:
         "Portfolio section presenting her approach through text animated with GSAP reveal effects.",
-      gallery5Alt:
-        "Project page presenting the context and approach behind the Vkard project.",
+      gallery5Alt: "Project page presenting the context and approach behind the Vkard project.",
       gallery6Alt:
         "Variation of Maë’s portfolio visual identity, combining her logotype with a colorful gradient.",
 
@@ -223,8 +217,7 @@ export default {
       introDescription:
         "Preview of Mirage’s universe: a minimal, dreamlike website where the logo transforms on hover, followed by an animated presentation of the studio’s visual projects.",
 
-      context1:
-        "Creation of Mirage, a fashion studio conceived as a space for visual exploration.",
+      context1: "Creation of Mirage, a fashion studio conceived as a space for visual exploration.",
       context2:
         "Art direction, identity, website and campaigns unfold within a minimal and dreamlike universe, from concept development to image creation, at the boundary between reality and dream.",
       viewExperience: "View the experience",
@@ -240,8 +233,7 @@ export default {
         "Website animation presenting Mirage’s philosophy, with a gradient progressively filling the text on scroll.",
       gallery4Alt:
         "Mirage campaign featuring a woman in lace inside a greenhouse filled with flowers, plants and neon lights, enveloped in a mysterious haze.",
-      gallery5Description:
-        "Website animation presenting a list of selected Mirage projects.",
+      gallery5Description: "Website animation presenting a list of selected Mirage projects.",
       gallery6Alt:
         "Mirage campaign featuring a model in a flowing red garment outdoors beneath a deep blue sky.",
       gallery7Description:
@@ -287,8 +279,7 @@ export default {
         "Animated website mockup presenting Ornate’s projects through a travelling sequence.",
       gallery8Description:
         "Variation of the animated website mockup, presenting another selection of Ornate projects through a travelling sequence.",
-      gallery9Alt:
-        "Cover and mockup of the “Case Studies 2020–2021” magazine designed for Ornate.",
+      gallery9Alt: "Cover and mockup of the “Case Studies 2020–2021” magazine designed for Ornate.",
       gallery10Alt:
         "Variation of Ornate’s 3D artwork combining a rose-gold grid, fluid material, pink ferns and the studio logotype.",
       gallery11Alt:
@@ -317,8 +308,7 @@ export default {
       motionDesignStudy2020: "Motion design study · 2020",
       webDesignStudent2026: "Web design · Student project · 2026",
       cinema4DStudy2019: "Cinema 4D study · 2019",
-      gameInterfaceDesignStudent2026:
-        "Game & interface design · Student project · 2026",
+      gameInterfaceDesignStudent2026: "Game & interface design · Student project · 2026",
       dataVisualization3D2026: "3D data visualization · 2026",
       interactiveGameStudent2026: "Interactive game · Student project · 2026",
       webDesignStudent2019: "Web design · Student project · 2019",
@@ -363,7 +353,8 @@ export default {
     domainDescription: "The website’s domain name is registered with OVHcloud.",
 
     propertyTitle: "Intellectual Property",
-    propertyIntro: "The content presented on this website is protected by intellectual property law.",
+    propertyIntro:
+      "The content presented on this website is protected by intellectual property law.",
     websiteContentTitle: "Website Content",
     websiteContentParagraph1:
       "Unless otherwise stated, all content featured on this website is the property of Guillaume Zhu, including texts, interfaces, animations, graphic elements, art direction, integrations and front-end development.",
@@ -433,8 +424,7 @@ export default {
       musicTitle: "Music & Sound",
       etherealDescription: "Ambient music featured in the experience.",
       seaCliffMeta: "BBC Sound Effects · Reference NHU05067080",
-      seaCliffLegal:
-        "Used as part of an experimental, free and non-commercial student project.",
+      seaCliffLegal: "Used as part of an experimental, free and non-commercial student project.",
 
       typographyTitle: "Typography",
       typographyDescription: "Primary typeface used throughout the experience interface.",
