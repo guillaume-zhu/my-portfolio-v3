@@ -17,8 +17,7 @@ export default {
   home: {
     description:
       "Portfolio de Guillaume Zhu, Front Creative Developer & Art Director, spécialisé en expériences web immersives, interfaces interactives et direction artistique.",
-    imageAlt:
-      "Logo 3D de Guillaume Zhu avec les mentions Front Creative Developer et Art Director",
+    imageAlt: "Logo 3D de Guillaume Zhu avec les mentions Front Creative Developer et Art Director",
     loaderLabel: "Chargement de la page",
 
     sectionNavigationLabel: "Navigation entre les sections",
@@ -48,7 +47,7 @@ export default {
 
     footerLine1: "Disponible pour rejoindre",
     footerLine2: "une équipe créative",
-    footerLine3: "Alternance · octobre 2026",
+    footerLine3: "Alternance · novembre 2026",
     footerLabel: "Pied de page",
     legalNotice: "Mentions légales",
     footerNavigationLabel: "Navigation du pied de page",
@@ -82,12 +81,12 @@ export default {
   contact: {
     title: "Contact — Guillaume Zhu",
     description:
-      "Contactez Guillaume Zhu pour des projets de creative development, d’expériences immersives et d’interfaces interactives. Disponible en alternance à Paris à partir d’octobre 2026.",
+      "Contactez Guillaume Zhu pour des projets de creative development, d’expériences immersives et d’interfaces interactives. Disponible en alternance à Paris à partir de novembre 2026.",
     headingLine1: "Créons",
     headingLine2: "des expériences",
     headingLine3: "qui se vivent",
     availability: "Disponible en alternance",
-    availabilityMeta: "Octobre 2026 · Paris",
+    availabilityMeta: "Novembre 2026 · Paris",
     servicesLabel: "Services",
     serviceCreativeDevelopment: "creative development",
     serviceImmersiveExperiences: "expériences immersives",
@@ -117,17 +116,14 @@ export default {
       viewExperience: "Voir l’expérience",
       credits: "Crédits & licences",
 
-      ellipseAlt:
-        "Vue d’une falaise au loin, peuplée de personnages intégrés à la scène 3D.",
+      ellipseAlt: "Vue d’une falaise au loin, peuplée de personnages intégrés à la scène 3D.",
 
       gallery1Alt: "Vue rapprochée d’un château au loin, posé sur l’eau.",
       gallery2Alt: "Vue rapprochée d’une scène forestière de l’expérience 3D.",
       gallery3Alt: "Calcifer au centre d’un feu de camp dans la scène 3D.",
-      gallery4Alt:
-        "Yubaba et des Warawara au premier plan, avec la falaise en arrière-plan.",
+      gallery4Alt: "Yubaba et des Warawara au premier plan, avec la falaise en arrière-plan.",
       gallery5Alt: "Queue de Haku sous sa forme de dragon traversant le ciel.",
-      gallery6Alt:
-        "Interface de quiz avec une image de référence et plusieurs réponses proposées.",
+      gallery6Alt: "Interface de quiz avec une image de référence et plusieurs réponses proposées.",
       gallery7Alt: "Interface d’anecdote affichée après une bonne réponse au quiz.",
       gallery8Alt:
         "Vue rapprochée de la table de pique-nique dans l’herbe, entourée de références aux films de Miyazaki.",
@@ -318,8 +314,7 @@ export default {
       motionDesignStudy2020: "Étude de motion design · 2020",
       webDesignStudent2026: "Web design · Projet étudiant · 2026",
       cinema4DStudy2019: "Étude Cinema 4D · 2019",
-      gameInterfaceDesignStudent2026:
-        "Game design & interface design · Projet étudiant · 2026",
+      gameInterfaceDesignStudent2026: "Game design & interface design · Projet étudiant · 2026",
       dataVisualization3D2026: "Visualisation de données 3D · 2026",
       interactiveGameStudent2026: "Jeu interactif · Projet étudiant · 2026",
       webDesignStudent2019: "Web design · Projet étudiant · 2019",
@@ -334,8 +329,7 @@ export default {
     title: "Mentions légales | Guillaume Zhu",
     description:
       "Mentions légales du portfolio de Guillaume Zhu : édition, hébergement, propriété intellectuelle et données personnelles.",
-    imageAlt:
-      "Logo 3D de Guillaume Zhu avec les mentions Front Creative Developer et Art Director",
+    imageAlt: "Logo 3D de Guillaume Zhu avec les mentions Front Creative Developer et Art Director",
     backHome: "Retour à l’accueil",
 
     heroTitleLine1: "Mentions",
@@ -438,8 +432,7 @@ export default {
         "Utilisé dans le cadre d’un projet étudiant expérimental, gratuit et non commercial.",
 
       typographyTitle: "Typographie",
-      typographyDescription:
-        "Typographie principale utilisée dans l’interface de l’expérience.",
+      typographyDescription: "Typographie principale utilisée dans l’interface de l’expérience.",
 
       filmDataTitle: "Données cinématographiques",
       filmDataDescription:
